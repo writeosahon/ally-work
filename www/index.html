@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- style libraries for the app (onsen ui) -->
+    <link rel="stylesheet" href="css/onsenui.min.css">
+    <link rel="stylesheet" href="css/onsen-css-components.css">
+    <!-- style libraries for font icons -->
+    <link rel="stylesheet" href="css/font_awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/ionicons/css/ionicons.min.css">
+    <link rel="stylesheet" href="css/material-design-iconic-font/css/material-design-iconic-font.min.css">
+
+    <!-- app custom font icons -->
+    <!--<link rel="stylesheet" href="css/edoae-font-icons/css/edoae-font-style.css">-->
+
+    <!--- style library used for materialize-css -->
+    <!-- <link rel="stylesheet" href="css/materialize.css"> -->
+
+    <!-- custom style library for app -->
+    <!--<link rel="stylesheet" href="css/app-custom-styles.css">-->
+
+    <meta charset="UTF-8">
+    <title>ALLY</title>
+
+    <!-- Content-Security-Policy tag -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' wss: ws: data: http: https: blob: heritagechurchapp: gap 'unsafe-inline' 'unsafe-eval'">
+
+    <!-- polyfil for ecma script 2015 -->
+    <script src="js/polyfill.min.js"></script>
+
+    <!-- jquery library -->
+    <script src="js/jquery-2.1.4.min.js"></script>
+
+    <!-- kendo libraries -->
+    <script src="js/kendo.core.min.js"></script>
+
+    <!-- script library for onsen ui -->
+    <script src="js/onsenui-2.7.0.min.js"></script>
+
+    <!-- script library for materialize-css -->
+    <!--<script src="js/materialize-0.98.2.min.js"></script>-->
+
+    <!-- hybrid script libraries for intel xdk and cordova -->
+    <script src="cordova.js"></script>
+
+    <!-- app script -->
+    <script src="js/compiled-js/base-compiled.js"></script>
+    <script src="js/compiled-js/controller-compiled.js"></script>
+    <script src="js/compiled-js/model-compiled.js"></script>
+
+    <!-- special script for triggering the intel xdk special device ready event i.e. "app.Ready" -->
+    <script src="xdk/init-dev.js"></script>
+
+</head>
+<body>
+
+<!-- splitter container housing the app -->
+<ons-splitter>
+    <ons-splitter-side id="side-menu" side="left" collapse width="100px">
+        <ons-page id="side-menu-page">
+            <ons-toolbar modifier="noshadow" style="background-color: #1b5e20">
+            </ons-toolbar>
+            <div class="row" style="background-color: #1b5e20">
+                <div class="col s12 waves-effect waves-light"
+                     style="text-align: center; color: #eeff41; border-bottom: solid 1px lightgray;
+                     padding-top: 0.5em;"
+                     onclick="utopiasoftware.edoae.controller.sideMenuViewModel.sideMenuListClicked('events schedule')">
+                    <ons-icon icon="md-edoae-icon-calendar-multiple"
+                              size="20px"></ons-icon>
+                    <span style="display: block; font-size: 0.7em;">
+                        Events Schedule
+                    </span>
+                </div>
+
+                <div class="col s12 waves-effect waves-light"
+                     style="text-align: center; color: #eeff41; border-bottom: solid 1px lightgray;
+                padding-top: 0.5em;"
+                     onclick="utopiasoftware.edoae.controller.sideMenuViewModel.sideMenuListClicked('hotels')">
+                    <ons-icon icon="md-city-alt"
+                              size="20px"></ons-icon>
+                    <span style="display: block; font-size: 0.7em;">
+                        Hotels
+                    </span>
+                </div>
+
+
+            </div>
+        </ons-page>
+    </ons-splitter-side>
+    <ons-splitter-content id="splitter-content"></ons-splitter-content>
+</ons-splitter>
+
+
+<!-- app-main navigator template page -->
+<ons-template id="app-main-template">
+    <!-- app-main navigator -->
+    <ons-navigator id="app-main-navigator" page="main-menu-page.html"></ons-navigator>
+</ons-template>
+
+<!-- loader modal -->
+<ons-modal id="loader-modal" direction="up">
+    <div style="text-align: center">
+        <ons-progress-circular indeterminate></ons-progress-circular>
+    </div>
+    <div id="loader-modal-message" style="text-align: center"></div>
+</ons-modal>
+
+</body>
+</html>
