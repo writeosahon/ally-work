@@ -1,0 +1,33 @@
+
+/** STYLE FOR THE ONBOARDING PAGE BEGINS **/
+#onboarding-carousel ons-carousel-item.first { /* style for onboarding slides/carousel item 1 */
+    background-image: linear-gradient(45deg, rgba(61,180,112,0.3) 0%, rgba(15,255,255,0.2) 100%),
+    url('app-images/sign-in-background.jpg');
+    background-repeat: no-repeat;
+    background-size: contain, cover;
+}
+#onboarding-carousel ons-carousel-item.second { /* style for onboarding slides/carousel item 2 */
+    background-image: linear-gradient(45deg, rgba(61,180,112,0.3) 0%, rgba(15,255,255,0.2) 100%),
+    url('app-images/sign-in-background-2.jpg');
+    background-repeat: no-repeat;
+    background-size: contain, cover;
+}
+#onboarding-carousel ons-carousel-item.third { /* style for onboarding slides/carousel item 3 */
+    background-image: linear-gradient(45deg, rgba(61,180,112,0.3) 0%, rgba(15,255,255,0.2) 100%),
+    url('app-images/sign-in-background-3.jpg');
+    background-repeat: no-repeat;
+    background-size: contain, 100% 100%;
+}
+#onboarding-page .carousel-counter { /* style for onboarding/carousel slides counter */
+    height: 6px ;
+    width: 6px !important;
+    margin-right: 6px;
+    background-color: transparent;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    display: inline-block;
+}
+#onboarding-page .carousel-counter.active { /* style for onboarding/carousel slides active counter */
+    background-color: #ffffff;
+}
+

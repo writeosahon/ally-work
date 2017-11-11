@@ -1,0 +1,45 @@
+<ons-page id="onboarding-page">
+    <ons-carousel id="onboarding-carousel" fullscreen direction="horizontal" swipeable auto-scroll auto-scroll-ratio="0.1"
+                   item-width="100%">
+        <ons-carousel-item class="first">
+            <div style="width: 100%; text-align: center; margin-top: 1em;">
+                <img src="css/app-images/logo1-mini.jpg" style="width: 4em; height: 4em;">
+            </div>
+            <div style="width: 100%; text-align: center; color: #ffffff; margin-top: 2em;">
+                <h3>You've got dreams?</h3>
+                <span style="font-weight: bold">We're here to make it happen</span>
+            </div>
+        </ons-carousel-item>
+        <ons-carousel-item class="second">
+            <div style="width: 100%; text-align: center; margin-top: 1em;">
+                <img src="css/app-images/logo1-mini.jpg" style="width: 4em; height: 4em;">
+            </div>
+            <div style="width: 100%; text-align: center; color: #ffffff; margin-top: 2em;">
+                <h3>ALLY</h3>
+                <span style="font-weight: bold">free, convenient and secure cashless transactions</span>
+            </div>
+        </ons-carousel-item >
+        <ons-carousel-item class="third">
+            <div style="width: 100%; text-align: center; margin-top: 1em;">
+                <img src="css/app-images/logo1-mini.jpg" style="width: 4em; height: 4em;">
+            </div>
+            <div style="width: 100%; text-align: center; color: #ffffff; margin-top: 2em;">
+                <h3>Out of cash?</h3>
+                <span style="font-weight: bold">pay a merchant directly from your bank account or wallet using ALLY</span>
+            </div>
+        </ons-carousel-item>
+    </ons-carousel>
+
+    <!-- container holds the fixed content at the bottom of the page -->
+    <div style="position: fixed; width: 80%; bottom: 6px; margin-left: 10%; margin-right: 10%">
+        <div style="text-align: center; width: 100%; margin-bottom: 1.5em;"> <!-- container holds the carousel counter -->
+            <span class="carousel-counter active"></span>
+            <span class="carousel-counter"></span>
+            <span class="carousel-counter"></span>
+        </div>
+        <ons-button disable-auto-styling modifier="large"
+                    style="background-color: #3db470; color: #ffffff; margin-bottom: 15px;">Sign Up</ons-button>
+        <ons-button disable-auto-styling modifier="large outline"
+                    style="color: #ffffff; border-color: #ffffff;">Login</ons-button>
+    </div>
+</ons-page>
