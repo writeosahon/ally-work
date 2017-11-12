@@ -30,4 +30,16 @@
 #onboarding-page .carousel-counter.active { /* style for onboarding/carousel slides active counter */
     background-color: #ffffff;
 }
+/** STYLE FOR THE ONBOARDING PAGE ENDS **/
 
+
+/** STYLE FOR THE SIGNUP PAGE BEGINS **/
+#signup-page .page--material__background {
+    background-image: linear-gradient(0deg, rgba(255, 255, 255,0.95) 0%, rgba(255, 255, 255,0.95) 100%),
+    url('app-images/logo1.jpg');
+    background-repeat: repeat;
+    background-size: contain, 50% 50%;
+}
+#signup-page ons-list, #signup-page ons-list-item {
+    background-color: transparent;
+}

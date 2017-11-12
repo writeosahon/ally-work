@@ -2870,7 +2870,7 @@ h4, h5, h6 {
   width: 22px;
   height: 22px;
   background: transparent;
-  border: 1px solid #c7c7cd;
+  border: 2px solid darkgray;
   border-radius: 22px;
   left: 0;
 }
@@ -4689,7 +4689,7 @@ h4, h5, h6 {
   font-family: 'Roboto', 'Noto', sans-serif;
   -webkit-font-smoothing: antialiased;
   font-weight: 400;
-  color: #212121;
+  color: green;
   background-image: -webkit-linear-gradient(bottom, transparent 1px, #afafaf 1px);
   background-image: linear-gradient(to top, transparent 1px, #afafaf 1px);
   background-size: 100% 2px;
@@ -4718,7 +4718,7 @@ h4, h5, h6 {
   pointer-events: none;
 }
 .text-input--material__label--active {
-  color: #3d5afe;
+  color: green;
   -webkit-transform: translate(0, -75%) scale(0.75);
           transform: translate(0, -75%) scale(0.75);
   -webkit-transform-origin: left top;
@@ -4729,9 +4729,9 @@ h4, h5, h6 {
   transition: transform 0.1s ease-in, color 0.1s ease-in, -webkit-transform 0.1s ease-in;
 }
 .text-input--material:focus {
-  background-image: -webkit-linear-gradient(#3d5afe, #3d5afe),
+  background-image: -webkit-linear-gradient(green, green),
     -webkit-linear-gradient(bottom, transparent 1px, #afafaf 1px);
-  background-image: linear-gradient(#3d5afe, #3d5afe),
+  background-image: linear-gradient(green, green),
     linear-gradient(to top, transparent 1px, #afafaf 1px);
   -webkit-animation: material-text-input-animate 0.3s forwards;
           animation: material-text-input-animate 0.3s forwards;
@@ -5694,7 +5694,7 @@ h4, h5, h6 {
 }
 .progress-bar--material__primary,
 .progress-bar--material__secondary {
-  background-color: #37474f;
+  background-color: #3db470;
   border-radius: 0;
 }
 .progress-bar--material__secondary {
@@ -5702,11 +5702,11 @@ h4, h5, h6 {
   z-index: 0;
 }
 .progress-bar--material.progress-bar--indeterminate:before { /* FIXME */
-  background-color: #37474f;
+  background-color: #3db470;
   border-radius: 0;
 }
 .progress-bar--material.progress-bar--indeterminate:after { /* FIXME */
-  background-color: #37474f;
+  background-color: #3db470;
   border-radius: 0;
 }
 /*~
@@ -5853,7 +5853,7 @@ h4, h5, h6 {
   stroke: transparent;
 }
 .progress-circular--material__primary {
-  stroke: #37474f;
+  stroke: #3db470;
 }
 .progress-circular--material__secondary {
   stroke: #548ba7;

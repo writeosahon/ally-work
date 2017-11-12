@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Created by UTOPIA SOFTWARE on 3/11/2017.
  */
@@ -11,7 +13,7 @@
  **/
 
 var utopiasoftware = {
-  heritage: {}
+  ally: {}
 };;
 
 //# sourceMappingURL=base-compiled.js.map

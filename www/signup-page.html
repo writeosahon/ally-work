@@ -1,0 +1,80 @@
+<!-- signup page -->
+<ons-page id="signup-page">
+    <ons-toolbar>
+        <div class="left">
+            <ons-toolbar-button onclick="$('#onboarding-navigator').get(0).popPage({});">
+                <ons-icon icon="md-long-arrow-left"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+        <div class="center"><img src="css/app-images/logo1-mini.jpg" style="height: 45px; margin-top: 5px;"> Sign Up</div>
+        </ons-toolbar>
+
+    <!-- signup form -->
+    <form id="signup-form" autocomplete="off" data-parsley-inputs="ons-input,textarea,ons-select"
+          data-parsley-excluded="ons-input[type=button], ons-input[type=submit],
+                              ons-input[type=reset], ons-input[type=hidden], [disabled], :hidden, readonly" style="display: block;">
+
+        <ons-list style="margin-top: 1em">
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-account-box" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <ons-input id="signup-firstname" type="text" placeholder="First Name" float modifier="transparent" style="width: 80%"></ons-input>
+                </div>
+            </ons-list-item>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-assignment-account" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <ons-input id="signup-lastname" type="text" placeholder="Last Name" float modifier="transparent" style="width: 80%"></ons-input>
+                </div>
+            </ons-list-item>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-account-box-phone" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <ons-input id="signup-phone-number" type="tel" placeholder="Your Phone Number" float modifier="transparent"
+                               style="width: 70%"></ons-input>
+                </div>
+            </ons-list-item>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                </div>
+                <div class="center">
+                    <ons-checkbox id="signup-verify-phone" input-id="signup-verify-phone-alt" value="checked" disable-auto-styling></ons-checkbox>
+                    <label for="signup-verify-phone-alt">&nbsp;Verify Phone Number</label>
+                </div>
+            </ons-list-item>
+
+            <ons-list-item modifier="nodivider">
+            <div class="left">
+                <ons-icon icon="md-lock" class="list-item__icon" fixed-width size="28px"></ons-icon>
+            </div>
+            <div class="center">
+                <ons-input id="signup-secure-pin" type="number" placeholder="Create Secure PIN" float modifier="transparent"
+                           style="width: 65%"></ons-input>
+                <ons-button modifier="quiet"
+                            style="color: #3db470; margin-left: 1.5em;"
+                            onclick="utopiasoftware.ally.controller.onboardingPageViewModel.signupButtonClicked()">
+                    <ons-icon icon="md-eye" size="21px"></ons-icon>
+                </ons-button>
+            </div>
+            </ons-list-item>
+
+        </ons-list>
+    </form>
+
+    <ons-bottom-toolbar modifier="transparent" style="height: 60px !important;">
+        <div style="width: 50%; margin-left: 25%; margin-right: 25%; padding-bottom: 3px;">
+            <ons-button disable-auto-styling modifier="large"
+                        style="background-color: #3db470; color: #ffffff; border-radius: 21px;"
+                        onclick="utopiasoftware.ally.controller.onboardingPageViewModel.signupButtonClicked()">Sign Up</ons-button>
+        </div>
+    </ons-bottom-toolbar>
+</ons-page>

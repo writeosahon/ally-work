@@ -7,13 +7,13 @@
 /**
  * file defines all View-Models, Controllers and Event Listeners used by the app
  *
- * The 'utopiasoftware.heritage' namespace has being defined in the base js file.
+ * The 'utopiasoftware.ally' namespace has being defined in the base js file.
  * The author uses the terms 'method' and function interchangeably; likewise the terms 'attribute' and 'property' are
  * also used interchangeably
  */
 
 // define the controller namespace
-utopiasoftware.heritage.controller = {
+utopiasoftware.ally.controller = {
 
     /**
      * method is used to handle the special event created by the intel xdk developer library. The special event (app.Ready)
@@ -28,7 +28,7 @@ utopiasoftware.heritage.controller = {
                 // does nothing for now!!
             });
 
-            if (utopiasoftware.heritage.model.isAppReady === false) {
+            if (utopiasoftware.ally.model.isAppReady === false) {
                 // if app has not completed loading
                 // displaying prepping message
                 $('#loader-modal-message').html("Loading App...");
@@ -97,13 +97,13 @@ utopiasoftware.heritage.controller = {
             return;
         }).then(function () {
             // notify the app that the app has been successfully initialised and is ready for further execution (set app ready flag to true)
-            utopiasoftware.heritage.model.isAppReady = true;
+            utopiasoftware.ally.model.isAppReady = true;
             // hide the splash screen
             navigator.splashscreen.hide();
         }).catch(function (err) {
 
             // notify the app that the app has been successfully initialised and is ready for further execution (set app ready flag to true)
-            utopiasoftware.heritage.model.isAppReady = true;
+            utopiasoftware.ally.model.isAppReady = true;
             // hide the splash screen
             navigator.splashscreen.hide();
 
@@ -179,7 +179,7 @@ utopiasoftware.heritage.controller = {
             //function is used to initialise the page if the app is fully ready for execution
             function loadPageOnAppReady() {
                 // check to see if onsen is ready and if all app loading has been completed
-                if (!ons.isReady() || utopiasoftware.heritage.model.isAppReady === false) {
+                if (!ons.isReady() || utopiasoftware.ally.model.isAppReady === false) {
                     setTimeout(loadPageOnAppReady, 500); // call this function again after half a second
                     return;
                 }
@@ -308,7 +308,7 @@ utopiasoftware.heritage.controller = {
             //function is used to initialise the page if the app is fully ready for execution
             function loadPageOnAppReady() {
                 // check to see if onsen is ready and if all app loading has been completed
-                if (!ons.isReady() || utopiasoftware.heritage.model.isAppReady === false) {
+                if (!ons.isReady() || utopiasoftware.ally.model.isAppReady === false) {
                     setTimeout(loadPageOnAppReady, 500); // call this function again after half a second
                     return;
                 }
@@ -346,29 +346,15 @@ utopiasoftware.heritage.controller = {
         /**
          * method is used to listen for click events of the main menu items
          *
-         * @param label
          */
-        mainMenuButtonsClicked: function mainMenuButtonsClicked(label) {
+        signupButtonClicked: function signupButtonClicked() {
 
-            if (label == "events schedule") {
-                // 'events schedule' button was clicked
+            $('#onboarding-navigator').get(0).pushPage("signup-page.html", {}); // navigate to the signup page
 
-                $('#app-main-navigator').get(0).pushPage("events-schedule-page.html", {}); // navigate to the events schedule page
-
-                return;
-            }
-
-            if (label == "hotels") {
-                // intro button was clicked
-
-                $('#app-main-navigator').get(0).pushPage("hotels-page.html", {}); // navigate to the page
-
-                return;
-            }
         },
 
         /**
-         * method is used to track changes on the tabbar tabs
+         * method is used to track changes on the carousel slides
          * @param event
          */
         carouselPostChange: function carouselPostChange(event) {

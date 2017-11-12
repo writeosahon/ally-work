@@ -11,6 +11,6 @@
  **/
 
 var utopiasoftware = {
-    heritage : {
+    ally : {
     }
 };;

@@ -99,8 +99,8 @@
   --material-radio-button-active-color: #37474f;
   --material-radio-button-inactive-color: #717171;
   --material-radio-button-disabled-color: #afafaf;
-  --material-text-input-text-color: #212121;
-  --material-text-input-active-color: #3d5afe;
+  --material-text-input-text-color: green;
+  --material-text-input-active-color: green;
   --material-text-input-inactive-color: #afafaf;
   --material-search-background-color: #fafafa;
   --material-dialog-background-color: #ffffff;
@@ -109,7 +109,7 @@
   --material-alert-dialog-title-color: #31313a;
   --material-alert-dialog-content-color: rgba(49, 49, 58, 0.85);
   --material-alert-dialog-button-color: #37474f;
-  --material-progress-bar-primary-color: #37474f;
+  --material-progress-bar-primary-color: #3db470;
   --material-progress-bar-secondary-color: #548ba7;
   --material-progress-bar-background-color: transparent;
   --material-progress-circle-primary-color: var(--material-progress-bar-primary-color);
