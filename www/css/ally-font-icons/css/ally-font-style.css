@@ -1,0 +1,191 @@
+/** CUSTOM FONT ICONS FOR APP **/
+@font-face {
+  font-family: 'ally-font-icons';
+  src: url('../fonts/ally-font.woff') format('woff'), url('../fonts/ally-font.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+.ally-icon {
+  display: inline-block;
+  font: normal normal normal 14px/1 'ally-font-icons';
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.ally-icon-hc-lg {
+  font-size: 1.33333333em;
+  line-height: 0.75em;
+  vertical-align: -15%;
+}
+.ally-icon-hc-2x {
+  font-size: 2em;
+}
+.ally-icon-hc-3x {
+  font-size: 3em;
+}
+.ally-icon-hc-4x {
+  font-size: 4em;
+}
+.ally-icon-hc-5x {
+  font-size: 5em;
+}
+.ally-icon-hc-fw {
+  width: 1.28571429em;
+  text-align: center;
+}
+.ally-icon-hc-ul {
+  padding-left: 0;
+  margin-left: 2.14285714em;
+  list-style-type: none;
+}
+.ally-icon-hc-ul > li {
+  position: relative;
+}
+.ally-icon-hc-li {
+  position: absolute;
+  left: -2.14285714em;
+  width: 2.14285714em;
+  top: 0.14285714em;
+  text-align: center;
+}
+.ally-icon-hc-li.ally-icon-hc-lg {
+  left: -1.85714286em;
+}
+.ally-icon-hc-border {
+  padding: .1em .25em;
+  border: solid 0.1em #9e9e9e;
+  border-radius: 2px;
+}
+.ally-icon-hc-border-circle {
+  padding: .1em .25em;
+  border: solid 0.1em #9e9e9e;
+  border-radius: 50%;
+}
+.ally-icon.pull-left {
+  float: left;
+  margin-right: .15em;
+}
+.ally-icon.pull-right {
+  float: right;
+  margin-left: .15em;
+}
+.ally-icon-hc-spin {
+  -webkit-animation: ally-spin 1.5s infinite linear;
+  animation: ally-spin 1.5s infinite linear;
+}
+.ally-icon-hc-spin-reverse {
+  -webkit-animation: ally-spin-reverse 1.5s infinite linear;
+  animation: ally-spin-reverse 1.5s infinite linear;
+}
+@-webkit-keyframes ally-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}
+@keyframes ally-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}
+@-webkit-keyframes ally-spin-reverse {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(-359deg);
+    transform: rotate(-359deg);
+  }
+}
+@keyframes ally-spin-reverse {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(-359deg);
+    transform: rotate(-359deg);
+  }
+}
+.ally-icon-hc-rotate-90 {
+  -webkit-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+.ally-icon-hc-rotate-180 {
+  -webkit-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+.ally-icon-hc-rotate-270 {
+  -webkit-transform: rotate(270deg);
+  -ms-transform: rotate(270deg);
+  transform: rotate(270deg);
+}
+.ally-icon-hc-flip-horizontal {
+  -webkit-transform: scale(-1, 1);
+  -ms-transform: scale(-1, 1);
+  transform: scale(-1, 1);
+}
+.ally-icon-hc-flip-vertical {
+  -webkit-transform: scale(1, -1);
+  -ms-transform: scale(1, -1);
+  transform: scale(1, -1);
+}
+.ally-icon-hc-stack {
+  position: relative;
+  display: inline-block;
+  width: 2em;
+  height: 2em;
+  line-height: 2em;
+  vertical-align: middle;
+}
+.ally-icon-hc-stack-1x,
+.ally-icon-hc-stack-2x {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  text-align: center;
+}
+.ally-icon-hc-stack-1x {
+  line-height: inherit;
+}
+.ally-icon-hc-stack-2x {
+  font-size: 2em;
+}
+.ally-icon-hc-inverse {
+  color: #ffffff;
+}
+
+/** DEFINE FONT ICONS **/
+.zmdi-ally-icon-cash:before {
+  display: inline-block;
+  font: normal normal normal 14px/1 'ally-font-icons';
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  content: '\e900';
+}
+.zmdi-ally-icon-wallet:before {
+  display: inline-block;
+  font: normal normal normal 14px/1 'ally-font-icons';
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  content: '\e901';
+}

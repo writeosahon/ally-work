@@ -1,0 +1,71 @@
+<!-- login page -->
+<ons-page id="login-page">
+    <ons-toolbar>
+        <div class="left">
+            <ons-toolbar-button
+                    onclick="$('ons-splitter').get(0).content.load('onboarding-template');">
+                <ons-icon icon="md-long-arrow-left"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+        <div class="center" style="text-align: center">Log In</div>
+        <div class="right">
+        </div>
+    </ons-toolbar>
+    <div style="position: relative; width: 100%; height: 100%; top: 0; bottom: 0; display: flex;
+            flex-direction: column; flex-wrap: nowrap; justify-content: space-around; align-items: center">
+        <div style="background-color: transparent; border-radius: 1em; min-height: 40%; width: 80%;
+                flex-basis: auto">
+            <form id="login-form" autocomplete="off" data-parsley-inputs="ons-input,textarea,select"
+                  data-parsley-excluded="ons-input[type=button], ons-input[type=submit],
+                              ons-input[type=reset], ons-input[type=hidden], [disabled], :hidden">
+                <ons-row style="margin-bottom: 2em;">
+                    <ons-col style="text-align: center;">
+                        <img src="css/app-images/logo2-mini.jpg" style="width: 6em; height: 6em;">
+                    </ons-col>
+                </ons-row>
+                <ons-row vertical-align="top" style="margin-bottom: 1em; text-align: center;">
+                    <ons-col width="100%">
+                        <ons-icon icon="md-account-circle" size="28px" style="color: #000000; margin-right: 0.2em;"></ons-icon>
+                        <ons-input id="login-phone-number" type="tel" style="width: 80%" required
+                                   modifier="ally-login" placeholder="Phone Number"
+                                   pattern="((0[1-9]{1}[0-9]{9}|\+234[1-9]{1}[0-9]{9})|\+[1-9]{1}[0-9]{4,})" required float
+                                   data-parsley-required-message="your phone number is required"
+                                   data-parsley-pattern-message="incorrect phone number format. phone number must be in international format (starting with '+')"
+                                   data-parsley-type-message="incorrect phone number format. phone number must be in international format (starting with '+')"
+                                   class="hint--top"></ons-input>
+                    </ons-col>
+                </ons-row>
+                <ons-row style="margin-bottom: 2.2em; text-align: center;">
+                    <ons-col width="100%">
+                        <ons-icon icon="md-lock" size="28px" style="color: #000000; margin-right: 0.2em;"></ons-icon>
+                        <ons-input id="login-pin" type="number" style="width: 80%" required
+                                   modifier="ally-login" data-parsley-type="digits"
+                                   data-parsley-minlength="4"
+                                   data-parsley-maxlength="8"
+                                   placeholder="Secure PIN" float
+                                   data-parsley-required-message="your PIN is required"
+                                   data-parsley-type-message="your PIN must contain only numbers"
+                                   data-parsley-minlength-message="your PIN must be at least 4 numbers"
+                                   data-parsley-maxlength-message="your PIN cannot be more than 8 numbers"
+                                   class="hint--bottom"></ons-input>
+                    </ons-col>
+                </ons-row>
+                <ons-row style="margin-bottom: 2.2em;">
+                    <ons-col style="text-align: center">
+                        <ons-button id="login-signin" disable-auto-styling modifier="large"
+                                    onclick="$('ons-splitter').get(0).content.load('app-main-template');">
+                            Log In
+                        </ons-button>
+                    </ons-col>
+                </ons-row>
+                <ons-row style="margin-bottom: 1em;">
+                    <ons-col style="text-align: center">
+                        <ons-button modifier="quiet" style="text-transform: lowercase; color: #000000"
+                        onclick="$('#login-navigator').get(0).pushPage('forgot-pin-page.html', {animation: 'lift-md'});">
+                            forgot PIN?</ons-button>
+                    </ons-col>
+                </ons-row>
+            </form>
+        </div>
+    </div>
+</ons-page>

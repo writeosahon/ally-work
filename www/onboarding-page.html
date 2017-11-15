@@ -41,6 +41,7 @@
                     style="background-color: #3db470; color: #ffffff; margin-bottom: 15px;"
         onclick="utopiasoftware.ally.controller.onboardingPageViewModel.signupButtonClicked()">Sign Up</ons-button>
         <ons-button disable-auto-styling modifier="large outline"
-                    style="color: #ffffff; border-color: #ffffff;">Login</ons-button>
+                    style="color: #ffffff; border-color: #ffffff;"
+                    onclick="$('ons-splitter').get(0).content.load('login-template');">Login</ons-button>
     </div>
 </ons-page>

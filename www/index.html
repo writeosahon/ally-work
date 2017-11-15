@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="css/material-design-iconic-font/css/material-design-iconic-font.min.css">
 
     <!-- app custom font icons -->
-    <!--<link rel="stylesheet" href="css/edoae-font-icons/css/edoae-font-style.css">-->
+    <link rel="stylesheet" href="css/ally-font-icons/css/ally-font-style.css">
 
     <!--- style library used for materialize-css -->
     <!-- <link rel="stylesheet" href="css/materialize.css"> -->
@@ -56,7 +56,7 @@
 
 <!-- splitter container housing the app -->
 <ons-splitter>
-    <ons-splitter-side id="side-menu" side="left" collapse width="100px">
+    <ons-splitter-side id="side-menu" side="right" collapse width="100px">
         <ons-page id="side-menu-page">
             <ons-toolbar modifier="noshadow" style="background-color: #1b5e20">
             </ons-toolbar>
@@ -95,6 +95,12 @@
 <ons-template id="onboarding-template">
     <!-- onboarding navigator -->
     <ons-navigator id="onboarding-navigator" page="onboarding-page.html"></ons-navigator>
+</ons-template>
+
+<!-- login navigator template page -->
+<ons-template id="login-template">
+    <!-- login navigator -->
+    <ons-navigator id="login-navigator" page="login-page.html"></ons-navigator>
 </ons-template>
 
 <!-- app-main navigator template page -->

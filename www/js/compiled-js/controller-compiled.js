@@ -260,21 +260,21 @@ utopiasoftware.ally.controller = {
                 case 1:
                     $('#menu-tabbar ons-tab').removeAttr("label"); // remove all displaced labels
 
-                    $(event.originalEvent.tabItem).attr("label", "List"); // update the label of the to-be displayed tab
+                    $(event.originalEvent.tabItem).attr("label", "Payments"); // update the label of the to-be displayed tab
 
                     break;
 
                 case 2:
                     $('#menu-tabbar ons-tab').removeAttr("label"); // remove all displaced labels
 
-                    $(event.originalEvent.tabItem).attr("label", "Accounts"); // update the label of the to-be displayed tab
+                    $(event.originalEvent.tabItem).attr("label", "Transfers"); // update the label of the to-be displayed tab
 
                     break;
 
                 case 3:
                     $('#menu-tabbar ons-tab').removeAttr("label"); // remove all displaced labels
 
-                    $(event.originalEvent.tabItem).attr("label", "Cards"); // update the label of the to-be displayed tab
+                    $(event.originalEvent.tabItem).attr("label", "Profile"); // update the label of the to-be displayed tab
 
                     break;
 
@@ -323,6 +323,77 @@ utopiasoftware.ally.controller = {
                             navigator.app.exitApp(); // Close the app
                         }
                     });
+                };
+
+                // hide the loader
+                $('#loader-modal').get(0).hide();
+            }
+        },
+
+        /**
+         * method is triggered when page is shown
+         */
+        pageShow: function pageShow() {
+            // disable the swipeable feature for the app splitter
+            $('ons-splitter-side').removeAttr("swipeable");
+        },
+
+        /**
+         * method is triggered when page is hidden
+         */
+        pageHide: function pageHide() {},
+
+        /**
+         * method is used to listen for click events of the main menu items
+         *
+         */
+        signupButtonClicked: function signupButtonClicked() {
+
+            $('#onboarding-navigator').get(0).pushPage("signup-page.html", {}); // navigate to the signup page
+
+        },
+
+        /**
+         * method is used to track changes on the carousel slides
+         * @param event
+         */
+        carouselPostChange: function carouselPostChange(event) {
+
+            // change the carousel counter indicator based on the currently active and previously active carousel slides
+            $('#onboarding-page .carousel-counter').eq(event.originalEvent.lastActiveIndex).removeClass('active');
+            $('#onboarding-page .carousel-counter').eq(event.originalEvent.activeIndex).addClass('active');
+        }
+    },
+
+    /**
+     * object is view-model for login page
+     */
+    loginPageViewModel: {
+
+        /**
+         * event is triggered when page is initialised
+         */
+        pageInit: function pageInit(event) {
+
+            var $thisPage = $(event.target); // get the current page shown
+            // disable the swipeable feature for the app splitter
+            $('ons-splitter-side').removeAttr("swipeable");
+
+            // call the function used to initialise the app page if the app is fully loaded
+            loadPageOnAppReady();
+
+            //function is used to initialise the page if the app is fully ready for execution
+            function loadPageOnAppReady() {
+                // check to see if onsen is ready and if all app loading has been completed
+                if (!ons.isReady() || utopiasoftware.ally.model.isAppReady === false) {
+                    setTimeout(loadPageOnAppReady, 500); // call this function again after half a second
+                    return;
+                }
+
+                // listen for the back button event
+                $('#login-navigator').get(0).topPage.onDeviceBackButton = function () {
+
+                    $('ons-splitter').get(0).content.load('onboarding-template');
                 };
 
                 // hide the loader
