@@ -284,14 +284,14 @@ utopiasoftware.ally.controller = {
                 case 2:
                     $('#menu-tabbar ons-tab').removeAttr("label"); // remove all displaced labels
 
-                    $(event.originalEvent.tabItem).attr("label", "Transfers"); // update the label of the to-be displayed tab
+                    $(event.originalEvent.tabItem).attr("label", "Wallet"); // update the label of the to-be displayed tab
 
                     break;
 
                 case 3:
                     $('#menu-tabbar ons-tab').removeAttr("label"); // remove all displaced labels
 
-                    $(event.originalEvent.tabItem).attr("label", "Profile"); // update the label of the to-be displayed tab
+                    $(event.originalEvent.tabItem).attr("label", "Account"); // update the label of the to-be displayed tab
 
                     break;
 
@@ -401,6 +401,11 @@ utopiasoftware.ally.controller = {
      */
     loginPageViewModel: {
 
+        /**
+         * used to hold the parsley form validation object for the sign-in page
+         */
+        formValidator: null,
+
 
         /**
          * event is triggered when page is initialised
@@ -428,6 +433,40 @@ utopiasoftware.ally.controller = {
                     $('ons-splitter').get(0).content.load('onboarding-template');
                 };
 
+                // check if the user is currently logged in
+                if(window.localStorage.getItem("app-status") && window.localStorage.getItem("app-status") != ""){ // user is logged in
+                    // display the user's save phone number on the login page phonenumber input
+                    //$('#login-form #user-phone').val(utopiasoftware.saveup.model.appUserDetails.phoneNumber);
+                }
+
+                // initialise the login form validation
+                utopiasoftware.ally.controller.loginPageViewModel.formValidator = $('#login-form').parsley();
+
+                // attach listener for the log in button click event on the login page
+                $('#login-signin').get(0).onclick = function(){
+                    // run the validation method for the sign-in form
+                    utopiasoftware.ally.controller.loginPageViewModel.formValidator.whenValidate();
+                };
+
+                // listen for log in form field validation failure event
+                utopiasoftware.ally.controller.loginPageViewModel.formValidator.on('field:error', function(fieldInstance) {
+                    // get the element that triggered the field validation error and use it to display tooltip
+                    // display tooltip
+                    $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                    $(fieldInstance.$element).attr("data-hint", fieldInstance.getErrorsMessages()[0]);
+                });
+
+                // listen for log in form field validation success event
+                utopiasoftware.ally.controller.loginPageViewModel.formValidator.on('field:success', function(fieldInstance) {
+                    // remove tooltip from element
+                    $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                    $(fieldInstance.$element).removeAttr("data-hint");
+                });
+
+                // listen for log in form validation success
+                utopiasoftware.ally.controller.loginPageViewModel.formValidator.on('form:success',
+                    utopiasoftware.ally.controller.loginPageViewModel.loginFormValidated);
+
                 // hide the loader
                 $('#loader-modal').get(0).hide();
 
@@ -448,14 +487,38 @@ utopiasoftware.ally.controller = {
          * method is triggered when page is hidden
          */
         pageHide: function(){
+
+            try {
+                // remove any tooltip being displayed on all forms in the login page
+                $('#login-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                $('#login-page [data-hint]').removeAttr("data-hint");
+                // reset the form validator object in the sign-in page
+                utopiasoftware.ally.controller.loginPageViewModel.formValidator.reset();
+            }
+            catch(err){}
+        },
+
+        /**
+         * method is triggered when the page is destroyed
+         * @param event
+         */
+        pageDestroy: (event) => {
+            try{
+                // remove any tooltip being displayed on all forms in the login page
+                $('#login-page [data-hint]').removeClass("hint--always hint--info hint--medium hint--rounded hint--no-animate");
+                $('#login-page [data-hint]').removeAttr("data-hint");
+                // destroy the form validator objects in the login page
+                utopiasoftware.ally.controller.loginPageViewModel.formValidator.destroy();
+            }
+            catch(err){}
         },
 
 
         /**
-         * method is used to listen for click events of the main menu items
+         * method is triggered when sign-in form is successfully validated
          *
          */
-        signupButtonClicked: function(){
+        loginFormValidated: function(){
 
             $('#onboarding-navigator').get(0).pushPage("signup-page.html", {}); // navigate to the signup page
 

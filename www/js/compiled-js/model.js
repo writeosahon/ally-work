@@ -40,6 +40,18 @@ $(document).on("hide", "#onboarding-page", utopiasoftware.ally.controller.onboar
 // used to listen for 'onboarding-carousel' carousel items/slide changes
 $(document).on("postchange", "#onboarding-carousel", utopiasoftware.ally.controller.onboardingPageViewModel.carouselPostChange);
 
+// listen for the initialisation of the Login page
+$(document).on("init", "#login-page", utopiasoftware.ally.controller.loginPageViewModel.pageInit);
+
+// listen for when the Login page is shown
+$(document).on("show", "#login-page", utopiasoftware.ally.controller.loginPageViewModel.pageShow);
+
+// listen for when the Login page is hidden
+$(document).on("hide", "#login-page", utopiasoftware.ally.controller.loginPageViewModel.pageHide);
+
+// listen for when the Login page is destroyed
+$(document).on("destroy", "#login-page", utopiasoftware.ally.controller.loginPageViewModel.pageDestroy);
+
 // listen for the initialisation of the Main-Menu page
 $(document).on("init", "#main-menu-page", utopiasoftware.ally.controller.onboardingPageViewModel.pageInit);
 

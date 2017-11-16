@@ -1,4 +1,13 @@
 
+/** STYLE FOR PARSLEY VALIDATION LIBRARY **/
+.parsley-errors-list {
+    display: none !important;
+}
+/** STYLE FOR VALIDATION TOOLTIP **/
+[data-hint]:after {
+    font-size: 0.8em !important;
+}
+
 /** STYLE FOR THE ONBOARDING PAGE BEGINS **/
 #onboarding-carousel ons-carousel-item.first { /* style for onboarding slides/carousel item 1 */
     background-image: linear-gradient(45deg, rgba(61,180,112,0.3) 0%, rgba(15,255,255,0.2) 100%),
@@ -48,13 +57,15 @@
 
 /** STYLE FOR THE LOGIN PAGE BEGINS **/
 #login-page .page--material__background {
-
     background-image: linear-gradient(45deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.6) 100%),
     url('app-images/login-background.png'),
     linear-gradient(45deg, rgba(61,180,112,1) 0%, rgba(15,255,255,0.1) 100%);
     background-repeat: repeat, no-repeat;
     background-size: contain, contain;
     background-position: center;
+}
+#login-page #login-pin input {
+    -webkit-text-security: disc;
 }
 /** STYLE FOR THE LOGIN PAGE ENDS **/
 
