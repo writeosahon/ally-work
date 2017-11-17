@@ -505,7 +505,7 @@ utopiasoftware.ally.controller = {
         pageDestroy: (event) => {
             try{
                 // remove any tooltip being displayed on all forms in the login page
-                $('#login-page [data-hint]').removeClass("hint--always hint--info hint--medium hint--rounded hint--no-animate");
+                $('#login-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
                 $('#login-page [data-hint]').removeAttr("data-hint");
                 // destroy the form validator objects in the login page
                 utopiasoftware.ally.controller.loginPageViewModel.formValidator.destroy();
@@ -520,21 +520,9 @@ utopiasoftware.ally.controller = {
          */
         loginFormValidated: function(){
 
-            $('#onboarding-navigator').get(0).pushPage("signup-page.html", {}); // navigate to the signup page
+            $('ons-splitter').get(0).content.load('app-main-template');
 
 
-        },
-
-
-        /**
-         * method is used to track changes on the carousel slides
-         * @param event
-         */
-        carouselPostChange(event){
-
-            // change the carousel counter indicator based on the currently active and previously active carousel slides
-            $('#onboarding-page .carousel-counter').eq(event.originalEvent.lastActiveIndex).removeClass('active');
-            $('#onboarding-page .carousel-counter').eq(event.originalEvent.activeIndex).addClass('active');
         }
 
 
