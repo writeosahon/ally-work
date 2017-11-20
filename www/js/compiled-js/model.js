@@ -37,8 +37,17 @@ $(document).on("show", "#onboarding-page", utopiasoftware.ally.controller.onboar
 // listen for when the Onboarding page is hidden
 $(document).on("hide", "#onboarding-page", utopiasoftware.ally.controller.onboardingPageViewModel.pageHide);
 
-// used to listen for 'onboarding-carousel' carousel items/slide changes
+// used to listen for 'onboarding-carousel' carousel items/slide changes on the onboarding page
 $(document).on("postchange", "#onboarding-carousel", utopiasoftware.ally.controller.onboardingPageViewModel.carouselPostChange);
+
+// listen for the initialisation of the Signup page
+$(document).on("init", "#signup-page", utopiasoftware.ally.controller.signupPageViewModel.pageInit);
+
+// listen for when the Signup page is hidden
+$(document).on("hide", "#signup-page", utopiasoftware.ally.controller.signupPageViewModel.pageHide);
+
+// listen for when the Signup page is destroyed
+$(document).on("destroy", "#signup-page", utopiasoftware.ally.controller.signupPageViewModel.pageDestroy);
 
 // listen for the initialisation of the Login page
 $(document).on("init", "#login-page", utopiasoftware.ally.controller.loginPageViewModel.pageInit);
@@ -52,6 +61,18 @@ $(document).on("hide", "#login-page", utopiasoftware.ally.controller.loginPageVi
 // listen for when the Login page is destroyed
 $(document).on("destroy", "#login-page", utopiasoftware.ally.controller.loginPageViewModel.pageDestroy);
 
+// listen for the initialisation of the Forgot-PIN page
+$(document).on("init", "#forgot-pin-page", utopiasoftware.ally.controller.forgotPinPageViewModel.pageInit);
+
+// listen for when the Forgot-PIN page is shown
+$(document).on("show", "#forgot-pin-page", utopiasoftware.ally.controller.forgotPinPageViewModel.pageShow);
+
+// listen for when the Forgot-PIN page is hidden
+$(document).on("hide", "#forgot-pin-page", utopiasoftware.ally.controller.forgotPinPageViewModel.pageHide);
+
+// listen for when the Forgot-PIN page is destroyed
+$(document).on("destroy", "#forgot-pin-page", utopiasoftware.ally.controller.forgotPinPageViewModel.pageDestroy);
+
 // listen for the initialisation of the Main-Menu page
 $(document).on("init", "#main-menu-page", utopiasoftware.ally.controller.onboardingPageViewModel.pageInit);
 
@@ -61,5 +82,5 @@ $(document).on("show", "#main-menu-page", utopiasoftware.ally.controller.mainMen
 // listen for when the Main-Menu page is hidden
 $(document).on("hide", "#main-menu-page", utopiasoftware.ally.controller.mainMenuPageViewModel.pageHide);
 
-// used to listen for 'menu-tabbar' tabbar tab changes
+// used to listen for 'menu-tabbar' tabbar tab changes on the "main menu" page
 $(document).on("prechange", "#menu-tabbar", utopiasoftware.ally.controller.mainMenuPageViewModel.tabbarPreChange);

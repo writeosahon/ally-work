@@ -233,31 +233,6 @@ utopiasoftware.ally.controller = {
         },
 
 
-        /**
-         * method is used to listen for click events of the main menu items
-         *
-         * @param label
-         */
-        mainMenuButtonsClicked: function(label){
-
-            if(label == "events schedule"){ // 'events schedule' button was clicked
-
-                $('#app-main-navigator').get(0).pushPage("events-schedule-page.html", {}); // navigate to the events schedule page
-
-                return;
-            }
-
-
-            if(label == "hotels"){ // intro button was clicked
-
-                $('#app-main-navigator').get(0).pushPage("hotels-page.html", {}); // navigate to the page
-
-                return;
-            }
-
-
-        },
-
 
         /**
          * method is used to track changes on the tabbar tabs
@@ -369,7 +344,7 @@ utopiasoftware.ally.controller = {
 
 
         /**
-         * method is used to listen for click events of the main menu items
+         * method is used to listen for click events of the "Sign Up" button
          *
          */
         signupButtonClicked: function(){
@@ -379,6 +354,16 @@ utopiasoftware.ally.controller = {
 
         },
 
+        /**
+         * method is used to listen for click events of the "Login" button
+         *
+         */
+        loginButtonClicked: function(){
+
+            $('ons-splitter').get(0).content.load('login-template'); // navigate to the login page
+
+
+        },
 
         /**
          * method is used to track changes on the carousel slides
@@ -526,6 +511,280 @@ utopiasoftware.ally.controller = {
         }
 
 
+
+    },
+
+    /**
+     * object is view-model for forgot-pin page
+     */
+    forgotPinPageViewModel: {
+
+        /**
+         * used to hold the parsley form validation object for the page
+         */
+        formValidator: null,
+
+
+        /**
+         * event is triggered when page is initialised
+         */
+        pageInit: function(event){
+
+            var $thisPage = $(event.target); // get the current page shown
+            // disable the swipeable feature for the app splitter
+            $('ons-splitter-side').removeAttr("swipeable");
+
+            // call the function used to initialise the app page if the app is fully loaded
+            loadPageOnAppReady();
+
+            //function is used to initialise the page if the app is fully ready for execution
+            function loadPageOnAppReady(){
+                // check to see if onsen is ready and if all app loading has been completed
+                if(!ons.isReady() || utopiasoftware.ally.model.isAppReady === false){
+                    setTimeout(loadPageOnAppReady, 500); // call this function again after half a second
+                    return;
+                }
+
+                // listen for the back button event
+                $('#login-navigator').get(0).topPage.onDeviceBackButton = function(){
+
+                    $('#login-navigator').get(0).popPage({});
+                };
+
+
+                // initialise the form validation
+                utopiasoftware.ally.controller.forgotPinPageViewModel.formValidator = $('#forgot-pin-form').parsley();
+
+                // attach listener for the log in button click event on the login page
+                $('#forgot-pin-reset').get(0).onclick = function(){
+                    // run the validation method for the sign-in form
+                    utopiasoftware.ally.controller.forgotPinPageViewModel.formValidator.whenValidate();
+                };
+
+                // listen for log in form field validation failure event
+                utopiasoftware.ally.controller.forgotPinPageViewModel.formValidator.on('field:error', function(fieldInstance) {
+                    // get the element that triggered the field validation error and use it to display tooltip
+                    // display tooltip
+                    $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                    $(fieldInstance.$element).attr("data-hint", fieldInstance.getErrorsMessages()[0]);
+                });
+
+                // listen for log in form field validation success event
+                utopiasoftware.ally.controller.forgotPinPageViewModel.formValidator.on('field:success', function(fieldInstance) {
+                    // remove tooltip from element
+                    $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                    $(fieldInstance.$element).removeAttr("data-hint");
+                });
+
+                // listen for log in form validation success
+                utopiasoftware.ally.controller.forgotPinPageViewModel.formValidator.on('form:success',
+                    utopiasoftware.ally.controller.forgotPinPageViewModel.forgotPinFormValidated);
+
+                // hide the loader
+                $('#loader-modal').get(0).hide();
+
+            }
+
+        },
+
+        /**
+         * method is triggered when page is shown
+         */
+        pageShow: function(){
+            // disable the swipeable feature for the app splitter
+            $('ons-splitter-side').removeAttr("swipeable");
+        },
+
+
+        /**
+         * method is triggered when page is hidden
+         */
+        pageHide: function(){
+
+            try {
+                // remove any tooltip being displayed on all forms in the page
+                $('#forgot-pin-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                $('#forgot-pin-page [data-hint]').removeAttr("data-hint");
+                // reset the form validator object in the page
+                utopiasoftware.ally.controller.forgotPinPageViewModel.formValidator.reset();
+            }
+            catch(err){}
+        },
+
+        /**
+         * method is triggered when the page is destroyed
+         * @param event
+         */
+        pageDestroy: (event) => {
+            try{
+                // remove any tooltip being displayed on all forms in the page
+                $('#forgot-pin-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                $('#forgot-pin-page [data-hint]').removeAttr("data-hint");
+                // destroy the form validator objects in the page
+                utopiasoftware.ally.controller.forgotPinPageViewModel.formValidator.destroy();
+            }
+            catch(err){}
+        },
+
+
+        /**
+         * method is triggered when the form is successfully validated
+         *
+         */
+        forgotPinFormValidated: function(){
+
+            $('#login-navigator').get(0).popPage({});
+
+
+        }
+
+
+
+    },
+
+    /**
+     * object is view-model for signup page
+     */
+    signupPageViewModel: {
+
+        /**
+         * used to hold the parsley form validation object for the page
+         */
+        formValidator: null,
+
+        /**
+         * event is triggered when page is initialised
+         */
+        pageInit: function(event){
+
+            var $thisPage = $(event.target); // get the current page shown
+
+            // call the function used to initialise the app page if the app is fully loaded
+            loadPageOnAppReady();
+
+            //function is used to initialise the page if the app is fully ready for execution
+            function loadPageOnAppReady(){
+                // check to see if onsen is ready and if all app loading has been completed
+                if(!ons.isReady() || utopiasoftware.ally.model.isAppReady === false){
+                    setTimeout(loadPageOnAppReady, 500); // call this function again after half a second
+                    return;
+                }
+
+                // listen for the back button event
+                $thisPage.get(0).onDeviceBackButton = function(){
+                    // move to the onboarding page
+                    $('#onboarding-navigator').get(0).popPage({});
+                };
+
+                // initialise the create-account form validation
+                utopiasoftware.ally.controller.signupPageViewModel.formValidator = $('#signup-form').parsley();
+
+                // attach listener for the sign up button on the page
+                $('#signup-signup-button').get(0).onclick = function(){
+                    // run the validation method for the form
+                    utopiasoftware.ally.controller.signupPageViewModel.formValidator.whenValidate();
+                };
+
+                // listen for log in form field validation failure event
+                utopiasoftware.ally.controller.signupPageViewModel.formValidator.on('field:error', function(fieldInstance) {
+                    // get the element that triggered the field validation error and use it to display tooltip
+                    // display tooltip
+                    $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                    $(fieldInstance.$element).attr("data-hint", fieldInstance.getErrorsMessages()[0]);
+                });
+
+                // listen for the form field validation success event
+                utopiasoftware.ally.controller.signupPageViewModel.formValidator.on('field:success', function(fieldInstance) {
+                    // remove tooltip from element
+                    $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                    $(fieldInstance.$element).removeAttr("data-hint");
+                });
+
+                // listen for the form validation success
+                utopiasoftware.ally.controller.signupPageViewModel.formValidator.on('form:success',
+                    utopiasoftware.ally.controller.signupPageViewModel.signupFormValidated);
+
+                // hide the loader
+                $('#loader-modal').get(0).hide();
+
+            }
+
+        },
+
+        /**
+         * method is triggered when the signup page is hidden
+         * @param event
+         */
+        pageHide: (event) => {
+            try {
+                // remove any tooltip being displayed on all forms on the page
+                $('#signup-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                $('#signup-page [data-hint]').removeAttr("data-hint");
+                // reset the form validator object on the page
+                utopiasoftware.ally.controller.signupPageViewModel.formValidator.reset();
+            }
+            catch(err){}
+        },
+
+        /**
+         * method is triggered when the signup page is destroyed
+         * @param event
+         */
+        pageDestroy: (event) => {
+            try{
+                // remove any tooltip being displayed on all forms on the page
+                $('#signup-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                $('#signup-page [data-hint]').removeAttr("data-hint");
+                // destroy the form validator objects on the page
+                utopiasoftware.ally.controller.signupPageViewModel.formValidator.destroy();
+            }
+            catch(err){}
+        },
+
+        /**
+         * method is triggered when sign-up form is successfully validated
+         */
+        signupFormValidated: function(){
+
+            $('ons-splitter').get(0).content.load("app-main-template");
+        },
+
+        /**
+         * method is triggered when the PIN visibility button is clicked.
+         * It toggles pin visibility
+         *
+         * @param buttonElement
+         */
+        pinVisibilityButtonClicked: function(buttonElement){
+            if($(buttonElement).attr("data-ally-visible") === "no"){ // pin is not visible, make it visible
+                $('#signup-secure-pin input').css("-webkit-text-security", "none"); // change the text-security for the input field
+                $(buttonElement).find('ons-icon').attr("icon", "md-eye-off"); // change the icon associated with the input
+                $(buttonElement).attr("data-ally-visible", "yes"); // flag the pin is now visible
+            }
+            else{ // make the pin not visible
+                $('#signup-secure-pin input').css("-webkit-text-security", "disc"); // change the text-security for the input field
+                $(buttonElement).find('ons-icon').attr("icon", "md-eye"); // change the icon associated with the input
+                $(buttonElement).attr("data-ally-visible", "no"); // flag the pin is now invisible
+            }
+        },
+
+
+        /**
+         * method is used to change the value for the Verify Phone Number based on the checkbox state.
+         * This change is used to enable validation for the input
+         *
+         * @param inputElement
+         */
+        verifyPhoneNumberClicked: function(inputElement){
+            if(inputElement.checked){ // input is checked
+                // update the input value
+                inputElement.value = "checked"
+            }
+            else{ // input is NOT checked
+                // reset the input value
+                inputElement.value = ""
+            }
+        }
 
     }
 

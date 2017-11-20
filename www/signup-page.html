@@ -10,17 +10,23 @@
         </ons-toolbar>
 
     <!-- signup form -->
-    <form id="signup-form" autocomplete="off" data-parsley-inputs="ons-input,textarea,ons-select"
+    <form id="signup-form" autocomplete="off" data-parsley-inputs="ons-input,textarea,ons-select,ons-checkbox"
           data-parsley-excluded="ons-input[type=button], ons-input[type=submit],
-                              ons-input[type=reset], ons-input[type=hidden], [disabled], :hidden, readonly" style="display: block;">
+                              ons-input[type=reset], ons-input[type=hidden], [disabled], :hidden, readonly"
+          style="display: block;">
 
-        <ons-list style="margin-top: 1em">
-            <ons-list-item modifier="nodivider">
+        <ons-list>
+            <ons-list-item modifier="nodivider" style="margin-top: 3.5em;">
                 <div class="left">
                     <ons-icon icon="md-account-box" class="list-item__icon" fixed-width size="28px"></ons-icon>
                 </div>
                 <div class="center">
-                    <ons-input id="signup-firstname" type="text" placeholder="First Name" float modifier="transparent" style="width: 80%"></ons-input>
+                    <ons-input id="signup-firstname" type="text" placeholder="First Name" modifier="transparent"
+                               pattern="[a-zA-Z]{1}[\w\s\-\.]*[a-zA-Z]{1}"
+                               required float
+                               data-parsley-required-message="your first name is required"
+                               data-parsley-pattern-message="incorrect first name format. please check your spelling"
+                               style="width: 80%" class="hint--top"></ons-input>
                 </div>
             </ons-list-item>
 
@@ -29,7 +35,12 @@
                     <ons-icon icon="md-assignment-account" class="list-item__icon" fixed-width size="28px"></ons-icon>
                 </div>
                 <div class="center">
-                    <ons-input id="signup-lastname" type="text" placeholder="Last Name" float modifier="transparent" style="width: 80%"></ons-input>
+                    <ons-input id="signup-lastname" type="text" placeholder="Last Name" modifier="transparent"
+                               pattern="[a-zA-Z]{1}[\w\s\-\.]*[a-zA-Z]{1}"
+                               required float
+                               data-parsley-required-message="your last name is required"
+                               data-parsley-pattern-message="incorrect last name format. please check your spelling"
+                        style="width: 80%" class="hint--top"></ons-input>
                 </div>
             </ons-list-item>
 
@@ -38,8 +49,13 @@
                     <ons-icon icon="md-account-box-phone" class="list-item__icon" fixed-width size="28px"></ons-icon>
                 </div>
                 <div class="center">
-                    <ons-input id="signup-phone-number" type="tel" placeholder="Your Phone Number" float modifier="transparent"
-                               style="width: 70%"></ons-input>
+                    <ons-input id="signup-phone-number" type="tel" placeholder="Your Phone Number" modifier="transparent"
+                               required float
+                               pattern="((0[1-9]{1}[0-9]{9}|\+234[1-9]{1}[0-9]{9})|\+[1-9]{1}[0-9]{4,})"
+                               data-parsley-required-message="your phone number is required"
+                               data-parsley-pattern-message="incorrect phone number format. phone number must be in international format (starting with '+')"
+                               data-parsley-type-message="incorrect phone number format. phone number must be in international format (starting with '+')"
+                               style="width: 70%" class=""></ons-input>
                 </div>
             </ons-list-item>
 
@@ -47,21 +63,32 @@
                 <div class="left">
                 </div>
                 <div class="center">
-                    <ons-checkbox id="signup-verify-phone" input-id="signup-verify-phone-alt" value="checked" disable-auto-styling></ons-checkbox>
+                    <ons-checkbox id="signup-verify-phone" input-id="signup-verify-phone-alt" value="" disable-auto-styling
+                                  required
+                                  data-parsley-required-message="tick this box for verification"
+                                  class="hint--bottom-right"
+                    onclick="utopiasoftware.ally.controller.signupPageViewModel.verifyPhoneNumberClicked(this)"></ons-checkbox>
                     <label for="signup-verify-phone-alt">&nbsp;Verify Phone Number</label>
                 </div>
             </ons-list-item>
 
-            <ons-list-item modifier="nodivider">
+            <ons-list-item modifier="nodivider" style="margin-bottom: 3.5em;">
             <div class="left">
                 <ons-icon icon="md-lock" class="list-item__icon" fixed-width size="28px"></ons-icon>
             </div>
             <div class="center">
-                <ons-input id="signup-secure-pin" type="number" placeholder="Create Secure PIN" float modifier="transparent"
-                           style="width: 65%"></ons-input>
-                <ons-button modifier="quiet"
+                <ons-input id="signup-secure-pin" type="number" placeholder="Create Secure PIN" required float modifier="transparent"
+                           data-parsley-type="digits"
+                           data-parsley-minlength="4"
+                           data-parsley-maxlength="8"
+                           data-parsley-required-message="create your PIN"
+                           data-parsley-type-message="your PIN must contain only numbers"
+                           data-parsley-minlength-message="your PIN must be at least 4 numbers"
+                           data-parsley-maxlength-message="your PIN cannot be more than 8 numbers"
+                           style="width: 65%" class="hint--bottom"></ons-input>
+                <ons-button modifier="quiet" data-ally-visible="no"
                             style="color: #3db470; margin-left: 1.5em;"
-                            onclick="utopiasoftware.ally.controller.onboardingPageViewModel.signupButtonClicked()">
+                            onclick="utopiasoftware.ally.controller.signupPageViewModel.pinVisibilityButtonClicked(this)">
                     <ons-icon icon="md-eye" size="21px"></ons-icon>
                 </ons-button>
             </div>
@@ -72,9 +99,8 @@
 
     <ons-bottom-toolbar modifier="transparent" style="height: 60px !important;">
         <div style="width: 50%; margin-left: 25%; margin-right: 25%; padding-bottom: 3px;">
-            <ons-button disable-auto-styling modifier="large"
-                        style="background-color: #3db470; color: #ffffff; border-radius: 21px;"
-                        onclick="utopiasoftware.ally.controller.onboardingPageViewModel.signupButtonClicked()">Sign Up</ons-button>
+            <ons-button id="signup-signup-button" disable-auto-styling modifier="large"
+                        style="background-color: #3db470; color: #ffffff; border-radius: 21px;">Sign Up</ons-button>
         </div>
     </ons-bottom-toolbar>
 </ons-page>
