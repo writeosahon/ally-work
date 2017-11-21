@@ -4,7 +4,7 @@
   --background-color: #efeff4;
   --text-color: #1f1f21;
   --sub-text-color: #999;
-  --highlight-color: #3db470;
+  --highlight-color: #30a401;
   --second-highlight-color: #25a6d9;
   --border-color: #ccc;
   --button-background-color: var(--highlight-color);
@@ -78,14 +78,14 @@
   --material-range-disabled-thumb-color: #b0b0b0;
   --material-range-disabled-thumb-border-color: #eeeeee;
   --material-range-zero-thumb-color: #f2f2f2;
-  --material-toolbar-background-color: #3db470;
+  --material-toolbar-background-color: #30a401;
   --material-toolbar-text-color: #ffffff;
   --material-toolbar-button-color: #ffffff;
   --material-segment-background-color: #fafafa;
   --material-segment-active-background-color: #c8c8c8;
   --material-segment-text-color: color(black a(38%));
   --material-segment-active-text-color: #353535;
-  --material-button-background-color: #3db470;
+  --material-button-background-color: #30a401;
   --material-button-text-color: #ffffff;
   --material-button-disabled-background-color: color(#4f4f4f a(26%));
   --material-button-disabled-color: color(black a(26%));
@@ -109,7 +109,7 @@
   --material-alert-dialog-title-color: #31313a;
   --material-alert-dialog-content-color: rgba(49, 49, 58, 0.85);
   --material-alert-dialog-button-color: #37474f;
-  --material-progress-bar-primary-color: #3db470;
+  --material-progress-bar-primary-color: #30a401;
   --material-progress-bar-secondary-color: #548ba7;
   --material-progress-bar-background-color: transparent;
   --material-progress-circle-primary-color: var(--material-progress-bar-primary-color);

@@ -76,7 +76,7 @@ utopiasoftware.ally.controller = {
         } catch (err) {}
 
         // set status bar color
-        StatusBar.backgroundColorByHexString("#38A465");
+        StatusBar.backgroundColorByHexString("#2C8E01");
 
         // prepare the inapp browser plugin
         window.open = cordova.InAppBrowser.open;

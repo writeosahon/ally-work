@@ -467,8 +467,8 @@ h4, h5, h6 {
   -webkit-appearance: none;
      -moz-appearance: none;
           appearance: none;
-  background-image: -webkit-linear-gradient(#3db470, #3db470);
-  background-image: linear-gradient(#3db470, #3db470);
+  background-image: -webkit-linear-gradient(#30a401, #30a401);
+  background-image: linear-gradient(#30a401, #30a401);
   background-position: left center;
   background-size: 0% 2px;
   background-repeat: no-repeat;
@@ -537,7 +537,7 @@ h4, h5, h6 {
 }
 .range__input::-ms-fill-lower {
   height: 2px;
-  background-color: #3db470;
+  background-color: #30a401;
 }
 .range__input::-ms-tooltip {
   display: none;
@@ -1057,7 +1057,7 @@ h4, h5, h6 {
   border-bottom: 0;
   box-shadow: 0 1px 5px rgba(0, 0, 0, .3);
   padding: 0;
-  background-color: #3db470;
+  background-color: #30a401;
   background-size: 0;
 }
 /*~
@@ -1214,7 +1214,7 @@ h4, h5, h6 {
   letter-spacing: 0;
   color: white;
   vertical-align: middle;
-  background-color: #3db470;
+  background-color: #30a401;
   border: 0 solid currentColor;
   border-radius: 3px;
   -webkit-transition: none;
@@ -1225,7 +1225,7 @@ h4, h5, h6 {
   transition: none;
 }
 .button:active {
-  background-color: #3db470;
+  background-color: #30a401;
   -webkit-transition: none;
   transition: none;
   opacity: 0.2;
@@ -1248,17 +1248,17 @@ h4, h5, h6 {
 */
 .button--outline {
   background-color: transparent;
-  border: 1px solid #3db470;
-  color: #3db470;
+  border: 1px solid #30a401;
+  color: #30a401;
 }
 .button--outline:active {
-  background-color: rgb(197, 233, 212);
-  border: 1px solid #3db470;
-  color: #3db470;
+  background-color: rgb(193, 228, 179);
+  border: 1px solid #30a401;
+  color: #30a401;
   opacity: 1;
 }
 .button--outline:hover {
-  border: 1px solid #3db470;
+  border: 1px solid #30a401;
   -webkit-transition: 0;
   transition: 0;
 }
@@ -1321,7 +1321,7 @@ h4, h5, h6 {
   letter-spacing: 0;
   color: white;
   vertical-align: middle;
-  background-color: #3db470;
+  background-color: #30a401;
   border: 0 solid currentColor;
   border-radius: 3px;
   -webkit-transition: none;
@@ -1330,7 +1330,7 @@ h4, h5, h6 {
   border: 1px solid transparent;
   box-shadow: none;
   background: transparent;
-  color: #3db470;
+  color: #30a401;
   border: none;
 }
 .button--quiet:disabled,
@@ -1353,7 +1353,7 @@ h4, h5, h6 {
   -webkit-transition: none;
   transition: none;
   opacity: 0.2;
-  color: #3db470;
+  color: #30a401;
 }
 /*~
   name: Call To Action Button
@@ -1395,7 +1395,7 @@ h4, h5, h6 {
   letter-spacing: 0;
   color: white;
   vertical-align: middle;
-  background-color: #3db470;
+  background-color: #30a401;
   border: 0 solid currentColor;
   border-radius: 3px;
   -webkit-transition: none;
@@ -1441,7 +1441,7 @@ h4, h5, h6 {
   text-align: center;
 }
 .button--large:active {
-  background-color: #3db470;
+  background-color: #30a401;
   -webkit-transition: none;
   transition: none;
   opacity: 0.2;
@@ -1499,7 +1499,7 @@ h4, h5, h6 {
   letter-spacing: 0;
   color: white;
   vertical-align: middle;
-  background-color: #3db470;
+  background-color: #30a401;
   border: 0 solid currentColor;
   border-radius: 3px;
   -webkit-transition: none;
@@ -1513,14 +1513,14 @@ h4, h5, h6 {
   background: transparent;
   border: 1px solid transparent;
   box-shadow: none;
-  color: #3db470;
+  color: #30a401;
   text-align: center;
 }
 .button--large--quiet:active { /* stylelint-disable-line */
   -webkit-transition: none;
   transition: none;
   opacity: 0.2;
-  color: #3db470;
+  color: #30a401;
   background: transparent;
   border: 1px solid transparent;
   box-shadow: none;
@@ -1576,7 +1576,7 @@ h4, h5, h6 {
   letter-spacing: 0;
   color: white;
   vertical-align: middle;
-  background-color: #3db470;
+  background-color: #30a401;
   border: 0 solid currentColor;
   border-radius: 3px;
   -webkit-transition: none;
@@ -1651,7 +1651,7 @@ h4, h5, h6 {
   letter-spacing: 0;
   color: white;
   vertical-align: middle;
-  background-color: #3db470;
+  background-color: #30a401;
   border: 0 solid currentColor;
   border-radius: 3px;
   -webkit-transition: none;
@@ -1670,7 +1670,7 @@ h4, h5, h6 {
   -webkit-transform: translate3d(0, 0, 0);
           transform: translate3d(0, 0, 0);
   text-transform: uppercase;
-  background-color: #3db470;
+  background-color: #30a401;
   color: #ffffff;
   font-weight: 500;
   -webkit-transition: background-color 0.25s linear;
@@ -1687,7 +1687,7 @@ h4, h5, h6 {
   box-shadow: 0 6px 10px 0 rgba(0, 0, 0, .14),
       0 1px 18px 0 rgba(0, 0, 0, .12),
       0 3px 5px -1px rgba(0, 0, 0, .4);
-  background-color: #3db470;
+  background-color: #30a401;
   opacity: 0.9;
   -webkit-transition: all 0.25s linear;
   transition: all 0.25s linear;
@@ -1744,7 +1744,7 @@ h4, h5, h6 {
   letter-spacing: 0;
   color: white;
   vertical-align: middle;
-  background-color: #3db470;
+  background-color: #30a401;
   border: 0 solid currentColor;
   border-radius: 3px;
   -webkit-transition: none;
@@ -1763,14 +1763,14 @@ h4, h5, h6 {
   -webkit-transform: translate3d(0, 0, 0);
           transform: translate3d(0, 0, 0);
   text-transform: uppercase;
-  background-color: #3db470;
+  background-color: #30a401;
   color: #ffffff;
   font-weight: 500;
   -webkit-transition: background-color 0.25s linear;
   transition: background-color 0.25s linear;
   box-shadow: none;
   background-color: transparent;
-  color: #3db470;
+  color: #30a401;
   -webkit-transition: all 0.25s linear;
   transition: all 0.25s linear;
 }
@@ -1781,7 +1781,7 @@ h4, h5, h6 {
 .button--material--flat:focus { /* stylelint-disable-line */
   box-shadow: none;
   background-color: transparent;
-  color: #3db470;
+  color: #30a401;
   outline: 0;
   opacity: 1;
   border: none;
@@ -1792,7 +1792,7 @@ h4, h5, h6 {
   opacity: 1;
   border: none;
   background-color: rgba(153, 153, 153, 0.2);
-  color: #3db470;
+  color: #30a401;
   -webkit-transition: all 0.25s linear;
   transition: all 0.25s linear;
 }
@@ -1859,8 +1859,8 @@ h4, h5, h6 {
   font-weight: 400;
   border-radius: 0;
   background-color: transparent;
-  color: #3db470;
-  border: 1px solid #3db470;
+  color: #30a401;
+  border: 1px solid #30a401;
   border-top-width: 1px;
   border-bottom-width: 1px;
   border-right-width: 1px;
@@ -1888,18 +1888,18 @@ h4, h5, h6 {
   outline: 0;
 }
 :checked + .button-bar__button {
-  background-color: #3db470;
+  background-color: #30a401;
   color: #fff;
   -webkit-transition: none;
   transition: none;
 }
 .button-bar__button:active,
 :active + .button-bar__button {
-  background-color: rgb(197, 233, 212);
-  border: 0 solid #3db470;
-  border-top: 1px solid #3db470;
-  border-bottom: 1px solid #3db470;
-  border-right: 1px solid #3db470;
+  background-color: rgb(193, 228, 179);
+  border: 0 solid #30a401;
+  border-top: 1px solid #30a401;
+  border-bottom: 1px solid #30a401;
+  border-right: 1px solid #30a401;
   font-size: 13px;
   width: 100%;
   -webkit-transition: none;
@@ -1993,8 +1993,8 @@ h4, h5, h6 {
   font-weight: 400;
   border-radius: 0;
   background-color: transparent;
-  color: #3db470;
-  border: 1px solid #3db470;
+  color: #30a401;
+  border: 1px solid #30a401;
   border-top-width: 1px;
   border-bottom-width: 1px;
   border-right-width: 1px;
@@ -2022,18 +2022,18 @@ h4, h5, h6 {
   outline: 0;
 }
 :active + .segment__button {
-  background-color: rgb(197, 233, 212);
-  border: 0 solid #3db470;
-  border-top: 1px solid #3db470;
-  border-bottom: 1px solid #3db470;
-  border-right: 1px solid #3db470;
+  background-color: rgb(193, 228, 179);
+  border: 0 solid #30a401;
+  border-top: 1px solid #30a401;
+  border-bottom: 1px solid #30a401;
+  border-right: 1px solid #30a401;
   font-size: 13px;
   width: 100%;
   -webkit-transition: none;
   transition: none;
 }
 :checked + .segment__button {
-  background-color: #3db470;
+  background-color: #30a401;
   color: #fff;
   -webkit-transition: none;
   transition: none;
@@ -2304,7 +2304,7 @@ h4, h5, h6 {
   padding: 0;
 }
 :checked + .tabbar__button {
-  color: #3db470;
+  color: #30a401;
   background-color: transparent;
   box-shadow: none;
   border-top: none;
@@ -2486,7 +2486,7 @@ h4, h5, h6 {
 }
 :checked + .tabbar--top-border__button {
   background-color: transparent;
-  border-bottom: 4px solid #3db470;
+  border-bottom: 4px solid #30a401;
 }
 .tabbar__border {
   position: absolute;
@@ -2494,7 +2494,7 @@ h4, h5, h6 {
   left: 0;
   width: 0;
   height: 4px;
-  background-color: #3db470;
+  background-color: #30a401;
 }
 .tabbar--material {
   background: none;
@@ -2645,7 +2645,7 @@ h4, h5, h6 {
   font-weight: 400;
   padding: 4px 10px;
   letter-spacing: 0;
-  color: #3db470;
+  color: #30a401;
   background-color: rgba(0, 0, 0, 0);
   border-radius: 2px;
   border: 1px solid transparent;
@@ -2676,7 +2676,7 @@ h4, h5, h6 {
   transition: none;
 }
 .toolbar-button--outline {
-  border: 1px solid #3db470;
+  border: 1px solid #30a401;
   margin: auto 8px;
   padding-left: 6px;
   padding-right: 6px;
@@ -2726,7 +2726,7 @@ h4, h5, h6 {
   height: 44px;
   line-height: 44px;
   padding-left: 8px;
-  color: #3db470;
+  color: #30a401;
   background-color: rgba(0, 0, 0, 0);
   display: inline-block;
 }
@@ -2746,7 +2746,7 @@ h4, h5, h6 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: inline-flex;
-  fill: #3db470;
+  fill: #30a401;
   -webkit-box-align: center;
   -webkit-align-items: center;
           align-items: center;
@@ -2893,7 +2893,7 @@ h4, h5, h6 {
   opacity: 0;
 }
 :checked + .checkbox__checkmark:before {
-  background: #3db470;
+  background: #30a401;
   border: none;
 }
 :checked + .checkbox__checkmark:after {
@@ -3001,7 +3001,7 @@ h4, h5, h6 {
   width: 11px;
   height: 4px;
   background: transparent;
-  border: 2px solid #3db470;
+  border: 2px solid #30a401;
   border-top: none;
   border-right: none;
   border-radius: 0;
@@ -3253,7 +3253,7 @@ h4, h5, h6 {
   width: 11px;
   height: 4px;
   background: transparent;
-  border: 2px solid #3db470;
+  border: 2px solid #30a401;
   border-top: none;
   border-right: none;
   border-radius: 0;
@@ -5097,7 +5097,7 @@ h4, h5, h6 {
   height: 44px;
   line-height: 44px;
   outline: none;
-  color: #3db470;
+  color: #30a401;
 }
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .alert-dialog-button {
@@ -5568,7 +5568,7 @@ h4, h5, h6 {
 .progress-bar__primary,
 .progress-bar__secondary {
   position: absolute;
-  background-color: #3db470;
+  background-color: #30a401;
   top: 0;
   bottom: 0;
   -webkit-transition: width .3s linear;
@@ -5583,7 +5583,7 @@ h4, h5, h6 {
 .progress-bar--indeterminate:before {
   content: '';
   position: absolute;
-  background-color: #3db470;
+  background-color: #30a401;
   top: 0;
   left: 0;
   bottom: 0;
@@ -5595,7 +5595,7 @@ h4, h5, h6 {
 .progress-bar--indeterminate:after {
   content: '';
   position: absolute;
-  background-color: #3db470;
+  background-color: #30a401;
   top: 0;
   left: 0;
   bottom: 0;
@@ -5694,7 +5694,7 @@ h4, h5, h6 {
 }
 .progress-bar--material__primary,
 .progress-bar--material__secondary {
-  background-color: #3db470;
+  background-color: #30a401;
   border-radius: 0;
 }
 .progress-bar--material__secondary {
@@ -5702,11 +5702,11 @@ h4, h5, h6 {
   z-index: 0;
 }
 .progress-bar--material.progress-bar--indeterminate:before { /* FIXME */
-  background-color: #3db470;
+  background-color: #30a401;
   border-radius: 0;
 }
 .progress-bar--material.progress-bar--indeterminate:after { /* FIXME */
-  background-color: #3db470;
+  background-color: #30a401;
   border-radius: 0;
 }
 /*~
@@ -5758,7 +5758,7 @@ h4, h5, h6 {
 .progress-circular__primary {
   stroke-dasharray: 1, 200;
   stroke-dashoffset: 0;
-  stroke: #3db470;
+  stroke: #30a401;
   -webkit-transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
   transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -5853,7 +5853,7 @@ h4, h5, h6 {
   stroke: transparent;
 }
 .progress-circular--material__primary {
-  stroke: #3db470;
+  stroke: #30a401;
 }
 .progress-circular--material__secondary {
   stroke: #548ba7;
@@ -5896,7 +5896,7 @@ h4, h5, h6 {
   color: #ffffff;
   vertical-align: middle;
   text-align: center;
-  background-color: #3db470;
+  background-color: #30a401;
   border: 0 solid currentColor;
   border-radius: 50%;
   overflow: hidden;
@@ -5906,7 +5906,7 @@ h4, h5, h6 {
 }
 .fab:active {
   box-shadow: 0 3px 6 rgba(0, 0, 0, .12);
-  background-color: rgba(61, 180, 112, 0.7);
+  background-color: rgba(48, 164, 1, 0.7);
   -webkit-transition: all 0.2s ease;
   transition: all 0.2s ease;
   box-shadow: 0 0 6 rgba(0, 0, 0, .12);
@@ -5971,7 +5971,7 @@ h4, h5, h6 {
   color: #ffffff;
   vertical-align: middle;
   text-align: center;
-  background-color: #3db470;
+  background-color: #30a401;
   border: 0 solid currentColor;
   border-radius: 50%;
   overflow: hidden;
@@ -6466,7 +6466,7 @@ h4, h5, h6 {
   height: 56px;
   font-size: 20px;
   text-align: center;
-  color: #3db470;
+  color: #30a401;
   background-color: rgba(255, 255, 255, .9);
   border-radius: 0;
   line-height: 56px;
