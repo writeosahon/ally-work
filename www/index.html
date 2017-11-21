@@ -40,11 +40,11 @@
     <!-- script library for onsen ui -->
     <script src="js/onsenui-2.7.0.min.js"></script>
 
-    <!-- script library for materialize-css -->
-    <!--<script src="js/materialize-0.98.2.min.js"></script>-->
-
     <!-- script library for parsley -->
     <script src="js/parsley-2.7.0.min.js"></script>
+
+    <!-- script library for random.js -->
+    <script src="js/random.min.js"></script>
 
     <!-- hybrid script libraries for intel xdk and cordova -->
     <script src="cordova.js"></script>
@@ -121,6 +121,14 @@
         <ons-progress-circular indeterminate style="transform: scale(2)"></ons-progress-circular>
     </div>
     <div id="loader-modal-message" style="text-align: center; margin-top: 1em; font-size: 1.3em;"></div>
+</ons-modal>
+
+<!-- hour-glass loader modal -->
+<ons-modal id="hour-glass-loader-modal" direction="up">
+    <div style="text-align: center">
+        <ons-icon icon="md-hourglass-alt" size="56px" class="hour-glass-rotation-animation" style="color: #30a401;"></ons-icon>
+    </div>
+    <div class="modal-message" style="text-align: center"></div>
 </ons-modal>
 
 </body>
