@@ -88,13 +88,32 @@ utopiasoftware.ally.controller = {
                 resolve(); // resolve the promise
             }, 0);
         }).then(function () {
+            // load the securely stored / encrypted data into the app
+            // check if the user is currently logged in
+            if (!window.localStorage.getItem("app-status") || window.localStorage.getItem("app-status") == "") {
+                // user is not logged in
+                return null;
+            }
 
-            // run the Microsoft Code-Push plugin
-            /*codePush.sync(null, {updateDialog: {updateTitle: "Updated Content",
-                mandatoryUpdateMessage: "The app has updated content. Press 'Continue' to retrieve content and restart app"},
-                installMode: InstallMode.IMMEDIATE, mandatoryInstallMode: InstallMode.IMMEDIATE}); */
+            return Promise.resolve(intel.security.secureStorage.read({ "id": "ally-user-details" }));
+        }).then(function (instanceId) {
+            if (instanceId == null) {
+                // user is not logged in
+                return null;
+            }
 
-            return;
+            return Promise.resolve(intel.security.secureData.getData(instanceId));
+        }).then(function (secureData) {
+
+            if (secureData == null) {
+                // user is not logged in
+                return null;
+            }
+
+            utopiasoftware.ally.model.appUserDetails = JSON.parse(secureData); // transfer the collected user details to the app
+            // update the first name being displayed in the side menu
+            //$('#side-menu-username').html(utopiasoftware.saveup.model.appUserDetails.firstName);
+            return null;
         }).then(function () {
             // notify the app that the app has been successfully initialised and is ready for further execution (set app ready flag to true)
             utopiasoftware.ally.model.isAppReady = true;
@@ -616,7 +635,7 @@ utopiasoftware.ally.controller = {
                 }
 
                 // listen for the back button event
-                $thisPage.get(0).onDeviceBackButton = function () {
+                $('#onboarding-navigator').get(0).topPage.onDeviceBackButton = function () {
                     // move to the onboarding page
                     $('#onboarding-navigator').get(0).popPage({});
                 };
@@ -686,7 +705,39 @@ utopiasoftware.ally.controller = {
          */
         signupFormValidated: function signupFormValidated() {
 
-            // tell the user that phoe number verification is necessary
+            // check if Internet Connection is available before proceeding
+            if (navigator.connection.type === Connection.NONE) {
+                // no Internet Connection
+                // inform the user that they cannot proceed without Internet
+                window.plugins.toast.showWithOptions({
+                    message: "ALLY account cannot be created without an Internet Connection",
+                    duration: 4000,
+                    position: "top",
+                    styling: {
+                        opacity: 1,
+                        backgroundColor: '#ff0000', //red
+                        textColor: '#FFFFFF',
+                        textSize: 14
+                    }
+                }, function (toastEvent) {
+                    if (toastEvent && toastEvent.event == "touch") {
+                        // user tapped the toast, so hide toast immediately
+                        window.plugins.toast.hide();
+                    }
+                });
+
+                return; // exit method immediately
+            }
+
+            // create the form data to be submitted
+            var createAcctFormData = {
+                firstName: $('#signup-page #signup-firstname').val(),
+                lastName: $('#signup-page #signup-lastname').val(),
+                lock: $('#signup-page #signup-secure-pin').val(),
+                phone: $('#signup-page #signup-phone-number').val().startsWith("0") ? $('#signup-page #signup-phone-number').val().replace("0", "+234") : $('#signup-page #signup-phone-number').val()
+            };
+
+            // tell the user that phone number verification is necessary
             new Promise(function (resolve, reject) {
                 ons.notification.confirm('To complete sign up, your phone number must be verified. <br>' + 'Usual SMS charge from your phone network provider will apply.<br> ' + 'Please ensure you have sufficient airtime to send/receive one SMS', { title: 'Verify Phone Number',
                     buttonLabels: ['Cancel', 'Ok'] }) // Ask for confirmation
@@ -703,8 +754,19 @@ utopiasoftware.ally.controller = {
 
                 //return null;
                 return utopiasoftware.ally.validatePhoneNumber($('#signup-page #signup-phone-number').val());
-            }).catch(function (err) {});
-            $('ons-splitter').get(0).content.load("app-main-template");
+            }).then(function () {
+                $('ons-splitter').get(0).content.load("app-main-template");
+            }).catch(function (err) {
+                if (typeof err !== "string") {
+                    // if err is NOT a String
+                    err = "Sorry. Sign Up could not be completed";
+                }
+                $('#loader-modal').get(0).hide(); // hide loader
+                ons.notification.alert({ title: '<ons-icon icon="md-close-circle-o" size="32px" ' + 'style="color: red;"></ons-icon> Sign Up Failed',
+                    messageHTML: '<span>' + err + '</span>',
+                    cancelable: false
+                });
+            });
         },
 
         /**
@@ -744,6 +806,77 @@ utopiasoftware.ally.controller = {
                 inputElement.value = "";
             }
         }
+
+    },
+
+    /**
+     * object is view-model for dashboard page
+     */
+    dashboardPageViewModel: {
+
+        /**
+         * event is triggered when page is initialised
+         */
+        pageInit: function pageInit(event) {
+
+            var $thisPage = $(event.target); // get the current page shown
+            // disable the swipeable feature for the app splitter
+            $('ons-splitter-side').removeAttr("swipeable");
+
+            // call the function used to initialise the app page if the app is fully loaded
+            loadPageOnAppReady();
+
+            //function is used to initialise the page if the app is fully ready for execution
+            function loadPageOnAppReady() {
+                // check to see if onsen is ready and if all app loading has been completed
+                if (!ons.isReady() || utopiasoftware.ally.model.isAppReady === false) {
+                    setTimeout(loadPageOnAppReady, 500); // call this function again after half a second
+                    return;
+                }
+
+                // listen for the back button event
+                $('#app-main-navigator').get(0).topPage.onDeviceBackButton = function () {
+                    ons.notification.confirm('Do you want to close the app?', { title: 'Exit2',
+                        buttonLabels: ['No', 'Yes'] }) // Ask for confirmation
+                    .then(function (index) {
+                        if (index === 1) {
+                            // OK button
+                            navigator.app.exitApp(); // Close the app
+                        }
+                    });
+                };
+
+                // initialise the DropDownList
+                var dropDownListObject = new ej.dropdowns.DropDownList({});
+
+                // render initialized DropDownList
+                dropDownListObject.appendTo('#dashboard-period-select');
+
+                // hide the loader
+                $('#loader-modal').get(0).hide();
+            }
+        },
+
+        /**
+         * method is triggered when page is shown
+         */
+        pageShow: function pageShow() {
+            // disable the swipeable feature for the app splitter
+            $('ons-splitter-side').removeAttr("swipeable");
+        },
+
+        /**
+         * method is triggered when page is hidden
+         */
+        pageHide: function pageHide() {
+            // stop the rotating animation on main menu page
+            //$('.rotating-infinite-ease-in-1').addClass('rotating-infinite-ease-in-1-paused');
+        },
+
+        /**
+         * method is triggered when page is destroyed
+         */
+        pageDestroy: function pageDestroy() {}
 
     }
 

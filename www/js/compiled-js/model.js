@@ -21,7 +21,11 @@ utopiasoftware.ally.model = {
      *
      * @type {boolean} flag for if the hybrid plugins and DOM content are ready for execution
      */
-    isAppReady: false
+    isAppReady: false,
+
+    ally_base_url: "https://myallyapp.com/",
+
+    appUserDetails: null
 };
 
 
@@ -74,7 +78,7 @@ $(document).on("hide", "#forgot-pin-page", utopiasoftware.ally.controller.forgot
 $(document).on("destroy", "#forgot-pin-page", utopiasoftware.ally.controller.forgotPinPageViewModel.pageDestroy);
 
 // listen for the initialisation of the Main-Menu page
-$(document).on("init", "#main-menu-page", utopiasoftware.ally.controller.onboardingPageViewModel.pageInit);
+$(document).on("init", "#main-menu-page", utopiasoftware.ally.controller.mainMenuPageViewModel.pageInit);
 
 // listen for when the Main-Menu page is shown
 $(document).on("show", "#main-menu-page", utopiasoftware.ally.controller.mainMenuPageViewModel.pageShow);
@@ -84,3 +88,15 @@ $(document).on("hide", "#main-menu-page", utopiasoftware.ally.controller.mainMen
 
 // used to listen for 'menu-tabbar' tabbar tab changes on the "main menu" page
 $(document).on("prechange", "#menu-tabbar", utopiasoftware.ally.controller.mainMenuPageViewModel.tabbarPreChange);
+
+
+$(document).on("init", "#dashboard-page", utopiasoftware.ally.controller.dashboardPageViewModel.pageInit);
+
+// listen for when the Main-Menu page is shown
+$(document).on("show", "#dashboard-page", utopiasoftware.ally.controller.dashboardPageViewModel.pageShow);
+
+// listen for when the Main-Menu page is hidden
+$(document).on("hide", "#dashboard-page", utopiasoftware.ally.controller.dashboardPageViewModel.pageHide);
+
+// listen for when the Main-Menu page is destroyed
+$(document).on("destroy", "#dashboard-page", utopiasoftware.ally.controller.dashboardPageViewModel.pageDestroy);

@@ -223,14 +223,14 @@
         -o-transform: rotate(180deg);
         transform: rotate(180deg);
     }
-    55% {
+    60% {
         -ms-transform: rotate(180deg);
         -moz-transform: rotate(180deg);
         -webkit-transform: rotate(180deg);
         -o-transform: rotate(180deg);
         transform: rotate(180deg);
     }
-    56% {
+    66% {
         -ms-transform: rotate(181deg);
         -moz-transform: rotate(181deg);
         -webkit-transform: rotate(181deg);
@@ -246,10 +246,11 @@
     }
 }
 .hour-glass-rotation-animation {
-    -webkit-animation: hour-glass-rotation-animation 2s ease-in infinite;
-    -moz-animation: hour-glass-rotation-animation 2s ease-in infinite;
-    -ms-animation: hour-glass-rotation-animation 2s ease-in infinite;
-    -o-animation: hour-glass-rotation-animation 2s ease-in infinite;
-    animation: hour-glass-rotation-animation 2s ease-in infinite;
+    -webkit-animation: hour-glass-rotation 2s ease-in infinite;
+    -moz-animation: hour-glass-rotation 2s ease-in infinite;
+    -ms-animation: hour-glass-rotation 2s ease-in infinite;
+    -o-animation: hour-glass-rotation 2s ease-in infinite;
+    animation: hour-glass-rotation 2s ease-in infinite;
 }
 /** STYLE FOR ROTATING THE HOUR-GLASS ON THE HOUR GLASS LOADER ENDS **/
+
