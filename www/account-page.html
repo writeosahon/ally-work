@@ -9,6 +9,12 @@
         <div class="center">
             Account
         </div>
+        <div class="right">
+            <ons-toolbar-button style="font-size: 0.75em; display: none;"
+                                onclick="utopiasoftware.ally.controller.dashboardPageViewModel.backButtonClicked()">
+                <ons-icon icon="md-save" ></ons-icon> Save
+            </ons-toolbar-button>
+        </div>
     </ons-toolbar>
 
     <div style="width: 100%; height: 80px;
@@ -21,8 +27,14 @@
         <img src="css/app-images/profile.png" style="height: 100px; width: auto; border-radius: 50%; border: double green 2px">
     </div>
 
+    <ons-fab id="account-reload-fab" position="top right" modifier="mini"
+    style="color: #ffffff; background-color: #30a401; margin-top: 48px !important; display: none;"> <!-- refresh account button -->
+        <ons-icon icon="md-refresh-alt" ></ons-icon>
+    </ons-fab>
+
+    <!-- account-list -->
     <ons-list id="account-list" style="position: fixed; top: 156px; width: 100%;
-    min-height: calc(100vh - 156px - 50px); max-height: calc(100vh - 156px - 50px); overflow-y: scroll"
+    min-height: calc(100vh - 156px - 50px); max-height: calc(100vh - 156px - 50px); overflow-y: scroll; display: none;"
               data-parsley-inputs="ons-input,textarea,ons-select,ons-checkbox"
               data-parsley-excluded="ons-input[type=button], ons-input[type=submit],
                               ons-input[type=reset], ons-input[type=hidden], [disabled], :hidden, [readonly]">
@@ -34,12 +46,19 @@
             </ons-row>
         </ons-list-item>
 
+        <ons-list-item modifier="longdivider" lock-on-drag="yes" style="margin-top: 1em;">
+            <ons-row>
+                <ons-col width="40%" style="color: darkgrey; padding-right: 1em;">LAST UPDATED</ons-col>
+                <ons-col width="60%" style="color: green" style="text-transform: uppercase">JAN 15TH 2017, 2:30PM</ons-col>
+            </ons-row>
+        </ons-list-item>
+
         <ons-list-item modifier="nodivider" lock-on-drag="yes" style="margin-top: 2.5em;">
             <div class="left">
                 <ons-icon icon="md-account-box" class="list-item__icon" fixed-width size="28px"></ons-icon>
             </div>
             <div class="center">
-                <ons-input id="account-firstname" type="text" placeholder="First Name" modifier="transparent"
+                <ons-input id="account-firstname" data-ally-readonly-field type="text" placeholder="First Name" modifier="transparent"
                            pattern="[a-zA-Z]{1}[\w\s\-\.]*[a-zA-Z]{1}"
                            required readonly float
                            data-parsley-required-message="your first name is required"
@@ -53,7 +72,7 @@
                 <ons-icon icon="md-assignment-account" class="list-item__icon" fixed-width size="28px"></ons-icon>
             </div>
             <div class="center">
-                <ons-input id="account-lastname" type="text" placeholder="Last Name" modifier="transparent"
+                <ons-input id="account-lastname" data-ally-readonly-field type="text" placeholder="Last Name" modifier="transparent"
                            pattern="[a-zA-Z]{1}[\w\s\-\.]*[a-zA-Z]{1}"
                            required readonly float
                            data-parsley-required-message="your last name is required"
@@ -82,7 +101,7 @@
                 <ons-icon icon="md-account-box-mail" class="list-item__icon" fixed-width size="28px"></ons-icon>
             </div>
             <div class="center">
-                <ons-input id="account-email" type="email" placeholder="Email (Optional)" modifier="transparent"
+                <ons-input id="account-email" data-ally-readonly-field type="email" placeholder="Email (Optional)" modifier="transparent"
                            readonly float
                            data-parsley-type-message="incorrect email format"
                            style="width: 80%" class="hint--top"></ons-input>
@@ -115,5 +134,25 @@
 
 
     </ons-list>
+
+    <ons-fab id="account-edit-fab" position="bottom right"
+             style="color: #ffffff; background-color: #30a401; display: none;"> <!-- account edit button -->
+        <ons-icon icon="md-edit"></ons-icon>
+    </ons-fab>
+
+    <!-- page preloader item -->
+    <ons-fab id="account-preloading-fab" style="position: fixed; top: calc((100vh - 56px) / 2);
+    margin-left: calc((100vw - 56px) / 2);
+    color: #ffffff; background-color: #30a401; display: inline-block;">
+        <ons-icon icon="md-ally-icon-loading" spin></ons-icon>
+    </ons-fab>
+
+    <!-- page error message display block -->
+    <p id="account-page-error" style="margin-top: 166px; margin-left: 1em;
+    margin-right:1em; text-align: center; min-height: 4em; display: none;">
+        <ons-icon icon="md-close-circle-o" size="55px" style="color: gray"></ons-icon><br>
+        <span style="text-align: center; font-size: 1.1em; color: gray">Sorry we could not load user account info.
+            <br>Please tap the <span class="zmdi zmdi-refresh-alt"></span> button to retry</span>
+    </p>
 
 </ons-page>

@@ -251,4 +251,9 @@
     position: absolute;
     top: 0;
 }
+#account-page #account-preloading-fab ons-icon[spin] { /* increase the speed of the preloader spinner **/
+    -webkit-animation: ons-icon-spin 0.8s infinite linear;
+    -moz-animation: ons-icon-spin 0.8s infinite linear;
+    animation: ons-icon-spin 0.8s infinite linear;
+}
 /** STYLE FOR THE ACCOUNT PAGE BEGINS **/
