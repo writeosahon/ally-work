@@ -23,8 +23,15 @@ utopiasoftware.ally.model = {
      */
     isAppReady: false,
 
-    ally_base_url: "https://myallyapp.com/",
+    /**
+     * property is used to hold the base url for communicating with ALLY app server
+     */
+    ally_base_url: "https://myallyapp.com",
 
+
+    /**
+     * holds details about the currently logged in user
+     */
     appUserDetails: null
 };
 

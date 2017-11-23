@@ -1,0 +1,119 @@
+<!-- account-page -->
+<ons-page id="account-page">
+    <ons-toolbar modifier="transparent">
+        <div class="left">
+            <ons-toolbar-button onclick="utopiasoftware.ally.controller.dashboardPageViewModel.backButtonClicked()">
+                <ons-icon icon="md-long-arrow-left"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+        <div class="center">
+            Account
+        </div>
+    </ons-toolbar>
+
+    <div style="width: 100%; height: 80px;
+    background-image: linear-gradient(45deg, #30a401 0%, rgb(15, 208, 208) 100%);
+    background-repeat: no-repeat; background-size: cover; position: fixed; top: 0; z-index: 1;"><!-- div with color background -->
+    </div>
+
+    <div style="width: 80%; margin-left: 10%; margin-right: 10%; top: 58px; z-index: 3 !important;
+    overflow-y: visible; position: fixed; text-align: center;">
+        <img src="css/app-images/profile.png" style="height: 100px; width: auto; border-radius: 50%; border: double green 2px">
+    </div>
+
+    <ons-list id="account-list" style="position: fixed; top: 156px; width: 100%;
+    min-height: calc(100vh - 156px - 50px); max-height: calc(100vh - 156px - 50px); overflow-y: scroll"
+              data-parsley-inputs="ons-input,textarea,ons-select,ons-checkbox"
+              data-parsley-excluded="ons-input[type=button], ons-input[type=submit],
+                              ons-input[type=reset], ons-input[type=hidden], [disabled], :hidden, [readonly]">
+
+        <ons-list-item modifier="longdivider" lock-on-drag="yes" style="margin-top: 1em;">
+            <ons-row>
+                <ons-col width="40%" style="color: darkgrey; padding-right: 1em;">WALLET BALANCE</ons-col>
+                <ons-col width="60%" style="color: green">24,456.50</ons-col>
+            </ons-row>
+        </ons-list-item>
+
+        <ons-list-item modifier="nodivider" lock-on-drag="yes" style="margin-top: 2.5em;">
+            <div class="left">
+                <ons-icon icon="md-account-box" class="list-item__icon" fixed-width size="28px"></ons-icon>
+            </div>
+            <div class="center">
+                <ons-input id="account-firstname" type="text" placeholder="First Name" modifier="transparent"
+                           pattern="[a-zA-Z]{1}[\w\s\-\.]*[a-zA-Z]{1}"
+                           required readonly float
+                           data-parsley-required-message="your first name is required"
+                           data-parsley-pattern-message="incorrect first name format. please check your spelling"
+                           style="width: 80%" class="hint--top"></ons-input>
+            </div>
+        </ons-list-item>
+
+        <ons-list-item modifier="nodivider" lock-on-drag="yes">
+            <div class="left">
+                <ons-icon icon="md-assignment-account" class="list-item__icon" fixed-width size="28px"></ons-icon>
+            </div>
+            <div class="center">
+                <ons-input id="account-lastname" type="text" placeholder="Last Name" modifier="transparent"
+                           pattern="[a-zA-Z]{1}[\w\s\-\.]*[a-zA-Z]{1}"
+                           required readonly float
+                           data-parsley-required-message="your last name is required"
+                           data-parsley-pattern-message="incorrect last name format. please check your spelling"
+                           style="width: 80%" class="hint--top"></ons-input>
+            </div>
+        </ons-list-item>
+
+        <ons-list-item modifier="nodivider" lock-on-drag="yes">
+            <div class="left">
+                <ons-icon icon="md-account-box-phone" class="list-item__icon" fixed-width size="28px"></ons-icon>
+            </div>
+            <div class="center">
+                <ons-input id="account-phone-number" type="tel" placeholder="Your Phone Number" modifier="transparent"
+                           required readonly float
+                           pattern="((0[1-9]{1}[0-9]{9}|\+234[1-9]{1}[0-9]{9})|\+[1-9]{1}[0-9]{4,})"
+                           data-parsley-required-message="your phone number is required"
+                           data-parsley-pattern-message="incorrect phone number format. phone number must be in international format (starting with '+')"
+                           data-parsley-type-message="incorrect phone number format. phone number must be in international format (starting with '+')"
+                           style="width: 70%" class=""></ons-input>
+            </div>
+        </ons-list-item>
+
+        <ons-list-item modifier="nodivider" lock-on-drag="yes">
+            <div class="left">
+                <ons-icon icon="md-account-box-mail" class="list-item__icon" fixed-width size="28px"></ons-icon>
+            </div>
+            <div class="center">
+                <ons-input id="account-email" type="email" placeholder="Email (Optional)" modifier="transparent"
+                           readonly float
+                           data-parsley-type-message="incorrect email format"
+                           style="width: 80%" class="hint--top"></ons-input>
+            </div>
+        </ons-list-item>
+
+        <ons-list-item modifier="nodivider" lock-on-drag="yes">
+            <div class="left">
+                <ons-icon icon="md-account-box-mail" class="list-item__icon" fixed-width size="28px"></ons-icon>
+            </div>
+            <div class="center">
+                <ons-input id="account-email2" type="email" placeholder="Email (Optional)" modifier="transparent"
+                           readonly float
+                           data-parsley-type-message="incorrect email format"
+                           style="width: 80%" class="hint--top"></ons-input>
+            </div>
+        </ons-list-item>
+
+        <ons-list-item modifier="nodivider" lock-on-drag="yes">
+            <div class="left">
+                <ons-icon icon="md-account-box-mail" class="list-item__icon" fixed-width size="28px"></ons-icon>
+            </div>
+            <div class="center">
+                <ons-input id="account-email3" type="email" placeholder="Email3 (Optional)" modifier="transparent"
+                           readonly float
+                           data-parsley-type-message="incorrect email format"
+                           style="width: 80%" class="hint--top"></ons-input>
+            </div>
+        </ons-list-item>
+
+
+    </ons-list>
+
+</ons-page>

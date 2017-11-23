@@ -186,20 +186,14 @@
         -o-transform: rotate(180deg);
         transform: rotate(180deg);
     }
-    55% {
+    70% {
         -ms-transform: rotate(180deg);
         -moz-transform: rotate(180deg);
         -webkit-transform: rotate(180deg);
         -o-transform: rotate(180deg);
         transform: rotate(180deg);
     }
-    56% {
-        -ms-transform: rotate(181deg);
-        -moz-transform: rotate(181deg);
-        -webkit-transform: rotate(181deg);
-        -o-transform: rotate(181deg);
-        transform: rotate(181deg);
-    }
+
     100% {
         -ms-transform: rotate(360deg);
         -moz-transform: rotate(360deg);
@@ -223,20 +217,14 @@
         -o-transform: rotate(180deg);
         transform: rotate(180deg);
     }
-    60% {
+    70% {
         -ms-transform: rotate(180deg);
         -moz-transform: rotate(180deg);
         -webkit-transform: rotate(180deg);
         -o-transform: rotate(180deg);
         transform: rotate(180deg);
     }
-    66% {
-        -ms-transform: rotate(181deg);
-        -moz-transform: rotate(181deg);
-        -webkit-transform: rotate(181deg);
-        -o-transform: rotate(181deg);
-        transform: rotate(181deg);
-    }
+
     100% {
         -ms-transform: rotate(360deg);
         -moz-transform: rotate(360deg);
@@ -254,3 +242,13 @@
 }
 /** STYLE FOR ROTATING THE HOUR-GLASS ON THE HOUR GLASS LOADER ENDS **/
 
+
+/** STYLE FOR THE ACCOUNT PAGE BEGINS **/
+#account-page ons-list, #account-page ons-list-item {
+    background-color: transparent;
+}
+#account-page .page--material__content {
+    position: absolute;
+    top: 0;
+}
+/** STYLE FOR THE ACCOUNT PAGE BEGINS **/

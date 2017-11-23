@@ -204,16 +204,15 @@ utopiasoftware.ally.controller = {
                 }
 
                 // listen for the back button event
-                $('#app-main-navigator').get(0).topPage.onDeviceBackButton = function () {
-                    ons.notification.confirm('Do you want to close the app?', { title: 'Exit',
-                        buttonLabels: ['No', 'Yes'] }) // Ask for confirmation
-                    .then(function (index) {
-                        if (index === 1) {
-                            // OK button
-                            navigator.app.exitApp(); // Close the app
-                        }
-                    });
-                };
+                /*$('#app-main-navigator').get(0).topPage.onDeviceBackButton = function(){
+                    ons.notification.confirm('Do you want to close the app?', {title: 'Exit',
+                            buttonLabels: ['No', 'Yes']}) // Ask for confirmation
+                        .then(function(index) {
+                            if (index === 1) { // OK button
+                                navigator.app.exitApp(); // Close the app
+                            }
+                        });
+                }; */
 
                 // hide the loader
                 $('#loader-modal').get(0).hide();
@@ -407,10 +406,11 @@ utopiasoftware.ally.controller = {
                 };
 
                 // check if the user is currently logged in
-                if (window.localStorage.getItem("app-status") && window.localStorage.getItem("app-status") != "") {} // user is logged in
-                // display the user's save phone number on the login page phonenumber input
-                //$('#login-form #user-phone').val(utopiasoftware.saveup.model.appUserDetails.phoneNumber);
-
+                if (window.localStorage.getItem("app-status") && window.localStorage.getItem("app-status") != "") {
+                    // user is logged in
+                    // display the user's save phone number on the login page phonenumber input
+                    $('#login-page #login-phone-number').val(utopiasoftware.ally.model.appUserDetails.phone);
+                }
 
                 // initialise the login form validation
                 utopiasoftware.ally.controller.loginPageViewModel.formValidator = $('#login-form').parsley();
@@ -486,7 +486,123 @@ utopiasoftware.ally.controller = {
          */
         loginFormValidated: function loginFormValidated() {
 
-            $('ons-splitter').get(0).content.load('app-main-template');
+            // check if Internet Connection is available before proceeding
+            if (navigator.connection.type === Connection.NONE) {
+                // no Internet Connection
+                // inform the user that they cannot proceed without Internet
+                window.plugins.toast.showWithOptions({
+                    message: "user cannot login to ALLY account without an Internet Connection",
+                    duration: 4000,
+                    position: "top",
+                    styling: {
+                        opacity: 1,
+                        backgroundColor: '#ff0000', //red
+                        textColor: '#FFFFFF',
+                        textSize: 14
+                    }
+                }, function (toastEvent) {
+                    if (toastEvent && toastEvent.event == "touch") {
+                        // user tapped the toast, so hide toast immediately
+                        window.plugins.toast.hide();
+                    }
+                });
+
+                return; // exit method immediately
+            }
+
+            // create the form data to be submitted
+            var formData = {
+                lock: $('#login-page #login-pin').val(),
+                phone: $('#login-page #login-phone-number').val().startsWith("0") ? $('#login-page #login-phone-number').val().replace("0", "+234") : $('#login-page #login-phone-number').val()
+            };
+
+            // tell the user that phone number verification is necessary
+            Promise.resolve().then(function () {
+                // display the loader message to indicate that account is being created;
+                $('#loader-modal-message').html("Completing User Login...");
+                return Promise.resolve($('#loader-modal').get(0).show()); // show loader
+            }).then(function () {
+                // clear all data belonging to previous user
+                var promisesArray = []; // holds all the Promise objects for all data being deleted
+
+                var promiseObject = new Promise(function (resolve, reject) {
+                    // delete the user app details from secure storage if it exists
+                    Promise.resolve(intel.security.secureStorage.delete({ 'id': 'ally-user-details' })).then(function () {
+                        resolve();
+                    }, function () {
+                        resolve();
+                    }); // ALWAYS resolve the promise
+                });
+
+                // add the promise object to the promise array
+                promisesArray.push(promiseObject);
+
+                // return promise when all operations have completed
+                return Promise.all(promisesArray);
+            }).then(function () {
+                // clear all data in the device local/session storage
+                window.localStorage.clear();
+                window.sessionStorage.clear();
+                return null;
+            }).then(function () {
+                // upload the user details to the server
+                return Promise.resolve($.ajax({
+                    url: utopiasoftware.ally.model.ally_base_url + "/mobile/login.php",
+                    type: "post",
+                    contentType: "application/x-www-form-urlencoded",
+                    beforeSend: function beforeSend(jqxhr) {
+                        jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                    },
+                    dataType: "text",
+                    timeout: 240000, // wait for 4 minutes before timeout of request
+                    processData: true,
+                    data: formData
+                }));
+            }).then(function (serverResponseText) {
+                serverResponseText += "";
+                var newUser = JSON.parse(serverResponseText.trim()); // get the new user object
+
+                // check if any error occurred
+                if (newUser.status == "error") {
+                    // an error occured
+                    throw newUser.message; // throw the error message attached to this error
+                }
+
+                // store user data
+                utopiasoftware.ally.model.appUserDetails = newUser; // store the user details
+
+                return newUser; // return user data
+            }).then(function (newUser) {
+                // create a cypher data of the user details
+                return Promise.resolve(intel.security.secureData.createFromData({ "data": JSON.stringify(newUser) }));
+            }).then(function (instanceId) {
+                // store the cyphered data in secure persistent storage
+                return Promise.resolve(intel.security.secureStorage.write({ "id": "ally-user-details", "instanceID": instanceId }));
+            }).then(function () {
+
+                // set app-status local storage (as user phone number)
+                window.localStorage.setItem("app-status", utopiasoftware.ally.model.appUserDetails.phone);
+
+                // update the first name being displayed in the side menu
+                //$('#side-menu-username').html(utopiasoftware.saveup.model.appUserDetails.firstName);
+
+                return $('#loader-modal').get(0).hide(); // hide loader
+            }).then(function () {
+                // navigate to the main menu page
+                return $('ons-splitter').get(0).content.load("app-main-template");
+            }).then(function () {
+                ons.notification.toast("Login complete! Welcome", { timeout: 4000 });
+            }).catch(function (err) {
+                if (typeof err !== "string") {
+                    // if err is NOT a String
+                    err = "Sorry. Login could not be completed";
+                }
+                $('#loader-modal').get(0).hide(); // hide loader
+                ons.notification.alert({ title: '<ons-icon icon="md-close-circle-o" size="32px" ' + 'style="color: red;"></ons-icon> Log In Failed',
+                    messageHTML: '<span>' + err + '</span>',
+                    cancelable: false
+                });
+            });
         }
 
     },
@@ -755,7 +871,79 @@ utopiasoftware.ally.controller = {
                 //return null;
                 return utopiasoftware.ally.validatePhoneNumber($('#signup-page #signup-phone-number').val());
             }).then(function () {
-                $('ons-splitter').get(0).content.load("app-main-template");
+                // display the loader message to indicate that account is being created;
+                $('#loader-modal-message').html("Completing Sign Up...");
+                return Promise.resolve($('#loader-modal').get(0).show()); // show loader
+            }).then(function () {
+                // clear all data belonging to previous user
+                var promisesArray = []; // holds all the Promise objects for all data being deleted
+
+                var promiseObject = new Promise(function (resolve, reject) {
+                    // delete the user app details from secure storage if it exists
+                    Promise.resolve(intel.security.secureStorage.delete({ 'id': 'ally-user-details' })).then(function () {
+                        resolve();
+                    }, function () {
+                        resolve();
+                    }); // ALWAYS resolve the promise
+                });
+
+                // add the promise object to the promise array
+                promisesArray.push(promiseObject);
+
+                // return promise when all operations have completed
+                return Promise.all(promisesArray);
+            }).then(function () {
+                // clear all data in the device local/session storage
+                window.localStorage.clear();
+                window.sessionStorage.clear();
+                return null;
+            }).then(function () {
+                // upload the user details to the server
+                return Promise.resolve($.ajax({
+                    url: utopiasoftware.ally.model.ally_base_url + "/mobile/signup.php",
+                    type: "post",
+                    contentType: "application/x-www-form-urlencoded",
+                    beforeSend: function beforeSend(jqxhr) {
+                        jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                    },
+                    dataType: "text",
+                    timeout: 240000, // wait for 4 minutes before timeout of request
+                    processData: true,
+                    data: createAcctFormData
+                }));
+            }).then(function (serverResponseText) {
+                serverResponseText += "";
+                var newUser = JSON.parse(serverResponseText.trim()); // get the new user object
+
+                // check if any error occurred
+                if (newUser.status == "error") {
+                    // an error occured
+                    throw newUser.message; // throw the error message attached to this error
+                }
+
+                // store user data
+                utopiasoftware.ally.model.appUserDetails = newUser;
+
+                return newUser;
+            }).then(function (newUser) {
+                // create a cypher data of the user details
+                return Promise.resolve(intel.security.secureData.createFromData({ "data": JSON.stringify(newUser) }));
+            }).then(function (instanceId) {
+                // store the cyphered data in secure persistent storage
+                return Promise.resolve(intel.security.secureStorage.write({ "id": "ally-user-details", "instanceID": instanceId }));
+            }).then(function () {
+
+                // set app-status local storage (as user phone number)
+                window.localStorage.setItem("app-status", utopiasoftware.ally.model.appUserDetails.phone);
+
+                // update the first name being displayed in the side menu
+                //$('#side-menu-username').html(utopiasoftware.saveup.model.appUserDetails.firstName);
+
+                return $('#loader-modal').get(0).hide(); // hide loader
+            }).then(function () {
+                return $('ons-splitter').get(0).content.load("app-main-template");
+            }).then(function () {
+                ons.notification.toast("Sign Up complete! Welcome", { timeout: 4000 });
             }).catch(function (err) {
                 if (typeof err !== "string") {
                     // if err is NOT a String
@@ -835,16 +1023,7 @@ utopiasoftware.ally.controller = {
                 }
 
                 // listen for the back button event
-                $('#app-main-navigator').get(0).topPage.onDeviceBackButton = function () {
-                    ons.notification.confirm('Do you want to close the app?', { title: 'Exit2',
-                        buttonLabels: ['No', 'Yes'] }) // Ask for confirmation
-                    .then(function (index) {
-                        if (index === 1) {
-                            // OK button
-                            navigator.app.exitApp(); // Close the app
-                        }
-                    });
-                };
+                $thisPage.get(0).onDeviceBackButton = utopiasoftware.ally.controller.dashboardPageViewModel.backButtonClicked;
 
                 // initialise the DropDownList
                 var dropDownListObject = new ej.dropdowns.DropDownList({});
@@ -876,7 +1055,29 @@ utopiasoftware.ally.controller = {
         /**
          * method is triggered when page is destroyed
          */
-        pageDestroy: function pageDestroy() {}
+        pageDestroy: function pageDestroy() {},
+
+        /**
+         * method is triggered when back button or device back button is clicked
+         */
+        backButtonClicked: function backButtonClicked() {
+
+            // check if the side menu is open
+            if ($('ons-splitter').get(0).right.isOpen) {
+                // side menu open, so close it
+                $('ons-splitter').get(0).right.close();
+                return; // exit the method
+            }
+
+            ons.notification.confirm('Do you want to close the app?', { title: 'Exit',
+                buttonLabels: ['No', 'Yes'] }) // Ask for confirmation
+            .then(function (index) {
+                if (index === 1) {
+                    // OK button
+                    navigator.app.exitApp(); // Close the app
+                }
+            });
+        }
 
     }
 
