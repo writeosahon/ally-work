@@ -102,6 +102,63 @@ var utopiasoftware = {
             });
 
             return phoneNumberVerifiedPromise;
+        },
+
+
+        /**
+         * method returns a Promise which saves the app details of the current user (in encrypted persistent storage) OR
+         * the Promise rejects with an error object
+         *
+         * @param userDetails {Object} contains the user details to be saved in encrypted storage
+         *
+         * @returns {Promise}
+         */
+        saveUserAppDetails: function(userDetails){
+
+            return new Promise(function(resolve, reject){
+
+                // write the provided user details to encrypted storage
+                Promise.resolve(intel.security.secureData.
+                createFromData({"data": JSON.stringify(userDetails)})).
+                then(function(instanceId){
+
+                    return Promise.resolve(
+                        intel.security.secureStorage.write({"id": "ally-user-details", "instanceID": instanceId})
+                    );
+                }).
+                then(function(){
+                    resolve(userDetails); // return the provided userDetails parameter back to the caller and resolve the Promise
+                }).
+                catch(function(err){
+                    reject(err); // reject the Promise with the provided error
+                })
+            });
+        },
+
+
+        /**
+         * method returns a Promise which contains the cached app details of the current user OR
+         * the Promise rejects with an error object
+         *
+         * @returns {Promise}
+         */
+        loadUserCachedAppDetails: function(){
+
+            return new Promise(function(resolve, reject){
+
+                // read the cached data from encrypted storage
+                Promise.resolve(intel.security.secureStorage.read({'id':'ally-user-details'})).
+                then(function(instanceId){
+
+                    return Promise.resolve(intel.security.secureData.getData(instanceId));
+                }).
+                then(function(userDetails){
+                    resolve(JSON.parse(userDetails)); // return the cached app details and resolve the Promise
+                }).
+                catch(function(err){
+                    reject(err); // reject the Promise with the provided error
+                })
+            });
         }
     }
 };

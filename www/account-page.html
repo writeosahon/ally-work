@@ -2,7 +2,7 @@
 <ons-page id="account-page">
     <ons-toolbar modifier="transparent">
         <div class="left">
-            <ons-toolbar-button onclick="utopiasoftware.ally.controller.dashboardPageViewModel.backButtonClicked()">
+            <ons-toolbar-button onclick="utopiasoftware.ally.controller.accountPageViewModel.backButtonClicked()">
                 <ons-icon icon="md-long-arrow-left"></ons-icon>
             </ons-toolbar-button>
         </div>
@@ -10,8 +10,8 @@
             Account
         </div>
         <div class="right">
-            <ons-toolbar-button style="font-size: 0.75em; display: none;"
-                                onclick="utopiasoftware.ally.controller.dashboardPageViewModel.backButtonClicked()">
+            <ons-toolbar-button id="account-save" style="font-size: 0.75em; display: none;"
+                                onclick="utopiasoftware.ally.controller.accountPageViewModel.saveAccountButtonClicked()">
                 <ons-icon icon="md-save" ></ons-icon> Save
             </ons-toolbar-button>
         </div>
@@ -28,31 +28,33 @@
     </div>
 
     <ons-fab id="account-reload-fab" position="top right" modifier="mini"
-    style="color: #ffffff; background-color: #30a401; margin-top: 48px !important; display: none;"> <!-- refresh account button -->
+    style="color: #ffffff; background-color: #30a401; margin-top: 48px !important; display: none;"
+    onclick="utopiasoftware.ally.controller.accountPageViewModel.refreshAccountButtonClicked();"> <!-- refresh/reload account button -->
         <ons-icon icon="md-refresh-alt" ></ons-icon>
     </ons-fab>
 
     <!-- account-list -->
     <ons-list id="account-list" style="position: fixed; top: 156px; width: 100%;
-    min-height: calc(100vh - 156px - 50px); max-height: calc(100vh - 156px - 50px); overflow-y: scroll; display: none;"
-              data-parsley-inputs="ons-input,textarea,ons-select,ons-checkbox"
-              data-parsley-excluded="ons-input[type=button], ons-input[type=submit],
-                              ons-input[type=reset], ons-input[type=hidden], [disabled], :hidden, [readonly]">
+    min-height: calc(100vh - 156px - 50px); max-height: calc(100vh - 156px - 50px); overflow-y: scroll; display: none;">
 
         <ons-list-item modifier="longdivider" lock-on-drag="yes" style="margin-top: 1em;">
-            <ons-row>
+            <ons-row style="font-size: 0.7em;">
                 <ons-col width="40%" style="color: darkgrey; padding-right: 1em;">WALLET BALANCE</ons-col>
-                <ons-col width="60%" style="color: green">24,456.50</ons-col>
+                <ons-col id="account-wallet-balance" width="60%" style="color: green">24,456.50</ons-col>
             </ons-row>
         </ons-list-item>
 
         <ons-list-item modifier="longdivider" lock-on-drag="yes" style="margin-top: 1em;">
-            <ons-row>
+            <ons-row style="font-size: 0.7em;">
                 <ons-col width="40%" style="color: darkgrey; padding-right: 1em;">LAST UPDATED</ons-col>
                 <ons-col width="60%" style="color: green" style="text-transform: uppercase">JAN 15TH 2017, 2:30PM</ons-col>
             </ons-row>
         </ons-list-item>
 
+        <!-- form for user account details -->
+        <form id="account-form" autocomplete="off" data-parsley-inputs="ons-input,textarea,ons-select,ons-checkbox"
+              data-parsley-excluded="ons-input[type=button], ons-input[type=submit],
+                              ons-input[type=reset], ons-input[type=hidden], [disabled], :hidden, [readonly]">
         <ons-list-item modifier="nodivider" lock-on-drag="yes" style="margin-top: 2.5em;">
             <div class="left">
                 <ons-icon icon="md-account-box" class="list-item__icon" fixed-width size="28px"></ons-icon>
@@ -107,36 +109,13 @@
                            style="width: 80%" class="hint--top"></ons-input>
             </div>
         </ons-list-item>
-
-        <ons-list-item modifier="nodivider" lock-on-drag="yes">
-            <div class="left">
-                <ons-icon icon="md-account-box-mail" class="list-item__icon" fixed-width size="28px"></ons-icon>
-            </div>
-            <div class="center">
-                <ons-input id="account-email2" type="email" placeholder="Email (Optional)" modifier="transparent"
-                           readonly float
-                           data-parsley-type-message="incorrect email format"
-                           style="width: 80%" class="hint--top"></ons-input>
-            </div>
-        </ons-list-item>
-
-        <ons-list-item modifier="nodivider" lock-on-drag="yes">
-            <div class="left">
-                <ons-icon icon="md-account-box-mail" class="list-item__icon" fixed-width size="28px"></ons-icon>
-            </div>
-            <div class="center">
-                <ons-input id="account-email3" type="email" placeholder="Email3 (Optional)" modifier="transparent"
-                           readonly float
-                           data-parsley-type-message="incorrect email format"
-                           style="width: 80%" class="hint--top"></ons-input>
-            </div>
-        </ons-list-item>
-
+        </form>
 
     </ons-list>
 
     <ons-fab id="account-edit-fab" position="bottom right"
-             style="color: #ffffff; background-color: #30a401; display: none;"> <!-- account edit button -->
+             style="color: #ffffff; background-color: #30a401; display: none;"
+    onclick="utopiasoftware.ally.controller.accountPageViewModel.editAccountButtonClicked();"> <!-- account edit button -->
         <ons-icon icon="md-edit"></ons-icon>
     </ons-fab>
 

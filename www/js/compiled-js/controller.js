@@ -552,7 +552,7 @@ utopiasoftware.ally.controller = {
             };
 
 
-            // tell the user that phone number verification is necessary
+            // begin login process
             Promise.resolve().
             then(function(){
                 // display the loader message to indicate that account is being created;
@@ -602,6 +602,8 @@ utopiasoftware.ally.controller = {
             then(function(serverResponseText){
                 serverResponseText +=  "";
                 var newUser = JSON.parse(serverResponseText.trim()); // get the new user object
+                // add a timestamp for the last time user details was updated
+                newUser._lastUpdatedDate = Date.now();
 
                 // check if any error occurred
                 if(newUser.status == "error"){ // an error occured
@@ -639,7 +641,7 @@ utopiasoftware.ally.controller = {
                 return $('ons-splitter').get(0).content.load("app-main-template");
             }).
             then(function(){
-                ons.notification.toast("Login complete! Welcome", {timeout:4000});
+                ons.notification.toast("Login complete! Welcome", {timeout:3000});
             }).
             catch(function(err){
                 if(typeof err !== "string"){ // if err is NOT a String
@@ -991,6 +993,8 @@ utopiasoftware.ally.controller = {
             then(function(serverResponseText){
                 serverResponseText +=  "";
                 var newUser = JSON.parse(serverResponseText.trim()); // get the new user object
+                // add a timestamp for the last time user details was updated
+                newUser._lastUpdatedDate = Date.now();
 
                 // check if any error occurred
                 if(newUser.status == "error"){ // an error occured
@@ -1028,7 +1032,7 @@ utopiasoftware.ally.controller = {
                 return $('ons-splitter').get(0).content.load("app-main-template");
             }).
             then(function(){
-                ons.notification.toast("Sign Up complete! Welcome", {timeout:4000});
+                ons.notification.toast("Sign Up complete! Welcome", {timeout:3000});
             }).
             catch(function(err){
                 if(typeof err !== "string"){ // if err is NOT a String
@@ -1169,6 +1173,465 @@ utopiasoftware.ally.controller = {
                         navigator.app.exitApp(); // Close the app
                     }
                 });
+        }
+
+    },
+
+    /**
+     * object is view-model for account page
+     */
+    accountPageViewModel: {
+
+        /**
+         * used to hold the parsley form validation object for the page
+         */
+        formValidator: null,
+
+        /**
+         * event is triggered when page is initialised
+         */
+        pageInit: function(event){
+
+            var $thisPage = $(event.target); // get the current page shown
+            // disable the swipeable feature for the app splitter
+            $('ons-splitter-side').removeAttr("swipeable");
+
+            // call the function used to initialise the app page if the app is fully loaded
+            loadPageOnAppReady();
+
+            //function is used to initialise the page if the app is fully ready for execution
+            function loadPageOnAppReady(){
+                // check to see if onsen is ready and if all app loading has been completed
+                if(!ons.isReady() || utopiasoftware.ally.model.isAppReady === false){
+                    setTimeout(loadPageOnAppReady, 500); // call this function again after half a second
+                    return;
+                }
+
+                // listen for the back button event
+                $thisPage.get(0).onDeviceBackButton = utopiasoftware.ally.controller.accountPageViewModel.backButtonClicked;
+
+                $('#account-preloading-fab', $thisPage).css("display", "inline-block"); // display page preloader
+
+                // initialise the form validation
+                utopiasoftware.ally.controller.accountPageViewModel.formValidator = $('#account-page #account-form').parsley();
+
+                // listen for form field validation failure event
+                utopiasoftware.ally.controller.accountPageViewModel.formValidator.on('field:error', function(fieldInstance) {
+                    // get the element that triggered the field validation error and use it to display tooltip
+                    // display tooltip
+                    $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                    $(fieldInstance.$element).attr("data-hint", fieldInstance.getErrorsMessages()[0]);
+                });
+
+                // listen for the form field validation success event
+                utopiasoftware.ally.controller.accountPageViewModel.formValidator.on('field:success', function(fieldInstance) {
+                    // remove tooltip from element
+                    $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                    $(fieldInstance.$element).removeAttr("data-hint");
+                });
+
+                // listen for the form validation success
+                utopiasoftware.ally.controller.accountPageViewModel.formValidator.on('form:success',
+                    utopiasoftware.ally.controller.accountPageViewModel.accountFormValidated);
+
+                // load the user data todo
+                utopiasoftware.ally.controller.accountPageViewModel.loadUserAccountData().
+                then(function(userDetails){ // save the returned user details in app cache
+                    return utopiasoftware.ally.saveUserAppDetails(userDetails);
+                }).
+                then(function(userDetails){ // update the page with the collect data details
+
+                    // update user data on app
+                    utopiasoftware.ally.model.appUserDetails = userDetails;
+
+                    $('#account-wallet-balance', $thisPage).html(userDetails.balance);
+                    $('#account-firstname', $thisPage).val(userDetails.firstname);
+                    $('#account-lastname', $thisPage).val(userDetails.lastname);
+                    $('#account-phone-number', $thisPage).val(userDetails.phone);
+                    $('#account-email', $thisPage).val((userDetails.email && userDetails.email != "") ? userDetails.email : "");
+
+                    // display the necessary page components
+                    $('#account-list', $thisPage).css("display", "block");
+                    $('#account-reload-fab', $thisPage).css("display", "inline-block");
+                    $('#account-edit-fab', $thisPage).css("display", "inline-block");
+
+                    // hide necessary page components
+                    $('#account-save', $thisPage).css("display", "none");
+                    $('#account-page-error', $thisPage).css("display", "none");
+                    // hide page preloader
+                    $('#account-preloading-fab', $thisPage).css("display", "none");
+
+                    // hide the loader
+                    $('#loader-modal').get(0).hide();
+                }).
+                catch(function(){ // an error occurred when trying to load the user data
+
+                    // hide the necessary page components
+                    $('#account-list', $thisPage).css("display", "none");
+                    $('#account-save', $thisPage).css("display", "none");
+                    $('#account-edit-fab', $thisPage).css("display", "none");
+
+                    // display necessary page components
+                    $('#account-page-error', $thisPage).css("display", "block");
+                    $('#account-reload-fab', $thisPage).css("display", "inline-block");
+
+                    // hide page preloader
+                    $('#account-preloading-fab', $thisPage).css("display", "none");
+
+                    // hide the loader
+                    $('#loader-modal').get(0).hide();
+                });
+
+
+            }
+
+        },
+
+        /**
+         * method is triggered when page is shown
+         */
+        pageShow: function(){
+            // disable the swipeable feature for the app splitter
+            $('ons-splitter-side').removeAttr("swipeable");
+        },
+
+
+        /**
+         * method is triggered when page is hidden
+         */
+        pageHide: function(){
+            try{
+                // remove any tooltip being displayed on all forms on the page
+                $('#account-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                $('#account-page [data-hint]').removeAttr("data-hint");
+                // destroy the form validator objects on the page
+                utopiasoftware.ally.controller.signupPageViewModel.formValidator.destroy();
+            }
+            catch(err){}
+        },
+
+
+        /**
+         * method is triggered when page is destroyed
+         */
+        pageDestroy: function(){
+
+            try{
+                // remove any tooltip being displayed on all forms on the page
+                $('#account-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                $('#account-page [data-hint]').removeAttr("data-hint");
+                // destroy the form validator objects on the page
+                utopiasoftware.ally.controller.accountPageViewModel.formValidator.destroy();
+            }
+            catch(err){}
+        },
+
+
+        /**
+         * method is triggered when back button or device back button is clicked
+         */
+        backButtonClicked: function(){
+
+            // check if the side menu is open
+            if($('ons-splitter').get(0).right.isOpen){ // side menu open, so close it
+                $('ons-splitter').get(0).right.close();
+                return; // exit the method
+            }
+
+            // check if the menu tabbar exists
+            if($('#menu-tabbar').get(0)){ // the menu tabbar object exists
+                // move to the previous tab
+                $('#menu-tabbar').get(0).setActiveTab(2);
+            }
+        },
+
+
+        /**
+         * method is triggered when the Edit Account fab button is clicked
+         */
+        editAccountButtonClicked(){
+
+            // remove the the readonly attributes, so the form  elements can be editable
+            $('#account-page [data-ally-readonly-field]').removeAttr('readonly');
+            // hide the edit account button
+            $('#account-page #account-edit-fab').css("display", "none");
+            // show the save account button
+            $('#account-page #account-save').css("display", "inline-block");
+            // display the instruction for running the account edit
+            ons.notification.toast("you can edit your account", {timeout:3000});
+        },
+
+
+        /**
+         * method is triggered when the Refresh Account fab button is clicked
+         */
+        refreshAccountButtonClicked(){
+
+            // add the the readonly attributes, so the form  elements cannot be editable
+            $('#account-page [data-ally-readonly-field]').attr('readonly', true);
+            // hide the edit account button
+            $('#account-page #account-edit-fab').css("display", "none");
+            // hide the save account button
+            $('#account-page #account-save').css("display", "none");
+            // display the page preloader
+            $('#account-page #account-preloading-fab').css("display", "inline-block");
+
+            // load the user data
+            utopiasoftware.ally.controller.accountPageViewModel.loadUserAccountData().
+            then(function(userDetails){ // save the returned user details in app cache
+                return utopiasoftware.ally.saveUserAppDetails(userDetails);
+            }).
+            then(function(userDetails){ // update the page with the collect data details
+
+                // update user data on app
+                utopiasoftware.ally.model.appUserDetails = userDetails;
+
+                $('#account-page #account-wallet-balance').html(userDetails.balance);
+                $('#account-page #account-firstname').val(userDetails.firstname);
+                $('#account-page #account-lastname').val(userDetails.lastname);
+                $('#account-page #account-phone-number').val(userDetails.phone);
+                $('#account-page #account-email').val((userDetails.email && userDetails.email != "") ? userDetails.email : "");
+
+                // display the necessary page components
+                $('#account-page #account-list').css("display", "block");
+                $('#account-page #account-reload-fab').css("display", "inline-block");
+                $('#account-page #account-edit-fab').css("display", "inline-block");
+
+                // hide necessary page components
+                $('#account-page #account-save').css("display", "none");
+                $('#account-page #account-page-error').css("display", "none");
+                // hide page preloader
+                $('#account-page #account-preloading-fab').css("display", "none");
+
+            }).
+            catch(function(){ // an error occurred when trying to load the user data
+
+                // hide the necessary page components
+                $('#account-page #account-list').css("display", "none");
+                $('#account-page #account-save').css("display", "none");
+                $('#account-page #account-edit-fab').css("display", "none");
+
+                // display necessary page components
+                $('#account-page #account-page-error').css("display", "block");
+                $('#account-page #account-reload-fab').css("display", "inline-block");
+
+                // hide page preloader
+                $('#account-page #account-preloading-fab').css("display", "none");
+
+            });
+        },
+
+
+        /**
+         * method is triggered when the Save Account fab button is clicked
+         */
+        saveAccountButtonClicked(){
+
+            // run the validation method for the sign-in form
+            utopiasoftware.ally.controller.accountPageViewModel.formValidator.whenValidate();
+            console.log("SAVE BUTTON CLICKED");
+        },
+
+
+        /**
+         * method is triggered when form is successfully validated
+         */
+        accountFormValidated(){
+            // check if Internet Connection is available before proceeding
+            if(navigator.connection.type === Connection.NONE){ // no Internet Connection
+                // inform the user that they cannot proceed without Internet
+                window.plugins.toast.showWithOptions({
+                    message: "ALLY account cannot be updated without an Internet Connection",
+                    duration: 4000,
+                    position: "top",
+                    styling: {
+                        opacity: 1,
+                        backgroundColor: '#ff0000', //red
+                        textColor: '#FFFFFF',
+                        textSize: 14
+                    }
+                }, function(toastEvent){
+                    if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                        window.plugins.toast.hide();
+                    }
+                });
+
+                return; // exit method immediately
+            }
+
+            // ask user for secure PIN before proceeding. secure pin MUST match
+            ons.notification.prompt({title: '<ons-icon icon="ion-lock-combination" size="28px" ' +
+            'style="color: #30a401;"></ons-icon> Security Check',
+                messageHTML: '<div><span>' +
+                'Please enter your ALLY Secure PIN to proceed</span></div>',
+                cancelable: true, placeholder: "Secure PIN", inputType: "number", defaultValue: "", autofocus: false,
+                submitOnEnter: true
+            }).
+            then(function(userInput){ // collect user secure PIN and submit the rest of the form data
+
+                // add the the readonly attributes, so the form  elements cannot be editable
+                $('#account-page [data-ally-readonly-field]').attr('readonly', true);
+                // hide the edit account button
+                $('#account-page #account-edit-fab').css("display", "none");
+                // hide the save account button
+                $('#account-page #account-save').css("display", "none");
+
+
+                // create the form data to be submitted
+                var formData = {
+                    firstName: $('#account-page #account-firstname').val(),
+                    lastName: $('#account-page #account-lastname').val(),
+                    lock: userInput,
+                    phone: $('#account-page #account-phone-number').val(),
+                    email: $('#account-page #account-email').val()
+                };
+
+
+                // display the loader message to indicate that account is being created;
+                $('#loader-modal-message').html("Saving Account Details...");
+                // forward the form data &show loader
+                return Promise.all([formData, Promise.resolve($('#hour-glass-loader-modal').get(0).show())]);
+
+            }).
+            then(function(dataArray){
+                // submit the form data
+                return Promise.resolve($.ajax(
+                    {
+                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/update-profile.php",
+                        type: "post",
+                        contentType: "application/x-www-form-urlencoded",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                        },
+                        dataType: "text",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: true,
+                        data: dataArray[0] // data to submit to server
+                    }
+                ));
+            }).
+            then(function(serverResponseText){
+                serverResponseText +=  "";
+                var userAcctDetails = JSON.parse(serverResponseText.trim()); // get the new user object
+                // add a timestamp for the last time user details was updated
+                userAcctDetails._lastUpdatedDate = Date.now();
+
+                // check if any error occurred
+                if(userAcctDetails.status == "error"){ // an error occured
+                    throw userAcctDetails.message; // throw the error message attached to this error
+                }
+
+                return utopiasoftware.ally.saveUserAppDetails(userAcctDetails); // cache the returned account details
+            }).
+            then(function(userAcctDetails){
+               // update the user data on the app
+                utopiasoftware.ally.model.appUserDetails = userAcctDetails;
+                return userAcctDetails;
+            }).
+            then(function(){
+
+                // display the necessary page components
+                $('#account-page #account-list').css("display", "block");
+                $('#account-page #account-reload-fab').css("display", "inline-block");
+                $('#account-page #account-edit-fab').css("display", "inline-block");
+
+                // hide necessary page components
+                $('#account-page #account-save').css("display", "none");
+                $('#account-page #account-page-error').css("display", "none");
+                // hide page preloader
+                $('#account-page #account-preloading-fab').css("display", "none");
+
+                return $('#hour-glass-loader-modal').get(0).hide(); // hide loader
+            }).
+            then(function(){
+                ons.notification.toast("Account Details Updated!", {timeout:3000});
+            }).
+            catch(function(err){
+                if(typeof err !== "string"){ // if err is NOT a String
+                    err = "Sorry. Your account details could not be updated. Please retry"
+                }
+
+                // remove the readonly attributes, so the form  elements can be editable
+                $('#account-page [data-ally-readonly-field]').removeAttr('readonly', true);
+                // hide the edit account button
+                $('#account-page #account-edit-fab').css("display", "none");
+                // show the save account button
+                $('#account-page #account-save').css("display", "inline-block");
+
+                $('#hour-glass-loader-modal').get(0).hide(); // hide loader
+                ons.notification.alert({title: '<ons-icon icon="md-close-circle-o" size="32px" ' +
+                'style="color: red;"></ons-icon> Sign Up Failed',
+                    messageHTML: '<span>' + err + '</span>',
+                    cancelable: false
+                });
+            });
+
+        },
+
+
+        /**
+         * method is used to load the user account data either from
+         * the locally cached data OR directly from the remote server
+         */
+        loadUserAccountData(){
+            return new Promise(function(resolve, reject){
+
+                // check if there is internet connection
+                if(navigator.connection.type === Connection.NONE){ // no internet connection
+                    // inform the user that cached data will be displayed in the absence of internet
+                    window.plugins.toast.showWithOptions({
+                        message: "No Internet Connection. Previously cached data will be displayed",
+                        duration: 4000,
+                        position: "top",
+                        styling: {
+                            opacity: 1,
+                            backgroundColor: '#008000',
+                            textColor: '#FFFFFF',
+                            textSize: 14
+                        }
+                    }, function(toastEvent){
+                        if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                            window.plugins.toast.hide();
+                        }
+                    });
+                    // no internet connection, so use local cache of data
+                    resolve(utopiasoftware.ally.loadUserCachedAppDetails());
+                }
+                else{ // there's internet, so make request for new data
+
+                    Promise.resolve($.ajax(
+                        {
+                            url: utopiasoftware.ally.model.ally_base_url + "/mobile/get-profile.php",
+                            type: "post",
+                            contentType: "application/x-www-form-urlencoded",
+                            beforeSend: function(jqxhr) {
+                                jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                            },
+                            dataType: "text",
+                            timeout: 240000, // wait for 4 minutes before timeout of request
+                            processData: true,
+                            data: {phone: utopiasoftware.ally.model.appUserDetails.phone} // data to submit to server
+                        }
+                    )).
+                    then(function(serverResponseText){
+                        serverResponseText +=  "";
+                        var userDetailsData = JSON.parse(serverResponseText.trim()); // get the new user object
+                        // add a timestamp for the last time user details was updated
+                        userDetailsData._lastUpdatedDate = Date.now();
+
+                        // check if any error occurred
+                        if(userDetailsData.status == "error"){ // an error occurred
+                            throw userDetailsData.message; // throw the error message attached to this error
+                        }
+
+
+                        resolve(userDetailsData); // return user data and resolve the Promise
+
+                    }).catch(function(err){
+                        reject(err); // reject the Promise error
+                    });
+                }
+            });
         }
 
     }

@@ -96,15 +96,28 @@ $(document).on("hide", "#main-menu-page", utopiasoftware.ally.controller.mainMen
 // used to listen for 'menu-tabbar' tabbar tab changes on the "main menu" page
 $(document).on("prechange", "#menu-tabbar", utopiasoftware.ally.controller.mainMenuPageViewModel.tabbarPreChange);
 
+// listen for the initialisation of the Dashboard page
 $(document).on("init", "#dashboard-page", utopiasoftware.ally.controller.dashboardPageViewModel.pageInit);
 
-// listen for when the Main-Menu page is shown
+// listen for when the Dashboard page is shown
 $(document).on("show", "#dashboard-page", utopiasoftware.ally.controller.dashboardPageViewModel.pageShow);
 
-// listen for when the Main-Menu page is hidden
+// listen for when the Dashboard page is hidden
 $(document).on("hide", "#dashboard-page", utopiasoftware.ally.controller.dashboardPageViewModel.pageHide);
 
-// listen for when the Main-Menu page is destroyed
+// listen for when the Dashboard page is destroyed
 $(document).on("destroy", "#dashboard-page", utopiasoftware.ally.controller.dashboardPageViewModel.pageDestroy);
+
+// listen for the initialisation of the Account page
+$(document).on("init", "#account-page", utopiasoftware.ally.controller.accountPageViewModel.pageInit);
+
+// listen for when the Account page is shown
+$(document).on("show", "#account-page", utopiasoftware.ally.controller.accountPageViewModel.pageShow);
+
+// listen for when the Account page is hidden
+$(document).on("hide", "#account-page", utopiasoftware.ally.controller.accountPageViewModel.pageHide);
+
+// listen for when the Account page is destroyed
+$(document).on("destroy", "#account-page", utopiasoftware.ally.controller.accountPageViewModel.pageDestroy);
 
 //# sourceMappingURL=model-compiled.js.map
