@@ -1304,8 +1304,8 @@ utopiasoftware.ally.controller = {
                 // remove any tooltip being displayed on all forms on the page
                 $('#account-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
                 $('#account-page [data-hint]').removeAttr("data-hint");
-                // destroy the form validator objects on the page
-                utopiasoftware.ally.controller.signupPageViewModel.formValidator.destroy();
+                // reset the form validator objects on the page
+                utopiasoftware.ally.controller.accountPageViewModel.formValidator.reset();
             }
             catch(err){}
         },
@@ -1373,6 +1373,12 @@ utopiasoftware.ally.controller = {
             $('#account-page #account-edit-fab').css("display", "none");
             // hide the save account button
             $('#account-page #account-save').css("display", "none");
+            // remove any tooltip being displayed on all forms on the page
+            $('#account-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+            $('#account-page [data-hint]').removeAttr("data-hint");
+            // reset the form validator objects on the page
+            utopiasoftware.ally.controller.accountPageViewModel.formValidator.reset();
+
             // display the page preloader
             $('#account-page #account-preloading-fab').css("display", "inline-block");
 
@@ -1381,7 +1387,7 @@ utopiasoftware.ally.controller = {
             then(function(userDetails){ // save the returned user details in app cache
                 return utopiasoftware.ally.saveUserAppDetails(userDetails);
             }).
-            then(function(userDetails){ // update the page with the collect data details
+            then(function(userDetails){ // update the page with the collected data details
 
                 // update user data on app
                 utopiasoftware.ally.model.appUserDetails = userDetails;
@@ -1488,7 +1494,7 @@ utopiasoftware.ally.controller = {
 
 
                 // display the loader message to indicate that account is being created;
-                $('#loader-modal-message').html("Saving Account Details...");
+                $('#hour-glass-loader-modal #modal-message').html("Saving Account Details...");
                 // forward the form data &show loader
                 return Promise.all([formData, Promise.resolve($('#hour-glass-loader-modal').get(0).show())]);
 
@@ -1560,7 +1566,7 @@ utopiasoftware.ally.controller = {
 
                 $('#hour-glass-loader-modal').get(0).hide(); // hide loader
                 ons.notification.alert({title: '<ons-icon icon="md-close-circle-o" size="32px" ' +
-                'style="color: red;"></ons-icon> Sign Up Failed',
+                'style="color: red;"></ons-icon> Account Update Failed',
                     messageHTML: '<span>' + err + '</span>',
                     cancelable: false
                 });
