@@ -42,7 +42,9 @@
                 <ons-row>
                     <ons-col width="49%" style="margin-top: 1em; margin-right: 1%;">
                         <ons-button id="wallet-fund-wallet"  modifier="large"
-                                    style="background-color: #30a401; color: #ffffff; border-radius: 21px;">Fund Wallet</ons-button>
+                                    style="background-color: #30a401; color: #ffffff; border-radius: 21px;"
+                        onclick="$('#app-main-navigator').get(0).pushPage('fund-wallet-page.html', {animation: 'lift-md'})">
+                            Fund Wallet</ons-button>
                     </ons-col>
                     <ons-col width="50%" style="margin-top: 1em;">
                         <ons-button id="wallet-wallet-transfer"  modifier="large"

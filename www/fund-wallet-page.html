@@ -1,49 +1,36 @@
-<ons-page id="dashboard-page">
+<ons-page id="fund-wallet-page">
     <ons-toolbar>
         <div class="left">
             <ons-toolbar-button onclick="utopiasoftware.ally.controller.dashboardPageViewModel.backButtonClicked()">
                 <ons-icon icon="md-long-arrow-left"></ons-icon>
             </ons-toolbar-button>
         </div>
-        <div class="center">Dashboard</div>
+        <div class="center">Fund Wallet</div>
         <div class="right">
         </div>
     </ons-toolbar>
 
-    <ons-list>
-        <ons-list-item modifier="nodivider">
-            <ons-row valign="bottom">
-                <ons-col width="50%"></ons-col>
-                <ons-col width="50%">
-                    <select id="dashboard-period-select">
-                        <option value="" disabled selected>Select Period</option>
-                        <option value="1">Daily</option>
-                        <option value="2">Weekly</option>
-                        <option value="3">Monthly</option>
-                    </select>
-                </ons-col>
-            </ons-row>
-        </ons-list-item>
+    <form id="fund-wallet-form" autocomplete="off" data-parsley-inputs="input,textarea,select"
+          data-parsley-excluded="input[type=button], input[type=submit],
+                              input[type=reset], input[type=hidden], [disabled], :hidden" style="display: block;">
 
-        <ons-list-item modifier="nodivider">
-            <ons-card style="height: 15em; width: 100%; background-color: #e8e8e8"></ons-card>
-        </ons-list-item>
+        <ons-list>
+            <ons-list-title style="background-color: #39DB01; color: #ffffff">Fund Wallet With Card</ons-list-title>
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-ally-icon-credit-card" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <ons-input id="signup-phone-number" type="tel" placeholder="Your Phone Number" modifier="transparent"
+                               required float
+                               pattern="((0[1-9]{1}[0-9]{9}|\+234[1-9]{1}[0-9]{9})|\+[1-9]{1}[0-9]{4,})"
+                               data-parsley-required-message="your phone number is required"
+                               data-parsley-pattern-message="incorrect phone number format. phone number must be in international format (starting with '+')"
+                               data-parsley-type-message="incorrect phone number format. phone number must be in international format (starting with '+')"
+                               style="width: 70%" class=""></ons-input>
+                </div>
+            </ons-list-item>
+        </ons-list>
 
-        <ons-list-item modifier="nodivider">
-            <ons-card style="height: 15em; width: 100%; background-color: #e8e8e8"></ons-card>
-        </ons-list-item>
-
-        <ons-list-item modifier="nodivider">
-            <ons-card style="height: 15em; width: 100%; background-color: #e8e8e8"></ons-card>
-        </ons-list-item>
-
-        <ons-list-item modifier="nodivider">
-            <ons-card style="height: 15em; width: 100%; background-color: #e8e8e8"></ons-card>
-        </ons-list-item>
-
-        <ons-list-item modifier="nodivider">
-            <ons-card style="height: 15em; width: 100%; background-color: #e8e8e8"></ons-card>
-        </ons-list-item>
-
-    </ons-list>
+    </form>
 </ons-page>
