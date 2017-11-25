@@ -1141,7 +1141,7 @@ utopiasoftware.ally.controller = {
                 // listen for the form validation success
                 utopiasoftware.ally.controller.accountPageViewModel.formValidator.on('form:success', utopiasoftware.ally.controller.accountPageViewModel.accountFormValidated);
 
-                // load the user data todo
+                // load the user data
                 utopiasoftware.ally.controller.accountPageViewModel.loadUserAccountData().then(function (userDetails) {
                     // save the returned user details in app cache
                     return utopiasoftware.ally.saveUserAppDetails(userDetails);
@@ -1151,7 +1151,8 @@ utopiasoftware.ally.controller = {
                     // update user data on app
                     utopiasoftware.ally.model.appUserDetails = userDetails;
 
-                    $('#account-wallet-balance', $thisPage).html(userDetails.balance);
+                    $('#account-wallet-balance', $thisPage).html(kendo.toString(kendo.parseFloat(userDetails.balance), "n2"));
+                    $('#account-last-updated', $thisPage).html(kendo.toString(new Date(userDetails._lastUpdatedDate), "MMM d yyyy, h:mmtt"));
                     $('#account-firstname', $thisPage).val(userDetails.firstname);
                     $('#account-lastname', $thisPage).val(userDetails.lastname);
                     $('#account-phone-number', $thisPage).val(userDetails.phone);
@@ -1292,7 +1293,8 @@ utopiasoftware.ally.controller = {
                 // update user data on app
                 utopiasoftware.ally.model.appUserDetails = userDetails;
 
-                $('#account-page #account-wallet-balance').html(userDetails.balance);
+                $('#account-page #account-wallet-balance').html(kendo.toString(kendo.parseFloat(userDetails.balance), "n2"));
+                $('#account-page #account-last-updated').html(kendo.toString(new Date(userDetails._lastUpdatedDate), "MMM d yyyy, h:mmtt"));
                 $('#account-page #account-firstname').val(userDetails.firstname);
                 $('#account-page #account-lastname').val(userDetails.lastname);
                 $('#account-page #account-phone-number').val(userDetails.phone);
@@ -1366,7 +1368,7 @@ utopiasoftware.ally.controller = {
             }
 
             // ask user for secure PIN before proceeding. secure pin MUST match
-            ons.notification.prompt({ title: '<ons-icon icon="ion-lock-combination" size="28px" ' + 'style="color: #30a401;"></ons-icon> Security Check',
+            ons.notification.prompt({ title: '<ons-icon icon="ion-lock-combination" size="28px" ' + 'style="color: #30a401;"></ons-icon> Security Check', id: "pin-security-check",
                 messageHTML: '<div><span>' + 'Please enter your ALLY Secure PIN to proceed</span></div>',
                 cancelable: true, placeholder: "Secure PIN", inputType: "number", defaultValue: "", autofocus: false,
                 submitOnEnter: true
@@ -1390,7 +1392,7 @@ utopiasoftware.ally.controller = {
                 };
 
                 // display the loader message to indicate that account is being created;
-                $('#hour-glass-loader-modal #modal-message').html("Saving Account Details...");
+                $('#hour-glass-loader-modal .modal-message').html("Saving Account Details...");
                 // forward the form data &show loader
                 return Promise.all([formData, Promise.resolve($('#hour-glass-loader-modal').get(0).show())]);
             }).then(function (dataArray) {
