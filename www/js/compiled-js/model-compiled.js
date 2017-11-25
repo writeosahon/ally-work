@@ -120,4 +120,16 @@ $(document).on("hide", "#account-page", utopiasoftware.ally.controller.accountPa
 // listen for when the Account page is destroyed
 $(document).on("destroy", "#account-page", utopiasoftware.ally.controller.accountPageViewModel.pageDestroy);
 
+// listen for the initialisation of the Wallet page
+$(document).on("init", "#wallet-page", utopiasoftware.ally.controller.walletPageViewModel.pageInit);
+
+// listen for when the Wallet page is shown
+$(document).on("show", "#wallet-page", utopiasoftware.ally.controller.walletPageViewModel.pageShow);
+
+// listen for when the Wallet page is hidden
+$(document).on("hide", "#wallet-page", utopiasoftware.ally.controller.walletPageViewModel.pageHide);
+
+// listen for when the Wallet page is destroyed
+$(document).on("destroy", "#wallet-page", utopiasoftware.ally.controller.walletPageViewModel.pageDestroy);
+
 //# sourceMappingURL=model-compiled.js.map

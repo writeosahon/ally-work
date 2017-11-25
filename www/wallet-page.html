@@ -1,55 +1,68 @@
 <ons-page id="wallet-page">
-    <ons-toolbar>
+    <ons-toolbar modifier="noshadow">
         <div class="left">
-            <ons-toolbar-button onclick="utopiasoftware.ally.controller.dashboardPageViewModel.backButtonClicked()">
+            <ons-toolbar-button onclick="utopiasoftware.ally.controller.walletPageViewModel.backButtonClicked()">
                 <ons-icon icon="md-long-arrow-left"></ons-icon>
             </ons-toolbar-button>
         </div>
-        <div class="center">Wallet</div>
+        <div class="center">ALLY Wallet</div>
         <div class="right">
-            <ons-toolbar-button onclick="utopiasoftware.ally.controller.dashboardPageViewModel.backButtonClicked()">
+            <ons-toolbar-button id="wallet-reload-fab"
+                                onclick="utopiasoftware.ally.controller.walletPageViewModel.refreshAccountButtonClicked()">
                 <ons-icon icon="md-refresh-alt"></ons-icon>
             </ons-toolbar-button>
         </div>
     </ons-toolbar>
 
-    <ons-card style="height: 15em; width: 100%; background-image: linear-gradient(45deg, #30a401 0%, rgb(15, 208, 208) 100%);
-    background-repeat: no-repeat; background-size: cover; "></ons-card>
+    <div></div>
 
-    <ons-list>
-        <ons-list-item modifier="nodivider">
-            <ons-row valign="bottom">
-                <ons-col width="50%"></ons-col>
-                <ons-col width="50%">
-                    <select id="dashboard-period-select">
-                        <option value="" disabled selected>Select Period</option>
-                        <option value="1">Daily</option>
-                        <option value="2">Weekly</option>
-                        <option value="3">Monthly</option>
-                    </select>
-                </ons-col>
+    <!-- card holds the wallet details and wallet logo blocks -->
+    <ons-card style="height: 10em; width: 100%; margin: 0; padding: 0;
+    background-image: linear-gradient(45deg, #30a401 0%, rgb(15, 208, 208) 100%);
+    background-repeat: no-repeat; background-size: cover; z-index: 2; position: fixed; top: 48px">
+        <div style="float: left; width: 60%; display: inline-block">
+            <ons-row style="font-size: 0.8em; margin-top: 2em; text-align: center">
+                <ons-col width="100%" style="color: white;">NAME</ons-col>
+                <ons-col id="wallet-owner-name" width="100%" style="color:white; font-weight: bold; text-transform: capitalize">osahon okungbowa</ons-col>
             </ons-row>
-        </ons-list-item>
+            <ons-row style="font-size: 0.8em; margin-top: 1em; text-align: center">
+                <ons-col width="100%" style="color: white;">BALANCE</ons-col>
+                <ons-col id="wallet-balance" width="100%" style="color:white; font-weight: bold;">24,456.50</ons-col>
+            </ons-row>
+        </div>
+        <div style="float: right; width: 40%; height: 100%; display: inline-block; text-align: center;
+        background-image: url('css/app-images/wallet-icon-img.png'); background-position: center; background-size: contain;">
+        </div>
+    </ons-card>
 
-        <ons-list-item modifier="nodivider">
-            <ons-card style="height: 15em; width: 100%; background-color: #e8e8e8"></ons-card>
-        </ons-list-item>
+    <div class="content">
+        <ons-list id="wallet-list" style="display: none;">
+            <ons-list-item modifier="nodivider" lock-on-drag="yes">
+                <ons-row>
+                    <ons-col width="49%" style="margin-top: 1em; margin-right: 1%;">
+                        <ons-button id="wallet-fund-wallet"  modifier="large"
+                                    style="background-color: #30a401; color: #ffffff; border-radius: 21px;">Fund Wallet</ons-button>
+                    </ons-col>
+                    <ons-col width="50%" style="margin-top: 1em;">
+                        <ons-button id="wallet-wallet-transfer"  modifier="large"
+                                    style="background-color: #0FD0D0; color: #ffffff; border-radius: 21px;">Wallet Transfer</ons-button>
+                    </ons-col>
+                    <ons-col width="25%" style="margin-top: 1em;"></ons-col>
+                    <ons-col width="50%" style="margin-top: 1em;">
+                        <ons-button id="wallet-disburse-wallet"  modifier="large"
+                                    style="background-color: purple; color: #ffffff; border-radius: 21px;">Disburse Wallet</ons-button>
+                    </ons-col>
+                    <ons-col width="25%" style="margin-top: 1em;"></ons-col>
+                </ons-row>
+            </ons-list-item>
 
-        <ons-list-item modifier="nodivider">
-            <ons-card style="height: 15em; width: 100%; background-color: #e8e8e8"></ons-card>
-        </ons-list-item>
+        </ons-list>
+    </div>
 
-        <ons-list-item modifier="nodivider">
-            <ons-card style="height: 15em; width: 100%; background-color: #e8e8e8"></ons-card>
-        </ons-list-item>
-
-        <ons-list-item modifier="nodivider">
-            <ons-card style="height: 15em; width: 100%; background-color: #e8e8e8"></ons-card>
-        </ons-list-item>
-
-        <ons-list-item modifier="nodivider">
-            <ons-card style="height: 15em; width: 100%; background-color: #e8e8e8"></ons-card>
-        </ons-list-item>
-
-    </ons-list>
+    <!-- page preloader item -->
+    <ons-fab id="wallet-preloading-fab" style="position: fixed; top: calc((100vh - 56px) / 2);
+    margin-left: calc((100vw - 56px) / 2);
+    color: #ffffff; background-color: #30a401; display: inline-block;">
+        <ons-icon icon="md-ally-icon-loading" spin></ons-icon>
+    </ons-fab>
 </ons-page>

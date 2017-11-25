@@ -1646,6 +1646,238 @@ utopiasoftware.ally.controller = {
             });
         }
 
+    },
+
+    /**
+     * object is view-model for wallet page
+     */
+    walletPageViewModel: {
+
+        /**
+         * event is triggered when page is initialised
+         */
+        pageInit: function(event){
+
+            var $thisPage = $(event.target); // get the current page shown
+            // disable the swipeable feature for the app splitter
+            $('ons-splitter-side').removeAttr("swipeable");
+
+            // call the function used to initialise the app page if the app is fully loaded
+            loadPageOnAppReady();
+
+            //function is used to initialise the page if the app is fully ready for execution
+            function loadPageOnAppReady(){
+                // check to see if onsen is ready and if all app loading has been completed
+                if(!ons.isReady() || utopiasoftware.ally.model.isAppReady === false){
+                    setTimeout(loadPageOnAppReady, 500); // call this function again after half a second
+                    return;
+                }
+
+                // listen for the back button event
+                $thisPage.get(0).onDeviceBackButton = utopiasoftware.ally.controller.walletPageViewModel.backButtonClicked;
+
+                $('#wallet-preloading-fab', $thisPage).css("display", "inline-block"); // display page preloader
+
+                // load the user data
+                utopiasoftware.ally.controller.walletPageViewModel.loadUserAccountData().
+                then(function(userDetails){ // save the returned user details in app cache
+                    return utopiasoftware.ally.saveUserAppDetails(userDetails);
+                }).
+                then(function(userDetails){ // update the page with the collect data details
+
+                    // update user data on app
+                    utopiasoftware.ally.model.appUserDetails = userDetails;
+
+                    $('#wallet-balance', $thisPage).
+                    html(kendo.toString(kendo.parseFloat(userDetails.balance), "n2"));
+
+                    $('#wallet-owner-name', $thisPage).val(userDetails.firstname + " " + userDetails.lastname);
+
+                    // display the necessary page components
+                    $('#wallet-list', $thisPage).css("display", "block");
+                    $('#wallet-reload-fab', $thisPage).css("display", "inline-block");
+
+                    // hide page preloader
+                    $('#wallet-preloading-fab', $thisPage).css("display", "none");
+
+                    // hide the loader
+                    $('#loader-modal').get(0).hide();
+                }).
+                catch(function(){ // an error occurred when trying to load the user data
+
+                    // display the necessary page components
+                    $('#wallet-list', $thisPage).css("display", "block");
+
+                    // display necessary page components
+                    $('#wallet-reload-fab', $thisPage).css("display", "inline-block");
+
+                    // hide page preloader
+                    $('#wallet-preloading-fab', $thisPage).css("display", "none");
+
+                    // hide the loader
+                    $('#loader-modal').get(0).hide();
+                });
+
+
+            }
+
+        },
+
+        /**
+         * method is triggered when page is shown
+         */
+        pageShow: function(){
+            // disable the swipeable feature for the app splitter
+            $('ons-splitter-side').removeAttr("swipeable");
+        },
+
+
+        /**
+         * method is triggered when page is hidden
+         */
+        pageHide: function(){
+
+        },
+
+
+        /**
+         * method is triggered when page is destroyed
+         */
+        pageDestroy: function(){
+
+        },
+
+
+        /**
+         * method is triggered when back button or device back button is clicked
+         */
+        backButtonClicked: function(){
+
+            // check if the side menu is open
+            if($('ons-splitter').get(0).right.isOpen){ // side menu open, so close it
+                $('ons-splitter').get(0).right.close();
+                return; // exit the method
+            }
+
+            // check if the menu tabbar exists
+            if($('#menu-tabbar').get(0)){ // the menu tabbar object exists
+                // move to the previous tab
+                $('#menu-tabbar').get(0).setActiveTab(1);
+            }
+        },
+
+
+        /**
+         * method is triggered when the Refresh Account fab button is clicked
+         */
+        refreshAccountButtonClicked(){
+
+            // display the page preloader
+            $('#wallet-page #wallet-preloading-fab').css("display", "inline-block");
+
+            // load the user data
+            utopiasoftware.ally.controller.walletPageViewModel.loadUserAccountData().
+            then(function(userDetails){ // save the returned user details in app cache
+                return utopiasoftware.ally.saveUserAppDetails(userDetails);
+            }).
+            then(function(userDetails){ // update the page with the collected data details
+
+                // update user data on app
+                utopiasoftware.ally.model.appUserDetails = userDetails;
+
+                $('#wallet-page #wallet-balance').
+                html(kendo.toString(kendo.parseFloat(userDetails.balance), "n2"));
+
+                $('#wallet-page #wallet-owner-name').val(userDetails.firstname + " " + userDetails.lastname);
+
+                // display the necessary page components
+                $('#wallet-page #wallet-list').css("display", "block");
+                $('#wallet-page #wallet-reload-fab').css("display", "inline-block");
+
+                // hide page preloader
+                $('#wallet-page #wallet-preloading-fab').css("display", "none");
+
+            }).
+            catch(function(){ // an error occurred when trying to load the user data
+
+                // display the necessary page components
+                $('#wallet-page #wallet-list').css("display", "none");
+
+                // display necessary page components
+                $('#wallet-page #wallet-reload-fab').css("display", "inline-block");
+
+                // hide page preloader
+                $('#wallet-page #wallet-preloading-fab').css("display", "none");
+
+            });
+        },
+
+
+        /**
+         * method is used to load the user account data either from
+         * the locally cached data OR directly from the remote server
+         */
+        loadUserAccountData(){
+            return new Promise(function(resolve, reject){
+
+                // check if there is internet connection
+                if(navigator.connection.type === Connection.NONE){ // no internet connection
+                    // inform the user that cached data will be displayed in the absence of internet
+                    window.plugins.toast.showWithOptions({
+                        message: "No Internet Connection. Previously cached data will be displayed",
+                        duration: 4000,
+                        position: "top",
+                        styling: {
+                            opacity: 1,
+                            backgroundColor: '#008000',
+                            textColor: '#FFFFFF',
+                            textSize: 14
+                        }
+                    }, function(toastEvent){
+                        if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                            window.plugins.toast.hide();
+                        }
+                    });
+                    // no internet connection, so use local cache of data
+                    resolve(utopiasoftware.ally.loadUserCachedAppDetails());
+                }
+                else{ // there's internet, so make request for new data
+
+                    Promise.resolve($.ajax(
+                        {
+                            url: utopiasoftware.ally.model.ally_base_url + "/mobile/get-profile.php",
+                            type: "post",
+                            contentType: "application/x-www-form-urlencoded",
+                            beforeSend: function(jqxhr) {
+                                jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                            },
+                            dataType: "text",
+                            timeout: 240000, // wait for 4 minutes before timeout of request
+                            processData: true,
+                            data: {phone: utopiasoftware.ally.model.appUserDetails.phone} // data to submit to server
+                        }
+                    )).
+                    then(function(serverResponseText){
+                        serverResponseText +=  "";
+                        var userDetailsData = JSON.parse(serverResponseText.trim()); // get the new user object
+                        // add a timestamp for the last time user details was updated
+                        userDetailsData._lastUpdatedDate = Date.now();
+
+                        // check if any error occurred
+                        if(userDetailsData.status == "error"){ // an error occurred
+                            throw userDetailsData.message; // throw the error message attached to this error
+                        }
+
+
+                        resolve(userDetailsData); // return user data and resolve the Promise
+
+                    }).catch(function(err){
+                        reject(err); // reject the Promise error
+                    });
+                }
+            });
+        }
+
     }
 
 };

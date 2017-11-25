@@ -266,5 +266,14 @@
 /** STYLE FOR THE WALLET PAGE BEGINS **/
 #wallet-page .page--material__content {
     position: absolute;
-    top: 50px;
+    top: 198px;
+    background-color: #ffffff;
+}
+#wallet-page .page--material__background {
+    background-color: #ffffff;
+}
+#wallet-page #wallet-preloading-fab ons-icon[spin] { /* increase the speed of the preloader spinner **/
+    -webkit-animation: ons-icon-spin 0.8s infinite linear;
+    -moz-animation: ons-icon-spin 0.8s infinite linear;
+    animation: ons-icon-spin 0.8s infinite linear;
 }
