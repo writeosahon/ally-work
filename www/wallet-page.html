@@ -1,14 +1,20 @@
-<ons-page id="dashboard-page">
+<ons-page id="wallet-page">
     <ons-toolbar>
         <div class="left">
             <ons-toolbar-button onclick="utopiasoftware.ally.controller.dashboardPageViewModel.backButtonClicked()">
                 <ons-icon icon="md-long-arrow-left"></ons-icon>
             </ons-toolbar-button>
         </div>
-        <div class="center">Dashboard</div>
+        <div class="center">Wallet</div>
         <div class="right">
+            <ons-toolbar-button onclick="utopiasoftware.ally.controller.dashboardPageViewModel.backButtonClicked()">
+                <ons-icon icon="md-refresh-alt"></ons-icon>
+            </ons-toolbar-button>
         </div>
     </ons-toolbar>
+
+    <ons-card style="height: 15em; width: 100%; background-image: linear-gradient(45deg, #30a401 0%, rgb(15, 208, 208) 100%);
+    background-repeat: no-repeat; background-size: cover; "></ons-card>
 
     <ons-list>
         <ons-list-item modifier="nodivider">
