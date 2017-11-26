@@ -21,13 +21,9 @@
                     <ons-icon icon="md-ally-icon-credit-card" class="list-item__icon" fixed-width size="28px"></ons-icon>
                 </div>
                 <div class="center">
-                    <ons-input id="signup-phone-number" type="tel" placeholder="Your Phone Number" modifier="transparent"
-                               required float
-                               pattern="((0[1-9]{1}[0-9]{9}|\+234[1-9]{1}[0-9]{9})|\+[1-9]{1}[0-9]{4,})"
-                               data-parsley-required-message="your phone number is required"
-                               data-parsley-pattern-message="incorrect phone number format. phone number must be in international format (starting with '+')"
-                               data-parsley-type-message="incorrect phone number format. phone number must be in international format (starting with '+')"
-                               style="width: 70%" class=""></ons-input>
+                    <input id="add-card-card-number" type="number" required
+                           data-parsley-required-message="Card Number is required"
+                           data-parsley-type-message="Card Number must contain only numbers">
                 </div>
             </ons-list-item>
         </ons-list>
