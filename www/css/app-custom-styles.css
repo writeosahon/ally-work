@@ -5,8 +5,73 @@
 }
 /** STYLE FOR VALIDATION TOOLTIP **/
 [data-hint]:after {
-    font-size: 0.8em !important;
+    font-size: 1.1em !important;
 }
+.ally-input-tooltip.e-tooltip-wrap {
+    background-color: #458746 !important;
+    color: #ffffff !important;
+    border-color: #458746 !important;
+    opacity: 1 !important;
+}
+.ally-input-tooltip.e-tooltip-wrap.e-popup {
+    background-color: #458746;
+    border: 1px solid #458746;
+}
+.ally-input-tooltip.e-tooltip-wrap .e-arrow-tip-outer.e-tip-bottom {
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #458746;
+}
+
+.ally-input-tooltip.e-tooltip-wrap .e-arrow-tip-outer.e-tip-top {
+    border-bottom: 8px solid #458746;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+}
+
+.ally-input-tooltip.e-tooltip-wrap .e-arrow-tip-outer.e-tip-left {
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid #458746;
+    border-top: 8px solid transparent;
+}
+
+.ally-input-tooltip.e-tooltip-wrap .e-arrow-tip-outer.e-tip-right {
+    border-bottom: 8px solid transparent;
+    border-left: 8px solid #458746;
+    border-top: 8px solid transparent;
+}
+.ally-input-tooltip.e-tooltip-wrap .e-arrow-tip-inner.e-tip-bottom {
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 7px solid #458746;
+    left: 1px;
+    top: 0;
+}
+.ally-input-tooltip.e-tooltip-wrap .e-arrow-tip-inner.e-tip-top {
+    border-bottom: 7px solid #458746;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    left: 1px;
+    top: 1px;
+}
+
+.ally-input-tooltip.e-tooltip-wrap .e-arrow-tip-inner.e-tip-left {
+    border-bottom: 7px solid transparent;
+    border-right: 7px solid #458746;
+    border-top: 7px solid transparent;
+    left: 1px;
+    top: 1px;
+}
+
+.ally-input-tooltip.e-tooltip-wrap .e-arrow-tip-inner.e-tip-right {
+    border-bottom: 7px solid transparent;
+    border-left: 7px solid #458746;
+    border-top: 7px solid transparent;
+    left: 0;
+    top: 1px;
+}
+
+
 /** STYLE FOR SECURITY CHECK PROMPT DIALOG **/
 #pin-security-check input {
     -webkit-text-security: disc;

@@ -1742,6 +1742,324 @@ utopiasoftware.ally.controller = {
                 }
             });
         }
+    },
+
+    /**
+     * object is view-model for fund-wallet page
+     */
+    fundWalletPageViewModel: {
+
+        /**
+         * used to hold the parsley form validation object for the page
+         */
+        formValidator: null,
+
+        /**
+         * used to hold the parsley validator for the Amount field
+         */
+        amountFieldValidator: null,
+
+        /**
+         * used to hold the Card Number DropDownList component
+         */
+        cardDropDownList: null,
+
+        /**
+         * * used to hold the ej Tooltip component
+         */
+        formTooltip: null,
+
+        /**
+         * event is triggered when page is initialised
+         */
+        pageInit: function pageInit(event) {
+
+            var $thisPage = $(event.target); // get the current page shown
+
+            // call the function used to initialise the app page if the app is fully loaded
+            loadPageOnAppReady();
+
+            //function is used to initialise the page if the app is fully ready for execution
+            function loadPageOnAppReady() {
+                // check to see if onsen is ready and if all app loading has been completed
+                if (!ons.isReady() || utopiasoftware.ally.model.isAppReady === false) {
+                    setTimeout(loadPageOnAppReady, 500); // call this function again after half a second
+                    return;
+                }
+
+                // listen for the back button event
+                $('#app-main-navigator').get(0).topPage.onDeviceBackButton = utopiasoftware.ally.controller.fundWalletPageViewModel.backButtonClicked;
+
+                // initialise the card DropDown widget
+                utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList = new ej.dropdowns.DropDownList({
+                    //set the data to dataSource property
+                    dataSource: ["******2341"],
+                    placeholder: "Select Card",
+                    popupHeight: "300px"
+                });
+
+                // render initialized card DropDownList
+                utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList.appendTo('#fund-wallet-card-number');
+
+                // initialise form tooltips
+                utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip = new ej.popups.Tooltip({
+                    target: '.ally-input-tooltip',
+                    position: 'top center',
+                    cssClass: 'ally-input-tooltip',
+                    opensOn: 'focus'
+                });
+
+                // render the initialized form tooltip
+                utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip.appendTo('#fund-wallet-form');
+
+                // initialise the amount field
+                utopiasoftware.ally.controller.fundWalletPageViewModel.amountFieldValidator = $('#fund-wallet-amount').parsley({
+                    value: function value(parsley) {
+                        // convert the amount back to a plain text without the thousand separator
+                        var parsedNumber = kendo.parseFloat($('#fund-wallet-amount', $thisPage).val());
+                        return parsedNumber ? parsedNumber : $('#fund-wallet-amount', $thisPage).val();
+                    }
+                });
+
+                // initialise the form validation
+                utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator = $('#fund-wallet-form').parsley();
+
+                // attach listener for the fund wallet button on the page
+                $('#fund-wallet-fund-button').get(0).onclick = function () {
+                    // run the validation method for the form
+                    utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.whenValidate();
+                };
+
+                // listen for the form field validation failure event
+                utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('field:error', function (fieldInstance) {
+                    // get the element that triggered the field validation error and use it to display tooltip
+                    // display tooltip
+                    $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                    $(fieldInstance.$element).attr("data-hint", fieldInstance.getErrorsMessages()[0]);
+                    $(fieldInstance.$element).attr("title", fieldInstance.getErrorsMessages()[0]);
+                });
+
+                // listen for the form field validation success event
+                utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('field:success', function (fieldInstance) {
+                    // remove tooltip from element
+                    $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                    $(fieldInstance.$element).removeAttr("data-hint");
+                    $(fieldInstance.$element).removeAttr("title");
+                });
+
+                // listen for the form validation success
+                utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('form:success', utopiasoftware.ally.controller.fundWalletPageViewModel.formValidated);
+
+                // hide the loader
+                $('#loader-modal').get(0).hide();
+            }
+        },
+
+        /**
+         * method is triggered when page is shown
+         *
+         * @param event
+         */
+        pageShow: function pageShow(event) {},
+
+        /**
+         * method is triggered when the page is hidden
+         * @param event
+         */
+        pageHide: function pageHide(event) {
+            try {
+                // remove any tooltip being displayed on all forms on the page
+                $('#fund-wallet-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                $('#fund-wallet-page [data-hint]').removeAttr("title");
+                $('#fund-wallet-page [data-hint]').removeAttr("data-hint");
+                // reset the form validator object on the page
+                utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.reset();
+            } catch (err) {}
+        },
+
+        /**
+         * method is triggered when the page is destroyed
+         * @param event
+         */
+        pageDestroy: function pageDestroy(event) {
+            console.log("PAGE DESTROYED");
+            try {
+                // remove any tooltip being displayed on all forms on the page
+                $('#fund-wallet-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                $('#fund-wallet-page [data-hint]').removeAttr("title");
+                $('#fund-wallet-page [data-hint]').removeAttr("data-hint");
+                // destroy the form validator objects on the page
+                utopiasoftware.ally.controller.fundWalletPageViewModel.amountFieldValidator.destroy();
+                utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.destroy();
+                // destroy other form components
+                utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList.destroy();
+                utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip.destroy();
+            } catch (err) {}
+        },
+
+        /**
+         * method is triggered when the form is successfully validated
+         */
+        formValidated: function formValidated() {
+
+            // check if Internet Connection is available before proceeding
+            if (navigator.connection.type === Connection.NONE) {
+                // no Internet Connection
+                // inform the user that they cannot proceed without Internet
+                window.plugins.toast.showWithOptions({
+                    message: "ALLY wallet cannot be funded without an Internet Connection",
+                    duration: 4000,
+                    position: "top",
+                    styling: {
+                        opacity: 1,
+                        backgroundColor: '#ff0000', //red
+                        textColor: '#FFFFFF',
+                        textSize: 14
+                    }
+                }, function (toastEvent) {
+                    if (toastEvent && toastEvent.event == "touch") {
+                        // user tapped the toast, so hide toast immediately
+                        window.plugins.toast.hide();
+                    }
+                });
+
+                return; // exit method immediately
+            }
+
+            // create the form data to be submitted
+            /** var createAcctFormData = {
+                firstName: $('#signup-page #signup-firstname').val(),
+                lastName: $('#signup-page #signup-lastname').val(),
+                lock: $('#signup-page #signup-secure-pin').val(),
+                phone: $('#signup-page #signup-phone-number').val().startsWith("0") ?
+                    $('#signup-page #signup-phone-number').val().replace("0", "+234"):$('#signup-page #signup-phone-number').val()
+            };
+                // tell the user that phone number verification is necessary
+            new Promise(function(resolve, reject){
+                ons.notification.confirm('To complete sign up, your phone number must be verified. <br>' +
+                        'Usual SMS charge from your phone network provider will apply.<br> ' +
+                        'Please ensure you have sufficient airtime to send/receive one SMS', {title: 'Verify Phone Number',
+                        buttonLabels: ['Cancel', 'Ok']}) // Ask for confirmation
+                    .then(function(index) {
+                        if (index === 1) { // OK button
+                            resolve();
+                        }
+                        else{
+                            reject("your phone number could not be verified");
+                        }
+                    });
+            }).
+            then(function(){ // verify the user's phone number
+                  //return null;
+                return utopiasoftware.ally.validatePhoneNumber($('#signup-page #signup-phone-number').val());
+            }).
+            then(function(){
+                // display the loader message to indicate that account is being created;
+                $('#loader-modal-message').html("Completing Sign Up...");
+                return Promise.resolve($('#loader-modal').get(0).show()); // show loader
+            }).
+            then(function(){ // clear all data belonging to previous user
+                var promisesArray = []; // holds all the Promise objects for all data being deleted
+                  var promiseObject = new Promise(function(resolve, reject){
+                    // delete the user app details from secure storage if it exists
+                    Promise.resolve(intel.security.secureStorage.
+                    delete({'id':'ally-user-details'})).
+                    then(function(){resolve();},function(){resolve();}); // ALWAYS resolve the promise
+                });
+                  // add the promise object to the promise array
+                promisesArray.push(promiseObject);
+                  // return promise when all operations have completed
+                return Promise.all(promisesArray);
+            }).
+            then(function(){
+                // clear all data in the device local/session storage
+                window.localStorage.clear();
+                window.sessionStorage.clear();
+                return null;
+            }).
+            then(function(){
+                // upload the user details to the server
+                return Promise.resolve($.ajax(
+                    {
+                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/signup.php",
+                        type: "post",
+                        contentType: "application/x-www-form-urlencoded",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                        },
+                        dataType: "text",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: true,
+                        data: createAcctFormData
+                    }
+                ));
+              }).
+            then(function(serverResponseText){
+                serverResponseText +=  "";
+                var newUser = JSON.parse(serverResponseText.trim()); // get the new user object
+                // add a timestamp for the last time user details was updated
+                newUser._lastUpdatedDate = Date.now();
+                  // check if any error occurred
+                if(newUser.status == "error"){ // an error occured
+                    throw newUser.message; // throw the error message attached to this error
+                }
+                  // store user data
+                utopiasoftware.ally.model.appUserDetails = newUser;
+                  return newUser;
+              }).
+            then(function(newUser){
+                // create a cypher data of the user details
+                return Promise.resolve(intel.security.secureData.
+                createFromData({"data": JSON.stringify(newUser)}));
+            }).
+            then(function(instanceId){
+                // store the cyphered data in secure persistent storage
+                return Promise.resolve(
+                    intel.security.secureStorage.write({"id": "ally-user-details", "instanceID": instanceId})
+                );
+            }).
+            then(function(){
+                  // set app-status local storage (as user phone number)
+                window.localStorage.setItem("app-status", utopiasoftware.ally.model.appUserDetails.phone);
+                  // update the first name being displayed in the side menu
+                //$('#side-menu-username').html(utopiasoftware.saveup.model.appUserDetails.firstName);
+                  return $('#loader-modal').get(0).hide(); // hide loader
+            }).
+            then(function(){
+                return $('ons-splitter').get(0).content.load("app-main-template");
+            }).
+            then(function(){
+                ons.notification.toast("Sign Up complete! Welcome", {timeout:3000});
+            }).
+            catch(function(err){
+                if(typeof err !== "string"){ // if err is NOT a String
+                    err = "Sorry. Sign Up could not be completed"
+                }
+                $('#loader-modal').get(0).hide(); // hide loader
+                ons.notification.alert({title: '<ons-icon icon="md-close-circle-o" size="32px" ' +
+                'style="color: red;"></ons-icon> Sign Up Failed',
+                    messageHTML: '<span>' + err + '</span>',
+                    cancelable: false
+                });
+            }); **/
+        },
+
+        /**
+         * method is triggered when back button or device back button is clicked
+         */
+        backButtonClicked: function backButtonClicked() {
+
+            // check if the side menu is open
+            if ($('ons-splitter').get(0).right.isOpen) {
+                // side menu open, so close it
+                $('ons-splitter').get(0).right.close();
+                return; // exit the method
+            }
+
+            // remove this page form the main navigator stack
+            $('#app-main-navigator').get(0).popPage();
+        }
+
     }
 
 };

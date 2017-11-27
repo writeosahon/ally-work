@@ -1,7 +1,7 @@
 <ons-page id="fund-wallet-page">
     <ons-toolbar>
         <div class="left">
-            <ons-toolbar-button onclick="utopiasoftware.ally.controller.dashboardPageViewModel.backButtonClicked()">
+            <ons-toolbar-button onclick="utopiasoftware.ally.controller.fundWalletPageViewModel.backButtonClicked()">
                 <ons-icon icon="md-long-arrow-left"></ons-icon>
             </ons-toolbar-button>
         </div>
@@ -9,24 +9,63 @@
         <div class="right">
         </div>
     </ons-toolbar>
+    <ons-progress-bar class="page-preloader" indeterminate style="display: none;"></ons-progress-bar>
 
-    <form id="fund-wallet-form" autocomplete="off" data-parsley-inputs="input,textarea,select"
+    <form id="fund-wallet-form" autocomplete="off" data-parsley-inputs="ons-input,input,textarea,select"
           data-parsley-excluded="input[type=button], input[type=submit],
                               input[type=reset], input[type=hidden], [disabled], :hidden" style="display: block;">
 
         <ons-list>
-            <ons-list-title style="background-color: #39DB01; color: #ffffff">Fund Wallet With Card</ons-list-title>
+            <ons-list-title>Fund Wallet With Card</ons-list-title>
             <ons-list-item modifier="nodivider">
                 <div class="left">
                     <ons-icon icon="md-ally-icon-credit-card" class="list-item__icon" fixed-width size="28px"></ons-icon>
                 </div>
                 <div class="center">
-                    <input id="add-card-card-number" type="number" required
-                           data-parsley-required-message="Card Number is required"
-                           data-parsley-type-message="Card Number must contain only numbers">
+                    <div style="width: 75%; display: inline-block">
+                        <input id="fund-wallet-card-number" type="tel" required
+                               data-parsley-required-message="Card Number is required"
+                               class="ally-input-tooltip">
+                    </div>
+                    <div style="width: 25%; text-align: center;">
+                        <!-- display the add card page -->
+                        <ons-fab id="fund-wallet-add-card" modifier="mini"
+                                 style="color: #ffffff; background-color: #30a401;"
+                                 onclick="$('#app-main-navigator').get(0).replacePage('add-card-page.html', {animation: 'lift-md'})">
+                            <ons-icon icon="md-plus"></ons-icon>
+                        </ons-fab>
+                    </div>
+
                 </div>
             </ons-list-item>
-        </ons-list>
 
+            <ons-list-title>Amount To be Funded</ons-list-title>
+
+            <ons-list-item modifier="nodivider" style="margin-bottom: 300px">
+                <div class="left">
+                    <ons-icon icon="md-ally-icon-cash" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <ons-input id="fund-wallet-amount" required placeholder="Amount (NGN)"
+                           data-parsley-type="number" type="tel"
+                           data-parsley-min="500"
+                           data-parsley-max="50000"
+                           data-parsley-required-message="enter amount to transfer"
+                           data-parsley-type-message="provide a valid cash amount"
+                           data-parsley-min-message="minimum amount per transfer is 500"
+                           data-parsley-max-message="maximum amount per transfer is 50,000"
+                           onchange="$(this).val(kendo.toString(kendo.parseFloat($(this).val()), 'n2'));"
+                               class="hint--bottom"></ons-input>
+                </div>
+            </ons-list-item>
+
+        </ons-list>
     </form>
+
+    <ons-bottom-toolbar style="height: 56px; !important;">
+        <div style="width: 60%; margin-left: 20%; margin-right: 20%; padding-top: 6px; padding-bottom: 6px">
+            <ons-button id="fund-wallet-fund-button" disable-auto-styling modifier="large"
+                        style="background-color: #30a401; color: #ffffff; border-radius: 21px;">Fund Wallet</ons-button>
+        </div>
+    </ons-bottom-toolbar>
 </ons-page>

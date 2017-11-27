@@ -132,4 +132,16 @@ $(document).on("hide", "#wallet-page", utopiasoftware.ally.controller.walletPage
 // listen for when the Wallet page is destroyed
 $(document).on("destroy", "#wallet-page", utopiasoftware.ally.controller.walletPageViewModel.pageDestroy);
 
+// listen for the initialisation of the Fund Wallet page
+$(document).on("init", "#fund-wallet-page", utopiasoftware.ally.controller.fundWalletPageViewModel.pageInit);
+
+// listen for when the Fund Wallet page is shown
+$(document).on("show", "#fund-wallet-page", utopiasoftware.ally.controller.fundWalletPageViewModel.pageShow);
+
+// listen for when the Fund Wallet page is hidden
+$(document).on("hide", "#fund-wallet-page", utopiasoftware.ally.controller.fundWalletPageViewModel.pageHide);
+
+// listen for when the Fund Wallet page is destroyed
+$(document).on("destroy", "#fund-wallet-page", utopiasoftware.ally.controller.fundWalletPageViewModel.pageDestroy);
+
 //# sourceMappingURL=model-compiled.js.map

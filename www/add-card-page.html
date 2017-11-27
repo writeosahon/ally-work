@@ -1,0 +1,99 @@
+
+<!-- add-card page -->
+<ons-page id="add-card-page">
+    <ons-toolbar>
+        <div class="left">
+            <ons-toolbar-button onclick="$('#app-main-navigator').get(0).popPage({data: {refresh: true}});">
+                <ons-icon icon="md-long-arrow-left"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+        <div class="center">
+            Add Card
+        </div>
+    </ons-toolbar>
+
+    <ons-progress-bar class="page-preloader" indeterminate style="display: none;"></ons-progress-bar>
+
+    <form id="add-card-form" autocomplete="off" data-parsley-inputs="ons-input,input,textarea,select"
+          data-parsley-excluded="input[type=button], input[type=submit],
+                              input[type=reset], input[type=hidden], [disabled], :hidden" style="display: none;">
+
+        <ons-list>
+            <ons-list-title>Add New Card Details</ons-list-title>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-ally-icon-credit-card" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <div style="width:80%; display: inline-block">
+                        <input id="add-card-card-number" type="tel" required
+                               data-length="20"
+                               data-parsley-type="digits"
+                               data-parsley-minlength="16"
+                               data-parsley-maxlength="20"
+                               data-parsley-required-message="Card Number is required"
+                               data-parsley-type-message="Card Number must contain only numbers"
+                               data-parsley-minlength-message="Card Number must be at least 16 digits"
+                               data-parsley-maxlength-message="Card Number cannot be more than 20 digits">
+                    </div>
+                </div>
+            </ons-list-item>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-ally-icon-credit-card" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <div style="width:50%; display: inline-block">
+                        <ons-input id="add-card-cvv" type="number" placeholder="CVV" float required
+                               data-parsley-type="digits"
+                               data-parsley-minlength="3"
+                               data-parsley-maxlength="3"
+                               data-parsley-required-message="CVV is required"
+                               data-parsley-type-message="CVV must contain only numbers"
+                               data-parsley-minlength-message="CVV must be 3 digits"
+                               data-parsley-maxlength-message="CVV must be 3 digits"></ons-input>
+                    </div>
+                </div>
+            </ons-list-item>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-calendar" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <div style="width:40%; display: inline-block">
+                        <input id="add-card-expiry-month">
+                    </div>
+                    <div style="width:10%; display: inline-block; text-align: center">
+                        /
+                    </div>
+                    <div style="width:50%; display: inline-block">
+                        <input id="add-card-expiry-year">
+                    </div>
+                </div>
+            </ons-list-item>
+        </ons-list>
+    </form>
+
+    <ons-bottom-toolbar>
+        <ons-row>
+            <ons-col width="100%" style="text-align: center;">
+                <ons-button id="add-card-cancel-button" modifier="quiet" disabled style="color: red;"
+                            onclick="$('#app-main-navigator').get(0).popPage({data: {refresh: true}});">Cancel</ons-button>
+                <ons-button id="add-card-save-button" modifier="quiet" disabled>Save</ons-button>
+            </ons-col>
+        </ons-row>
+    </ons-bottom-toolbar>
+
+    <!-- tap target for feature discovery. This is not directly visible on the page -->
+    <div class="tap-target" data-activates="add-card-help-1" style="background-color: #82b1ff; color: #ffffff;">
+        <div class="tap-target-content">
+            <h5 style="padding-left: 2em;">Store Your Card</h5>
+            <p style="width: 50%; margin-left: 3%;">
+                Add your bank cards to your secure digital wallet</p>
+        </div>
+    </div>
+
+</ons-page>
