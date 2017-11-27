@@ -5,7 +5,7 @@
 }
 /** STYLE FOR VALIDATION TOOLTIP **/
 [data-hint]:after {
-    font-size: 1.1em !important;
+    font-size: 0.85em !important;
 }
 .ally-input-tooltip.e-tooltip-wrap {
     background-color: #458746 !important;

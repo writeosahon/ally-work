@@ -3,7 +3,7 @@
 <ons-page id="add-card-page">
     <ons-toolbar>
         <div class="left">
-            <ons-toolbar-button onclick="$('#app-main-navigator').get(0).popPage({data: {refresh: true}});">
+            <ons-toolbar-button onclick="utopiasoftware.ally.controller.addCardPageViewModel.backButtonClicked();">
                 <ons-icon icon="md-long-arrow-left"></ons-icon>
             </ons-toolbar-button>
         </div>
@@ -12,11 +12,11 @@
         </div>
     </ons-toolbar>
 
-    <ons-progress-bar class="page-preloader" indeterminate style="display: none;"></ons-progress-bar>
+    <ons-progress-bar class="page-preloader" indeterminate style="display: block;"></ons-progress-bar>
 
     <form id="add-card-form" autocomplete="off" data-parsley-inputs="ons-input,input,textarea,select"
           data-parsley-excluded="input[type=button], input[type=submit],
-                              input[type=reset], input[type=hidden], [disabled], :hidden" style="display: none;">
+                              input[type=reset], [disabled], :hidden, [type=hidden]" style="display: block;">
 
         <ons-list>
             <ons-list-title>Add New Card Details</ons-list-title>
@@ -27,7 +27,7 @@
                 </div>
                 <div class="center">
                     <div style="width:80%; display: inline-block">
-                        <input id="add-card-card-number" type="tel" required
+                        <input id="add-card-card-number" type="text" required
                                data-length="20"
                                data-parsley-type="digits"
                                data-parsley-minlength="16"
@@ -35,14 +35,15 @@
                                data-parsley-required-message="Card Number is required"
                                data-parsley-type-message="Card Number must contain only numbers"
                                data-parsley-minlength-message="Card Number must be at least 16 digits"
-                               data-parsley-maxlength-message="Card Number cannot be more than 20 digits">
+                               data-parsley-maxlength-message="Card Number cannot be more than 20 digits"
+                               class="ally-input-tooltip">
                     </div>
                 </div>
             </ons-list-item>
 
             <ons-list-item modifier="nodivider">
                 <div class="left">
-                    <ons-icon icon="md-ally-icon-credit-card" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                    <ons-icon icon="md-card" class="list-item__icon" fixed-width size="28px"></ons-icon>
                 </div>
                 <div class="center">
                     <div style="width:50%; display: inline-block">
@@ -53,47 +54,63 @@
                                data-parsley-required-message="CVV is required"
                                data-parsley-type-message="CVV must contain only numbers"
                                data-parsley-minlength-message="CVV must be 3 digits"
-                               data-parsley-maxlength-message="CVV must be 3 digits"></ons-input>
+                               data-parsley-maxlength-message="CVV must be 3 digits"
+                        style="width: 100%;" class="hint--top"></ons-input>
                     </div>
                 </div>
             </ons-list-item>
 
             <ons-list-item modifier="nodivider">
                 <div class="left">
+                    <ons-icon icon="md-ally-icon-square-keypad" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <div style="width:52%; display: inline-block">
+                        <ons-input id="add-card-pin" type="number" placeholder="Card ATM PIN" float required
+                                   data-parsley-type="digits"
+                                   data-parsley-minlength="4"
+                                   data-parsley-maxlength="4"
+                                   data-parsley-required-message="enter card PIN"
+                                   data-parsley-type-message="card PIN must contain only numbers"
+                                   data-parsley-minlength-message="card PIN must be at least 4 numbers"
+                                   data-parsley-maxlength-message="card PIN cannot be more than 4 numbers"
+                                   style="width: 100%;" class="hint--bottom"></ons-input>
+                    </div>
+                </div>
+            </ons-list-item>
+
+            <ons-list-item modifier="nodivider" style="margin-bottom: 300px;">
+                <div class="left">
                     <ons-icon icon="md-calendar" class="list-item__icon" fixed-width size="28px"></ons-icon>
                 </div>
                 <div class="center">
                     <div style="width:40%; display: inline-block">
-                        <input id="add-card-expiry-month">
+                        <input id="add-card-expiry-month" required
+                               data-parsley-required-message="no month"
+                               class="ally-input-tooltip hint--top">
                     </div>
-                    <div style="width:10%; display: inline-block; text-align: center">
+                    <div style="width:10%; display: inline-block; text-align: center; font-weight: bold">
                         /
                     </div>
                     <div style="width:50%; display: inline-block">
-                        <input id="add-card-expiry-year">
+                        <input id="add-card-expiry-year" required
+                               data-parsley-required-message="no year"
+                               class="ally-input-tooltip hint--top">
                     </div>
                 </div>
             </ons-list-item>
         </ons-list>
     </form>
 
-    <ons-bottom-toolbar>
-        <ons-row>
-            <ons-col width="100%" style="text-align: center;">
-                <ons-button id="add-card-cancel-button" modifier="quiet" disabled style="color: red;"
-                            onclick="$('#app-main-navigator').get(0).popPage({data: {refresh: true}});">Cancel</ons-button>
-                <ons-button id="add-card-save-button" modifier="quiet" disabled>Save</ons-button>
-            </ons-col>
-        </ons-row>
-    </ons-bottom-toolbar>
+    <ons-bottom-toolbar style="height: 56px; !important;">
+        <div style="width: 100%; padding-top: 6px; padding-bottom: 6px; text-align: center">
+            <ons-button id="add-card-cancel-button" disable-auto-styling
+                        style="background-color: #dd0000; color: #ffffff; width: 45%; border-radius: 21px;"
+                        onclick="utopiasoftware.ally.controller.addCardPageViewModel.backButtonClicked();">Cancel</ons-button>
 
-    <!-- tap target for feature discovery. This is not directly visible on the page -->
-    <div class="tap-target" data-activates="add-card-help-1" style="background-color: #82b1ff; color: #ffffff;">
-        <div class="tap-target-content">
-            <h5 style="padding-left: 2em;">Store Your Card</h5>
-            <p style="width: 50%; margin-left: 3%;">
-                Add your bank cards to your secure digital wallet</p>
+            <ons-button id="add-card-save-button" disable-auto-styling
+                        style="background-color: #30a401; color: #ffffff; width: 45%; border-radius: 21px;">Save</ons-button>
         </div>
-    </div>
+    </ons-bottom-toolbar>
 
 </ons-page>
