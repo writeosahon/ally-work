@@ -48,7 +48,9 @@
                     </ons-col>
                     <ons-col width="50%" style="margin-top: 1em;">
                         <ons-button id="wallet-wallet-transfer"  modifier="large"
-                                    style="background-color: #0FD0D0; color: #ffffff; border-radius: 21px;">Wallet Transfer</ons-button>
+                                    style="background-color: #0FD0D0; color: #ffffff; border-radius: 21px;"
+                                    onclick="$('#app-main-navigator').get(0).pushPage('wallet-transfer-page.html', {animation: 'fade-md'})">
+                            Wallet Transfer</ons-button>
                     </ons-col>
                     <ons-col width="25%" style="margin-top: 1em;"></ons-col>
                     <ons-col width="50%" style="margin-top: 1em;">

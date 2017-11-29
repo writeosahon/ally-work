@@ -1,52 +1,57 @@
-<ons-page id="fund-wallet-page">
+<ons-page id="wallet-transfer-page">
     <ons-toolbar>
         <div class="left">
             <ons-toolbar-button onclick="utopiasoftware.ally.controller.fundWalletPageViewModel.backButtonClicked()">
                 <ons-icon icon="md-long-arrow-left"></ons-icon>
             </ons-toolbar-button>
         </div>
-        <div class="center">Fund Wallet</div>
+        <div class="center">Wallet Transfer</div>
         <div class="right">
         </div>
     </ons-toolbar>
     <ons-progress-bar class="page-preloader" indeterminate style="display: block;"></ons-progress-bar>
 
-    <form id="fund-wallet-form" autocomplete="off" data-parsley-inputs="ons-input,input,textarea,select"
+    <form id="wallet-transfer-form" autocomplete="off" data-parsley-inputs="ons-input,input,textarea,select"
           data-parsley-excluded="input[type=button], input[type=submit],
-                              input[type=reset], input[type=hidden], [disabled], :hidden" style="display: none;">
+                              input[type=reset], input[type=hidden], [disabled], :hidden" style="display: block;">
 
         <ons-list>
-            <ons-list-title>Fund Wallet With Card</ons-list-title>
+            <ons-list-title>Transfer Funds To User Wallet</ons-list-title>
             <ons-list-item modifier="nodivider">
                 <div class="left">
-                    <ons-icon icon="md-ally-icon-credit-card" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                    <ons-icon icon="md-account-box-phone" class="list-item__icon" fixed-width size="28px"></ons-icon>
                 </div>
                 <div class="center">
                     <div style="width: 75%; display: inline-block">
-                        <input id="fund-wallet-card-number" type="tel" required
-                               data-parsley-required-message="Card Number is required"
-                               class="ally-input-tooltip">
+                        <ons-input id="wallet-transfer-receiver-phone-number" type="tel" placeholder="Recipient Phone Number"
+                                   modifier="transparent"
+                                   required float
+                                   pattern="((0[1-9]{1}[0-9]{9}|\+234[1-9]{1}[0-9]{9})|\+[1-9]{1}[0-9]{4,})"
+                                   data-parsley-required-message="recipient phone number is required"
+                                   data-parsley-pattern-message="incorrect phone number format. phone number must be in international format (starting with '+')"
+                                   data-parsley-type-message="incorrect phone number format. phone number must be in international format (starting with '+')"
+                                   style="width: 100%" class="hint--bottom"></ons-input>
                     </div>
                     <div style="width: 25%; text-align: center;">
                         <!-- display the add card page -->
-                        <ons-fab id="fund-wallet-add-card" modifier="mini"
+                        <ons-fab id="wallet-transfer-add-user" modifier="mini"
                                  style="color: #ffffff; background-color: #30a401;"
                                  onclick="$('#app-main-navigator').get(0).replacePage('add-card-page.html', {animation: 'slide-md'})">
-                            <ons-icon icon="md-plus"></ons-icon>
+                            <ons-icon icon="md-account-add"></ons-icon>
                         </ons-fab>
                     </div>
 
                 </div>
             </ons-list-item>
 
-            <ons-list-title>Amount To be Funded</ons-list-title>
+            <ons-list-title>Amount To be Transfer</ons-list-title>
 
             <ons-list-item modifier="nodivider" style="margin-bottom: 300px">
                 <div class="left">
                     <ons-icon icon="md-ally-icon-cash" class="list-item__icon" fixed-width size="28px"></ons-icon>
                 </div>
                 <div class="center">
-                    <ons-input id="fund-wallet-amount" required placeholder="Amount (NGN)"
+                    <ons-input id="wallet-transfer-amount" required placeholder="Amount (NGN)"
                            data-parsley-type="number" type="tel"
                            data-parsley-min="500"
                            data-parsley-max="50000"
@@ -64,8 +69,8 @@
 
     <ons-bottom-toolbar style="height: 56px; !important;">
         <div style="width: 60%; margin-left: 20%; margin-right: 20%; padding-top: 6px; padding-bottom: 6px">
-            <ons-button id="fund-wallet-fund-button" disable-auto-styling modifier="large"
-                        style="background-color: #30a401; color: #ffffff; border-radius: 21px;">Fund Wallet</ons-button>
+            <ons-button id="wallet-transfer-transfer-button" disable-auto-styling modifier="large"
+                        style="background-color: #30a401; color: #ffffff; border-radius: 21px;">Transfer</ons-button>
         </div>
     </ons-bottom-toolbar>
 </ons-page>
