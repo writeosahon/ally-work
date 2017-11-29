@@ -27,7 +27,7 @@
                 </div>
                 <div class="center">
                     <div style="width:80%; display: inline-block">
-                        <input id="add-card-card-number" type="text" required
+                        <input id="add-card-card-number" type="tel" required
                                data-length="20"
                                data-parsley-type="digits"
                                data-parsley-minlength="16"
@@ -36,7 +36,8 @@
                                data-parsley-type-message="Card Number must contain only numbers"
                                data-parsley-minlength-message="Card Number must be at least 16 digits"
                                data-parsley-maxlength-message="Card Number cannot be more than 20 digits"
-                               class="ally-input-tooltip">
+                               class="ally-input-tooltip"
+                        onfocus="this.select();">
                     </div>
                 </div>
             </ons-list-item>
@@ -79,7 +80,7 @@
                 </div>
             </ons-list-item>
 
-            <ons-list-item modifier="nodivider" style="margin-bottom: 300px;">
+            <ons-list-item modifier="nodivider">
                 <div class="left">
                     <ons-icon icon="md-calendar" class="list-item__icon" fixed-width size="28px"></ons-icon>
                 </div>
@@ -99,6 +100,26 @@
                     </div>
                 </div>
             </ons-list-item>
+
+            <ons-list-title>Amount To Charge</ons-list-title>
+            <ons-list-item modifier="nodivider" style="margin-bottom: 300px">
+                <div class="left">
+                    <ons-icon icon="md-ally-icon-cash" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <ons-input id="add-card-charge-amount" required placeholder="Amount (NGN)"
+                               data-parsley-type="number" type="tel"
+                               data-parsley-min="500"
+                               data-parsley-max="50000"
+                               data-parsley-required-message="enter amount to charge"
+                               data-parsley-type-message="provide a valid cash amount"
+                               data-parsley-min-message="minimum amount per charge is 500"
+                               data-parsley-max-message="maximum amount per charge is 50,000"
+                               onchange="$(this).val(kendo.toString(kendo.parseFloat($(this).val()), 'n2'));"
+                               class="hint--bottom"></ons-input>
+                </div>
+            </ons-list-item>
+
         </ons-list>
     </form>
 
@@ -108,8 +129,8 @@
                         style="background-color: #dd0000; color: #ffffff; width: 45%; border-radius: 21px;"
                         onclick="utopiasoftware.ally.controller.addCardPageViewModel.backButtonClicked();">Cancel</ons-button>
 
-            <ons-button id="add-card-save-button" disable-auto-styling
-                        style="background-color: #30a401; color: #ffffff; width: 45%; border-radius: 21px;">Save</ons-button>
+            <ons-button id="add-card-fund-button" disable-auto-styling
+                        style="background-color: #30a401; color: #ffffff; width: 45%; border-radius: 21px;">Fund</ons-button>
         </div>
     </ons-bottom-toolbar>
 

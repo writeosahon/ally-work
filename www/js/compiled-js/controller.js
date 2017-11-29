@@ -1441,7 +1441,6 @@ utopiasoftware.ally.controller = {
 
             // run the validation method for the sign-in form
             utopiasoftware.ally.controller.accountPageViewModel.formValidator.whenValidate();
-            console.log("SAVE BUTTON CLICKED");
         },
 
 
@@ -1726,9 +1725,62 @@ utopiasoftware.ally.controller = {
         /**
          * method is triggered when page is shown
          */
-        pageShow: function(){
+        pageShow: function(event){
+
+            var $thisPage = $(event.target); // get the current page shown
+
+            // check if the user triggered a page refresh
+            if($('#app-main-navigator').get(0).topPage.data.refresh !== true){ // page refresh was NOT triggered
+                return; // exit
+            }
+
+            // a page refresh was triggered, so begin refresh the wallet page content
+
             // disable the swipeable feature for the app splitter
             $('ons-splitter-side').removeAttr("swipeable");
+
+
+            $('#wallet-preloading-fab', $thisPage).css("display", "inline-block"); // display page preloader
+
+            // hide the necessary page components
+            $('#wallet-list', $thisPage).css("display", "none");
+
+            // load the user data
+            utopiasoftware.ally.controller.walletPageViewModel.loadUserAccountData().
+            then(function(userDetails){ // save the returned user details in app cache
+                return utopiasoftware.ally.saveUserAppDetails(userDetails);
+            }).
+            then(function(userDetails){ // update the page with the collect data details
+
+                // update user data on app
+                utopiasoftware.ally.model.appUserDetails = userDetails;
+
+                $('#wallet-balance', $thisPage).
+                html(kendo.toString(kendo.parseFloat(userDetails.balance), "n2"));
+
+                $('#wallet-owner-name', $thisPage).val(userDetails.firstname + " " + userDetails.lastname);
+
+                // display the necessary page components
+                $('#wallet-list', $thisPage).css("display", "block");
+                $('#wallet-reload-fab', $thisPage).css("display", "inline-block");
+
+                // hide page preloader
+                $('#wallet-preloading-fab', $thisPage).css("display", "none");
+
+                // hide the loader
+                $('#loader-modal').get(0).hide();
+            }).
+            catch(function(){ // an error occurred when trying to load the user data
+
+                // display the necessary page components
+                $('#wallet-list', $thisPage).css("display", "block");
+
+                // display necessary page components
+                $('#wallet-reload-fab', $thisPage).css("display", "inline-block");
+
+                // hide page preloader
+                $('#wallet-preloading-fab', $thisPage).css("display", "none");
+            });
         },
 
 
@@ -1927,73 +1979,140 @@ utopiasoftware.ally.controller = {
                 $('#app-main-navigator').get(0).topPage.onDeviceBackButton =
                     utopiasoftware.ally.controller.fundWalletPageViewModel.backButtonClicked;
 
+                // display the page preloader
+                $('.page-preloader', $thisPage).css('display', "block");
 
+                // hide the form
+                $('#fund-wallet-form', $thisPage).css('display', "none");
 
-                // initialise the card DropDown widget
-                utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList =  new ej.dropdowns.DropDownList({
-                    //set the data to dataSource property
-                    dataSource: ["******2341"],
-                    placeholder: "Select Card",
-                    popupHeight: "300px"
-                });
+                // create the form data to be sent
+                var formData = {phone: utopiasoftware.ally.model.appUserDetails.phone};
 
-                // render initialized card DropDownList
-               utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList.appendTo('#fund-wallet-card-number');
-
-
-                // initialise form tooltips
-                utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip = new ej.popups.Tooltip({
-                    target: '.ally-input-tooltip',
-                    position: 'top center',
-                    cssClass: 'ally-input-tooltip',
-                    opensOn: 'focus'
-                });
-
-                // render the initialized form tooltip
-                utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip.appendTo('#fund-wallet-form');
-
-                // initialise the amount field
-                utopiasoftware.ally.controller.fundWalletPageViewModel.amountFieldValidator =
-                    $('#fund-wallet-amount').parsley({
-                        value: function(parsley) {
-                            // convert the amount back to a plain text without the thousand separator
-                            let parsedNumber = kendo.parseFloat($('#fund-wallet-amount', $thisPage).val());
-                            return (parsedNumber ? parsedNumber : $('#fund-wallet-amount', $thisPage).val());
+                // get the collection of stored/tokenised cards
+                Promise.resolve(formData).
+                then(function(){
+                    // submit the form data
+                    return Promise.resolve($.ajax(
+                        {
+                            url: utopiasoftware.ally.model.ally_base_url + "/mobile/get-my-cards.php",
+                            type: "post",
+                            contentType: "application/x-www-form-urlencoded",
+                            beforeSend: function(jqxhr) {
+                                jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                            },
+                            dataType: "text",
+                            timeout: 240000, // wait for 4 minutes before timeout of request
+                            processData: true,
+                            data: formData // data to submit to server
                         }
+                    ));
+                }).
+                then(function(serverResponse){
+                    serverResponse +=  "";
+                    serverResponse = JSON.parse(serverResponse.trim()); // get the response object
+                    return serverResponse; // forward the server response i.e. collection of tokenised cards
+                }).
+                then(function(cardCollectionArray){
+
+                    // initialise the card DropDown widget
+                    utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList =  new ej.dropdowns.DropDownList({
+                        //set the data to dataSource property
+                        dataSource: cardCollectionArray,
+                        fields: {text: 'CARDNUMBER2', value: 'CARDNUMBER2'},
+                        placeholder: "Select Card",
+                        popupHeight: "300px"
                     });
 
-                // initialise the form validation
-                utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator = $('#fund-wallet-form').parsley();
+                    // render initialized card DropDownList
+                    utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList.appendTo('#fund-wallet-card-number');
 
-                // attach listener for the fund wallet button on the page
-                $('#fund-wallet-fund-button').get(0).onclick = function(){
-                    // run the validation method for the form
-                    utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.whenValidate();
-                };
 
-                // listen for the form field validation failure event
-                utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('field:error', function(fieldInstance) {
-                    // get the element that triggered the field validation error and use it to display tooltip
-                    // display tooltip
-                    $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
-                    $(fieldInstance.$element).attr("data-hint", fieldInstance.getErrorsMessages()[0]);
-                    $(fieldInstance.$element).attr("title", fieldInstance.getErrorsMessages()[0]);
+                    // initialise form tooltips
+                    utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip = new ej.popups.Tooltip({
+                        target: '.ally-input-tooltip',
+                        position: 'top center',
+                        cssClass: 'ally-input-tooltip',
+                        opensOn: 'focus'
+                    });
+
+                    // render the initialized form tooltip
+                    utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip.appendTo('#fund-wallet-form');
+
+                    // initialise the amount field
+                    utopiasoftware.ally.controller.fundWalletPageViewModel.amountFieldValidator =
+                        $('#fund-wallet-amount').parsley({
+                            value: function(parsley) {
+                                // convert the amount back to a plain text without the thousand separator
+                                let parsedNumber = kendo.parseFloat($('#fund-wallet-amount', $thisPage).val());
+                                return (parsedNumber ? parsedNumber : $('#fund-wallet-amount', $thisPage).val());
+                            }
+                        });
+
+                    // initialise the form validation
+                    utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator = $('#fund-wallet-form').parsley();
+
+                    // attach listener for the fund wallet button on the page
+                    $('#fund-wallet-fund-button').get(0).onclick = function(){
+                        // run the validation method for the form
+                        utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.whenValidate();
+                    };
+
+                    // listen for the form field validation failure event
+                    utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('field:error', function(fieldInstance) {
+                        // get the element that triggered the field validation error and use it to display tooltip
+                        // display tooltip
+                        $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                        $(fieldInstance.$element).attr("data-hint", fieldInstance.getErrorsMessages()[0]);
+                        $(fieldInstance.$element).attr("title", fieldInstance.getErrorsMessages()[0]);
+                    });
+
+                    // listen for the form field validation success event
+                    utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('field:success', function(fieldInstance) {
+                        // remove tooltip from element
+                        $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                        $(fieldInstance.$element).removeAttr("data-hint");
+                        $(fieldInstance.$element).removeAttr("title");
+                    });
+
+                    // listen for the form validation success
+                    utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('form:success',
+                        utopiasoftware.ally.controller.fundWalletPageViewModel.formValidated);
+
+                    // hide the page preloader
+                    $('.page-preloader', $thisPage).css('display', "none");
+
+                    // display the form
+                    $('#fund-wallet-form', $thisPage).css('display', "block");
+
+                    // hide the loader
+                    $('#loader-modal').get(0).hide();
+
+                }).
+                catch(function(){
+                    // hide the page preloader
+                    $('.page-preloader', $thisPage).css('display', "none");
+
+                    // display the form
+                    $('#fund-wallet-form', $thisPage).css('display', "block");
+
+                    // inform the user that they cannot proceed without Internet
+                    window.plugins.toast.showWithOptions({
+                        message: "some content could be loaded without an Internet Connection",
+                        duration: 4000,
+                        position: "top",
+                        styling: {
+                            opacity: 1,
+                            backgroundColor: '#ff0000', //red
+                            textColor: '#FFFFFF',
+                            textSize: 14
+                        }
+                    }, function(toastEvent){
+                        if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                            window.plugins.toast.hide();
+                        }
+                    });
                 });
 
-                // listen for the form field validation success event
-                utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('field:success', function(fieldInstance) {
-                    // remove tooltip from element
-                    $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
-                    $(fieldInstance.$element).removeAttr("data-hint");
-                    $(fieldInstance.$element).removeAttr("title");
-                });
-
-                // listen for the form validation success
-                utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('form:success',
-                    utopiasoftware.ally.controller.fundWalletPageViewModel.formValidated);
-
-                // hide the loader
-                $('#loader-modal').get(0).hide();
 
             }
 
@@ -2028,7 +2147,7 @@ utopiasoftware.ally.controller = {
          * @param event
          */
         pageDestroy: (event) => {
-            console.log("PAGE DESTROYED");
+
             try{
                 // remove any tooltip being displayed on all forms on the page
                 $('#fund-wallet-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
@@ -2072,67 +2191,24 @@ utopiasoftware.ally.controller = {
             }
 
             // create the form data to be submitted
-            /** var createAcctFormData = {
-                firstName: $('#signup-page #signup-firstname').val(),
-                lastName: $('#signup-page #signup-lastname').val(),
-                lock: $('#signup-page #signup-secure-pin').val(),
-                phone: $('#signup-page #signup-phone-number').val().startsWith("0") ?
-                    $('#signup-page #signup-phone-number').val().replace("0", "+234"):$('#signup-page #signup-phone-number').val()
+            var formData = {
+                firstname: utopiasoftware.ally.model.appUserDetails.firstname,
+                lastname: utopiasoftware.ally.model.appUserDetails.lastname,
+                phone: utopiasoftware.ally.model.appUserDetails.phone,
+                email: utopiasoftware.ally.model.appUserDetails.email ? utopiasoftware.ally.model.appUserDetails.email : "",
+                cardno: utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList.value,
+                amount: kendo.parseFloat($('#fund-wallet-page #fund-wallet-amount').val())
             };
 
-
-            // tell the user that phone number verification is necessary
-            new Promise(function(resolve, reject){
-                ons.notification.confirm('To complete sign up, your phone number must be verified. <br>' +
-                        'Usual SMS charge from your phone network provider will apply.<br> ' +
-                        'Please ensure you have sufficient airtime to send/receive one SMS', {title: 'Verify Phone Number',
-                        buttonLabels: ['Cancel', 'Ok']}) // Ask for confirmation
-                    .then(function(index) {
-                        if (index === 1) { // OK button
-                            resolve();
-                        }
-                        else{
-                            reject("your phone number could not be verified");
-                        }
-                    });
-            }).
-            then(function(){ // verify the user's phone number
-
-                //return null;
-                return utopiasoftware.ally.validatePhoneNumber($('#signup-page #signup-phone-number').val());
-            }).
-            then(function(){
-                // display the loader message to indicate that account is being created;
-                $('#loader-modal-message').html("Completing Sign Up...");
-                return Promise.resolve($('#loader-modal').get(0).show()); // show loader
-            }).
-            then(function(){ // clear all data belonging to previous user
-                var promisesArray = []; // holds all the Promise objects for all data being deleted
-
-                var promiseObject = new Promise(function(resolve, reject){
-                    // delete the user app details from secure storage if it exists
-                    Promise.resolve(intel.security.secureStorage.
-                    delete({'id':'ally-user-details'})).
-                    then(function(){resolve();},function(){resolve();}); // ALWAYS resolve the promise
-                });
-
-                // add the promise object to the promise array
-                promisesArray.push(promiseObject);
-
-                // return promise when all operations have completed
-                return Promise.all(promisesArray);
-            }).
-            then(function(){
-                // clear all data in the device local/session storage
-                window.localStorage.clear();
-                window.sessionStorage.clear();
-                return null;
-            }).
-            then(function(){
-                // upload the user details to the server
+            // display the loader message to indicate that account is being created;
+            $('#hour-glass-loader-modal .modal-message').html("Funding User Wallet...");
+            // forward the form data & show loader
+            Promise.all([formData, Promise.resolve($('#hour-glass-loader-modal').get(0).show())]).
+            then(function(dataArray){
+                // submit the form data
                 return Promise.resolve($.ajax(
                     {
-                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/signup.php",
+                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/rave-payment-using-token.php",
                         type: "post",
                         contentType: "application/x-www-form-urlencoded",
                         beforeSend: function(jqxhr) {
@@ -2141,66 +2217,51 @@ utopiasoftware.ally.controller = {
                         dataType: "text",
                         timeout: 240000, // wait for 4 minutes before timeout of request
                         processData: true,
-                        data: createAcctFormData
+                        data: dataArray[0] // data to submit to server
                     }
                 ));
-
             }).
-            then(function(serverResponseText){
-                serverResponseText +=  "";
-                var newUser = JSON.parse(serverResponseText.trim()); // get the new user object
-                // add a timestamp for the last time user details was updated
-                newUser._lastUpdatedDate = Date.now();
+            then(function(serverResponse){
+                serverResponse +=  "";
+                serverResponse = JSON.parse(serverResponse.trim()); // get the response object
 
                 // check if any error occurred
-                if(newUser.status == "error"){ // an error occured
-                    throw newUser.message; // throw the error message attached to this error
+                if(serverResponse.status != "success"){ // an error occured
+                    throw serverResponse.message || serverResponse.data.message; // throw the error message attached to this error
                 }
 
-                // store user data
-                utopiasoftware.ally.model.appUserDetails = newUser;
-
-                return newUser;
-
+                return serverResponse; // forward the server response
             }).
-            then(function(newUser){
-                // create a cypher data of the user details
-                return Promise.resolve(intel.security.secureData.
-                createFromData({"data": JSON.stringify(newUser)}));
+            then(function(serverResponse){
+                // hide the loader
+                return Promise.all([serverResponse, $('#hour-glass-loader-modal').get(0).hide()]);
             }).
-            then(function(instanceId){
-                // store the cyphered data in secure persistent storage
-                return Promise.resolve(
-                    intel.security.secureStorage.write({"id": "ally-user-details", "instanceID": instanceId})
-                );
+            then(function(responseArray){
+                // ask user for transaction otp
+                return Promise.all([responseArray[0], ons.notification.alert({title: '<ons-icon icon="md-check-circle" size="32px" ' +
+                    'style="color: green;"></ons-icon> Wallet Funded',
+                    messageHTML: `<span>FUNDING FEE: ${kendo.toString(kendo.parseFloat(responseArray[0].data.appfee), 'n2')}<br>
+                    AMOUNT CHARGED: ${kendo.toString(kendo.parseFloat(responseArray[0].data.charged_amount), 'n2')}</span>`,
+                    cancelable: false
+                })]);
             }).
             then(function(){
+                return Promise.all([ons.notification.toast("Wallet Funded Successfully!", {timeout:4000}),
+                    $('#app-main-navigator').get(0).popPage({data: {refresh: true}})]);
 
-                // set app-status local storage (as user phone number)
-                window.localStorage.setItem("app-status", utopiasoftware.ally.model.appUserDetails.phone);
-
-                // update the first name being displayed in the side menu
-                //$('#side-menu-username').html(utopiasoftware.saveup.model.appUserDetails.firstName);
-
-                return $('#loader-modal').get(0).hide(); // hide loader
-            }).
-            then(function(){
-                return $('ons-splitter').get(0).content.load("app-main-template");
-            }).
-            then(function(){
-                ons.notification.toast("Sign Up complete! Welcome", {timeout:3000});
             }).
             catch(function(err){
                 if(typeof err !== "string"){ // if err is NOT a String
-                    err = "Sorry. Sign Up could not be completed"
+                    err = "Sorry. Your ALLY wallet could not be funded. Please retry"
                 }
-                $('#loader-modal').get(0).hide(); // hide loader
+
+                $('#hour-glass-loader-modal').get(0).hide(); // hide loader
                 ons.notification.alert({title: '<ons-icon icon="md-close-circle-o" size="32px" ' +
-                'style="color: red;"></ons-icon> Sign Up Failed',
+                'style="color: red;"></ons-icon> Wallet Funding Failed',
                     messageHTML: '<span>' + err + '</span>',
                     cancelable: false
                 });
-            }); **/
+            });
         },
 
 
@@ -2236,6 +2297,11 @@ utopiasoftware.ally.controller = {
          * used to validate the card number field
          */
         cardNumberFieldValidator: null,
+
+        /**
+         * used to hold the parsley validator for the Amount field
+         */
+        amountFieldValidator: null,
 
         /**
          * used to hold the ej library card masked text input
@@ -2307,7 +2373,7 @@ utopiasoftware.ally.controller = {
                         {value: "10", displayText: "10"},
                         {value: "11", displayText: "11"},
                         {value: "12", displayText: "12"}],
-                        fields: {text: 'displayText', id: 'value'},
+                        fields: {text: 'displayText', value: 'value'},
                     placeholder: "Expiry Month",
                     floatLabelType: "Auto"
                 });
@@ -2333,7 +2399,7 @@ utopiasoftware.ally.controller = {
                 utopiasoftware.ally.controller.addCardPageViewModel.cardYearDropDownList =
                     new ej.dropdowns.DropDownList({
                         dataSource: cardYearsArray,
-                        fields: {text: 'displayText', id: 'value'},
+                        fields: {text: 'displayText', value: 'value'},
                         placeholder: "Expiry Year",
                         floatLabelType: "Auto"
                     });
@@ -2353,7 +2419,7 @@ utopiasoftware.ally.controller = {
                 // render the initialized form tooltip
                 utopiasoftware.ally.controller.addCardPageViewModel.formTooltip.appendTo('#add-card-form');
 
-                // initialise the amount field validator
+                // initialise the card number field validator
                 utopiasoftware.ally.controller.addCardPageViewModel.cardNumberFieldValidator =
                     $('#add-card-card-number').parsley({
                         value: function(parsley) {
@@ -2362,11 +2428,21 @@ utopiasoftware.ally.controller = {
                         }
                     });
 
+                // initialise the amount field
+                utopiasoftware.ally.controller.addCardPageViewModel.amountFieldValidator =
+                    $('#add-card-charge-amount').parsley({
+                        value: function(parsley) {
+                            // convert the amount back to a plain text without the thousand separator
+                            let parsedNumber = kendo.parseFloat($('#add-card-charge-amount', $thisPage).val());
+                            return (parsedNumber ? parsedNumber : $('#add-card-charge-amount', $thisPage).val());
+                        }
+                    });
+
                 // initialise the form validation
                 utopiasoftware.ally.controller.addCardPageViewModel.formValidator = $('#add-card-form').parsley();
 
                 // attach listener for the fund wallet button on the page
-                $('#add-card-save-button').get(0).onclick = function(){
+                $('#add-card-fund-button').get(0).onclick = function(){
                     // run the validation method for the form
                     utopiasoftware.ally.controller.addCardPageViewModel.formValidator.whenValidate();
                 };
@@ -2440,6 +2516,7 @@ utopiasoftware.ally.controller = {
                 $('#add-card-page [data-hint]').removeAttr("data-hint");
                 // destroy the form validator objects on the page
                 utopiasoftware.ally.controller.addCardPageViewModel.cardNumberFieldValidator.destroy();
+                utopiasoftware.ally.controller.addCardPageViewModel.amountFieldValidator.destroy();
                 utopiasoftware.ally.controller.addCardPageViewModel.formValidator.destroy();
                 // destroy other form components
                 utopiasoftware.ally.controller.addCardPageViewModel.cardMaskedTextInput.destroy();
@@ -2459,7 +2536,7 @@ utopiasoftware.ally.controller = {
             if(navigator.connection.type === Connection.NONE){ // no Internet Connection
                 // inform the user that they cannot proceed without Internet
                 window.plugins.toast.showWithOptions({
-                    message: "Financial card cannot be saved without an Internet Connection",
+                    message: "ALLY wallet cannot be saved without an Internet Connection",
                     duration: 4000,
                     position: "top",
                     styling: {
@@ -2478,67 +2555,28 @@ utopiasoftware.ally.controller = {
             }
 
             // create the form data to be submitted
-            /** var createAcctFormData = {
-                firstName: $('#signup-page #signup-firstname').val(),
-                lastName: $('#signup-page #signup-lastname').val(),
-                lock: $('#signup-page #signup-secure-pin').val(),
-                phone: $('#signup-page #signup-phone-number').val().startsWith("0") ?
-                    $('#signup-page #signup-phone-number').val().replace("0", "+234"):$('#signup-page #signup-phone-number').val()
+            var formData = {
+                firstName: utopiasoftware.ally.model.appUserDetails.firstname,
+                lastName: utopiasoftware.ally.model.appUserDetails.lastname,
+                phone: utopiasoftware.ally.model.appUserDetails.phone,
+                email: utopiasoftware.ally.model.appUserDetails.email ? utopiasoftware.ally.model.appUserDetails.email : "",
+                cardno: utopiasoftware.ally.controller.addCardPageViewModel.cardMaskedTextInput.value,
+                cvv: $('#add-card-page #add-card-cvv').val(),
+                expirymonth: utopiasoftware.ally.controller.addCardPageViewModel.cardMonthDropDownList.value,
+                expiryyear: utopiasoftware.ally.controller.addCardPageViewModel.cardYearDropDownList.value,
+                pin: $('#add-card-page #add-card-pin').val(),
+                amount: kendo.parseFloat($('#add-card-page #add-card-charge-amount').val())
             };
 
-
-             // tell the user that phone number verification is necessary
-             new Promise(function(resolve, reject){
-                ons.notification.confirm('To complete sign up, your phone number must be verified. <br>' +
-                        'Usual SMS charge from your phone network provider will apply.<br> ' +
-                        'Please ensure you have sufficient airtime to send/receive one SMS', {title: 'Verify Phone Number',
-                        buttonLabels: ['Cancel', 'Ok']}) // Ask for confirmation
-                    .then(function(index) {
-                        if (index === 1) { // OK button
-                            resolve();
-                        }
-                        else{
-                            reject("your phone number could not be verified");
-                        }
-                    });
-            }).
-             then(function(){ // verify the user's phone number
-
-                //return null;
-                return utopiasoftware.ally.validatePhoneNumber($('#signup-page #signup-phone-number').val());
-            }).
-             then(function(){
-                // display the loader message to indicate that account is being created;
-                $('#loader-modal-message').html("Completing Sign Up...");
-                return Promise.resolve($('#loader-modal').get(0).show()); // show loader
-            }).
-             then(function(){ // clear all data belonging to previous user
-                var promisesArray = []; // holds all the Promise objects for all data being deleted
-
-                var promiseObject = new Promise(function(resolve, reject){
-                    // delete the user app details from secure storage if it exists
-                    Promise.resolve(intel.security.secureStorage.
-                    delete({'id':'ally-user-details'})).
-                    then(function(){resolve();},function(){resolve();}); // ALWAYS resolve the promise
-                });
-
-                // add the promise object to the promise array
-                promisesArray.push(promiseObject);
-
-                // return promise when all operations have completed
-                return Promise.all(promisesArray);
-            }).
-             then(function(){
-                // clear all data in the device local/session storage
-                window.localStorage.clear();
-                window.sessionStorage.clear();
-                return null;
-            }).
-             then(function(){
-                // upload the user details to the server
+            // display the loader message to indicate that account is being created;
+            $('#hour-glass-loader-modal .modal-message').html("Funding User Wallet...");
+            // forward the form data & show loader
+            Promise.all([formData, Promise.resolve($('#hour-glass-loader-modal').get(0).show())]).
+            then(function(dataArray){
+                // submit the form data
                 return Promise.resolve($.ajax(
                     {
-                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/signup.php",
+                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/rave-card-payment.php",
                         type: "post",
                         contentType: "application/x-www-form-urlencoded",
                         beforeSend: function(jqxhr) {
@@ -2547,66 +2585,89 @@ utopiasoftware.ally.controller = {
                         dataType: "text",
                         timeout: 240000, // wait for 4 minutes before timeout of request
                         processData: true,
-                        data: createAcctFormData
+                        data: dataArray[0] // data to submit to server
                     }
                 ));
-
             }).
-             then(function(serverResponseText){
-                serverResponseText +=  "";
-                var newUser = JSON.parse(serverResponseText.trim()); // get the new user object
-                // add a timestamp for the last time user details was updated
-                newUser._lastUpdatedDate = Date.now();
+            then(function(serverResponse){
+                serverResponse +=  "";
+                serverResponse = JSON.parse(serverResponse.trim()); // get the response object
 
                 // check if any error occurred
-                if(newUser.status == "error"){ // an error occured
-                    throw newUser.message; // throw the error message attached to this error
+                if(serverResponse.status != "success"){ // an error occured
+                    throw serverResponse.message || serverResponse.data.message; // throw the error message attached to this error
                 }
 
-                // store user data
-                utopiasoftware.ally.model.appUserDetails = newUser;
+                return serverResponse; // forward the server response
+            }).
+            then(function(serverResponse){
+                // hide the loader
+                return Promise.all([serverResponse, $('#hour-glass-loader-modal').get(0).hide()]);
+            }).
+            then(function(responseArray){
+                // ask user for transaction otp
+                return Promise.all([responseArray[0], ons.notification.prompt({title: "OTP Confirmation",
+                    messageHTML: `<div><ons-icon icon="md-ally-icon-otp" size="24px"
+                    style="color: #30a401; float: left; width: 26px;"></ons-icon>
+                    <span style="float: right; width: calc(100% - 26px);">
+                    FUNDING FEE: ${kendo.toString(kendo.parseFloat(responseArray[0].data.appfee), 'n2')}<br>
+                    AMOUNT TO CHARGE: ${kendo.toString(kendo.parseFloat(responseArray[0].data.charged_amount), 'n2')}<br>
+                    Confirm Transaction by providing OTP sent to your phone or generated by your bank token</span></div>`,
+                    cancelable: false, placeholder: "OTP", inputType: "number", defaultValue: "", autofocus: false,
+                    submitOnEnter: true
+                })]);
+            }).
+            then(function(responseArray){
+                // display the loader message to indicate that account is being created;
+                $('#hour-glass-loader-modal .modal-message').html("Authorizing Wallet Fund...");
+                return Promise.all([...responseArray, $('#hour-glass-loader-modal').get(0).show()])
+            }).
+            then(function(responseArray){
+                // submit the form data
+                return Promise.resolve($.ajax(
+                    {
+                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/rave-approve-card-payment-via-otp.php",
+                        type: "post",
+                        contentType: "application/x-www-form-urlencoded",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                        },
+                        dataType: "text",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: true,
+                        data: {raverefid: responseArray[0].data.flwRef, otp: responseArray[1],
+                            phone: utopiasoftware.ally.model.appUserDetails.phone} // data to submit to server
+                    }
+                ));
+            }).
+            then(function(serverResponse){
+                serverResponse +=  "";
+                serverResponse = JSON.parse(serverResponse.trim()); // get the new user object
 
-                return newUser;
+                // check if any error occurred
+                if(serverResponse.status == "error"){ // an error occured
+                    throw serverResponse.message; // throw the error message attached to this error
+                }
+
+                return $('#hour-glass-loader-modal').get(0).hide(); // hide loader
+            }).
+            then(function(){
+                return Promise.all([ons.notification.toast("Wallet Funded Successfully!", {timeout:4000}),
+                    $('#app-main-navigator').get(0).popPage({data: {refresh: true}})]);
 
             }).
-             then(function(newUser){
-                // create a cypher data of the user details
-                return Promise.resolve(intel.security.secureData.
-                createFromData({"data": JSON.stringify(newUser)}));
-            }).
-             then(function(instanceId){
-                // store the cyphered data in secure persistent storage
-                return Promise.resolve(
-                    intel.security.secureStorage.write({"id": "ally-user-details", "instanceID": instanceId})
-                );
-            }).
-             then(function(){
-
-                // set app-status local storage (as user phone number)
-                window.localStorage.setItem("app-status", utopiasoftware.ally.model.appUserDetails.phone);
-
-                // update the first name being displayed in the side menu
-                //$('#side-menu-username').html(utopiasoftware.saveup.model.appUserDetails.firstName);
-
-                return $('#loader-modal').get(0).hide(); // hide loader
-            }).
-             then(function(){
-                return $('ons-splitter').get(0).content.load("app-main-template");
-            }).
-             then(function(){
-                ons.notification.toast("Sign Up complete! Welcome", {timeout:3000});
-            }).
-             catch(function(err){
+            catch(function(err){
                 if(typeof err !== "string"){ // if err is NOT a String
-                    err = "Sorry. Sign Up could not be completed"
+                    err = "Sorry. Your ALLY wallet could not be funded. Please retry"
                 }
-                $('#loader-modal').get(0).hide(); // hide loader
+
+                $('#hour-glass-loader-modal').get(0).hide(); // hide loader
                 ons.notification.alert({title: '<ons-icon icon="md-close-circle-o" size="32px" ' +
-                'style="color: red;"></ons-icon> Sign Up Failed',
+                'style="color: red;"></ons-icon> Wallet Funding Failed',
                     messageHTML: '<span>' + err + '</span>',
                     cancelable: false
                 });
-            }); **/
+            });
         },
 
 
@@ -2623,7 +2684,7 @@ utopiasoftware.ally.controller = {
             }
 
             // remove this page form the main navigator stack
-            $('#app-main-navigator').get(0).replacePage('fund-wallet-page.html', {animation: 'fade-md'})
+            $('#app-main-navigator').get(0).replacePage('fund-wallet-page.html', {animation: 'fade-md'});
         }
 
     }

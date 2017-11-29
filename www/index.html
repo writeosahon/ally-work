@@ -134,5 +134,21 @@
     <div class="modal-message" style="text-align: center"></div>
 </ons-modal>
 
+<ons-modal id="fund-wallet-authorise-modal" direction="up" style="background: rgba(211, 211, 211, 1);">
+    <ons-fab modifier="mini" position="top right" style="color: #ffffff; background-color: #30a401; z-index: 3"
+             onclick="$('#fund-wallet-authorise-modal').get(0).hide();
+                $('#fund-wallet-authorise-modal-iframe').attr('src', '');">
+        <ons-icon icon="md-close"></ons-icon>
+    </ons-fab>
+    <div style="width: calc(100% - 0px); height: calc(100vh - 0px); display: block">
+        <iframe id="fund-wallet-authorise-modal-iframe" src="" style="width: 100%; height: 85%;"></iframe>
+        <ons-row style="color: #000000">
+            <ons-col width="50%">AMOUNT CHARGED</ons-col>
+            <ons-col width="50%" id="fund-wallet-authorise-modal-amount-charged"></ons-col>
+        </ons-row>
+
+    </div>
+</ons-modal>
+
 </body>
 </html>
