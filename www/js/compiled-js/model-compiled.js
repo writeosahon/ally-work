@@ -156,4 +156,16 @@ $(document).on("hide", "#add-card-page", utopiasoftware.ally.controller.addCardP
 // listen for when the Add Card page is destroyed
 $(document).on("destroy", "#add-card-page", utopiasoftware.ally.controller.addCardPageViewModel.pageDestroy);
 
+// listen for the initialisation of the Wallet Transfer page
+$(document).on("init", "#wallet-transfer-page", utopiasoftware.ally.controller.walletTransferPageViewModel.pageInit);
+
+// listen for when the Wallet Transfer page is shown
+$(document).on("show", "#wallet-transfer-page", utopiasoftware.ally.controller.walletTransferPageViewModel.pageShow);
+
+// listen for when the Wallet Transfer page is hidden
+$(document).on("hide", "#wallet-transfer-page", utopiasoftware.ally.controller.walletTransferPageViewModel.pageHide);
+
+// listen for when the Wallet Transfer page is destroyed
+$(document).on("destroy", "#wallet-transfer-page", utopiasoftware.ally.controller.walletTransferPageViewModel.pageDestroy);
+
 //# sourceMappingURL=model-compiled.js.map

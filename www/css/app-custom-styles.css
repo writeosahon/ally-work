@@ -73,7 +73,7 @@
 
 
 /** STYLE FOR SECURITY CHECK PROMPT DIALOG **/
-#pin-security-check input {
+#pin-security-check input, #pin-security-check2 input {
     -webkit-text-security: disc;
 }
 

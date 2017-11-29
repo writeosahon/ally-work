@@ -2687,6 +2687,385 @@ utopiasoftware.ally.controller = {
             $('#app-main-navigator').get(0).replacePage('fund-wallet-page.html', {animation: 'fade-md'});
         }
 
+    },
+
+
+    /**
+     * object is view-model for wallet-transfer page
+     */
+    walletTransferPageViewModel: {
+
+        /**
+         * used to hold the parsley form validation object for the page
+         */
+        formValidator: null,
+
+        /**
+         * used to hold the parsley validator for the Amount field
+         */
+        amountFieldValidator: null,
+
+
+        /**
+         * * used to hold the ej Tooltip component
+         */
+        formTooltip: null,
+
+        /**
+         * event is triggered when page is initialised
+         */
+        pageInit: function(event){
+
+            var $thisPage = $(event.target); // get the current page shown
+
+            // call the function used to initialise the app page if the app is fully loaded
+            loadPageOnAppReady();
+
+            //function is used to initialise the page if the app is fully ready for execution
+            function loadPageOnAppReady(){
+                // check to see if onsen is ready and if all app loading has been completed
+                if(!ons.isReady() || utopiasoftware.ally.model.isAppReady === false){
+                    setTimeout(loadPageOnAppReady, 500); // call this function again after half a second
+                    return;
+                }
+
+                // listen for the back button event
+                $('#app-main-navigator').get(0).topPage.onDeviceBackButton =
+                    utopiasoftware.ally.controller.walletTransferPageViewModel.backButtonClicked;
+
+                // attach listen for when the 'wallet-transfer-add-recipient-button' is clicked
+                $('#wallet-transfer-add-recipient-button').get(0).onclick =
+                    utopiasoftware.ally.controller.walletTransferPageViewModel.pickContactButtonClicked;
+
+                // display the page preloader
+                $('.page-preloader', $thisPage).css('display', "block");
+
+                // hide the form
+                $('#wallet-transfer-form', $thisPage).css('display', "none");
+
+
+                // start a promise chain to setup the page
+                Promise.resolve({}).
+                then(function(){
+                    // initialise the amount field
+                    utopiasoftware.ally.controller.walletTransferPageViewModel.amountFieldValidator =
+                        $('#wallet-transfer-amount').parsley({
+                            value: function(parsley) {
+                                // convert the amount back to a plain text without the thousand separator
+                                let parsedNumber = kendo.parseFloat($('#wallet-transfer-amount', $thisPage).val());
+                                return (parsedNumber ? parsedNumber : $('#wallet-transfer-amount', $thisPage).val());
+                            }
+                        });
+
+                    // initialise the form validation
+                    utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator = $('#wallet-transfer-form').parsley();
+
+                    // attach listener for the wallet-transfer button on the page
+                    $('#wallet-transfer-transfer-button').get(0).onclick = function(){
+                        // run the validation method for the form
+                        utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.whenValidate();
+                    };
+
+                    // listen for the form field validation failure event
+                    utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.on('field:error', function(fieldInstance) {
+                        // get the element that triggered the field validation error and use it to display tooltip
+                        // display tooltip
+                        $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                        $(fieldInstance.$element).attr("data-hint", fieldInstance.getErrorsMessages()[0]);
+                        $(fieldInstance.$element).attr("title", fieldInstance.getErrorsMessages()[0]);
+                    });
+
+                    // listen for the form field validation success event
+                    utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.on('field:success', function(fieldInstance) {
+                        // remove tooltip from element
+                        $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                        $(fieldInstance.$element).removeAttr("data-hint");
+                        $(fieldInstance.$element).removeAttr("title");
+                    });
+
+                    // listen for the form validation success
+                    utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.on('form:success',
+                        utopiasoftware.ally.controller.walletTransferPageViewModel.formValidated);
+
+                    // hide the page preloader
+                    $('.page-preloader', $thisPage).css('display', "none");
+
+                    // display the form
+                    $('#wallet-transfer-form', $thisPage).css('display', "block");
+
+                    // hide the loader
+                    $('#loader-modal').get(0).hide();
+
+                }).
+                catch(function(){
+                    // hide the page preloader
+                    $('.page-preloader', $thisPage).css('display', "none");
+
+                    // display the form
+                    $('#wallet-transfer-form', $thisPage).css('display', "block");
+
+                });
+
+
+            }
+
+        },
+
+
+        /**
+         * method is triggered when page is shown
+         *
+         * @param event
+         */
+        pageShow: (event) => {},
+
+        /**
+         * method is triggered when the page is hidden
+         * @param event
+         */
+        pageHide: (event) => {
+            try {
+                // remove any tooltip being displayed on all forms on the page
+                $('#wallet-transfer-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                $('#wallet-transfer-page [title]').removeAttr("title");
+                $('#wallet-transfer-page [data-hint]').removeAttr("data-hint");
+                // reset the form validator object on the page
+                utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.reset();
+            }
+            catch(err){}
+        },
+
+        /**
+         * method is triggered when the page is destroyed
+         * @param event
+         */
+        pageDestroy: (event) => {
+
+            try{
+                // remove any tooltip being displayed on all forms on the page
+                $('#wallet-transfer-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                $('#wallet-transfer-page [data-hint]').removeAttr("title");
+                $('#wallet-transfer-page [data-hint]').removeAttr("data-hint");
+                // destroy the form validator objects on the page
+                utopiasoftware.ally.controller.walletTransferPageViewModel.amountFieldValidator.destroy();
+                utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.destroy();
+            }
+            catch(err){}
+        },
+
+        /**
+         * method is triggered when the form is successfully validated
+         */
+        formValidated: function(){
+
+            // check if Internet Connection is available before proceeding
+            if(navigator.connection.type === Connection.NONE){ // no Internet Connection
+                // inform the user that they cannot proceed without Internet
+                window.plugins.toast.showWithOptions({
+                    message: "ALLY wallet transfer cannot be performed without an Internet Connection",
+                    duration: 4000,
+                    position: "top",
+                    styling: {
+                        opacity: 1,
+                        backgroundColor: '#ff0000', //red
+                        textColor: '#FFFFFF',
+                        textSize: 14
+                    }
+                }, function(toastEvent){
+                    if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                        window.plugins.toast.hide();
+                    }
+                });
+
+                return; // exit method immediately
+            }
+
+            // create the form data to be submitted
+            var formData = {
+                phone_sender: utopiasoftware.ally.model.appUserDetails.phone,
+                phone_receiver: $('#wallet-transfer-page #wallet-transfer-receiver-phone-number').val(),
+                amount: kendo.parseFloat($('#wallet-transfer-page #wallet-transfer-amount').val())
+            };
+
+            // display the loader message to indicate that account is being created;
+            $('#hour-glass-loader-modal .modal-message').html("Completing Wallet Transfer...");
+            // forward the form data & show loader
+            Promise.all([formData, Promise.resolve($('#hour-glass-loader-modal').get(0).show())]).
+            then(function(dataArray){
+                // submit the form data
+                return Promise.resolve($.ajax(
+                    {
+                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/transfer-wallet-to-wallet.php",
+                        type: "post",
+                        contentType: "application/x-www-form-urlencoded",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                        },
+                        dataType: "text",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: true,
+                        data: dataArray[0] // data to submit to server
+                    }
+                ));
+            }).
+            then(function(serverResponse){
+                serverResponse +=  "";
+                serverResponse = JSON.parse(serverResponse.trim()); // get the response object
+
+                // check if any error occurred
+                if(serverResponse.status != "success"){ // an error occured
+                    throw serverResponse.message || serverResponse.data.message; // throw the error message attached to this error
+                }
+
+                return serverResponse; // forward the server response
+            }).
+            then(function(serverResponse){
+                // hide the loader
+                return Promise.all([serverResponse, $('#hour-glass-loader-modal').get(0).hide()]);
+            }).
+            then(function(responseArray){
+                // ask user for transaction otp
+                return Promise.all([responseArray[0], ons.notification.prompt({title: "ALLY Secure PIN Confirmation",
+                    id: 'pin-security-check2',
+                    messageHTML: `<div><ons-icon icon="ion-lock-combination" size="24px"
+                    style="color: #30a401; float: left; width: 26px;"></ons-icon>
+                    <span style="float: right; width: calc(100% - 26px);">
+                    ${responseArray[0].fullname.length > 0 ?
+                        'RECIPIENT: ' +  responseArray[0].fullname + '<br>' :  ''}
+                    TRANSFER FEE: ${kendo.toString(kendo.parseFloat(responseArray[0].appfee), 'n2')}<br>
+                    AMOUNT TO CHARGE: ${kendo.toString(kendo.parseFloat(responseArray[0].total), 'n2')}<br>
+                    Confirm wallet transfer by providing your ALLY Secure PIN</span></div>`,
+                    cancelable: false, placeholder: "Secure PIN", inputType: "number", defaultValue: "", autofocus: false,
+                    submitOnEnter: true
+                })]);
+            }).
+            then(function(responseArray){
+                // display the loader message to indicate that account is being created;
+                $('#hour-glass-loader-modal .modal-message').html("Authorizing Wallet Transfer...");
+                return Promise.all([...responseArray, $('#hour-glass-loader-modal').get(0).show()])
+            }).
+            then(function(responseArray){
+                // create the data to be sent for confirm of wallet transfer
+                var confirmationData = responseArray[0];
+                confirmationData.lock = responseArray[1];
+
+                // submit the data
+                return Promise.resolve($.ajax(
+                    {
+                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/transfer-wallet-to-wallet-confirm.php",
+                        type: "post",
+                        contentType: "application/x-www-form-urlencoded",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                        },
+                        dataType: "text",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: true,
+                        data: confirmationData // data to submit to server
+                    }
+                ));
+            }).
+            then(function(serverResponse){
+                serverResponse +=  "";
+                serverResponse = JSON.parse(serverResponse.trim()); // get the new user object
+
+                // check if any error occurred
+                if(serverResponse.status == "error"){ // an error occured
+                    throw serverResponse.message; // throw the error message attached to this error
+                }
+
+                return serverResponse; // forward the serverResponse i.e the user details object
+            }).
+            then(function(userDetails){
+                // save the user details to encrypted storage
+               return utopiasoftware.ally.saveUserAppDetails(userDetails);
+            }).
+            then(function(){
+                return $('#hour-glass-loader-modal').get(0).hide(); // hide loader
+            }).
+            then(function(){
+                return Promise.all([ons.notification.toast("Wallet Transfer Successful!", {timeout:4000}),
+                    $('#app-main-navigator').get(0).popPage({data: {refresh: true}})]);
+
+            }).
+            catch(function(err){
+                if(typeof err !== "string"){ // if err is NOT a String
+                    err = "Sorry. Your ALLY wallet transfer could not be completed. Please retry"
+                }
+
+                $('#hour-glass-loader-modal').get(0).hide(); // hide loader
+                ons.notification.alert({title: '<ons-icon icon="md-close-circle-o" size="32px" ' +
+                'style="color: red;"></ons-icon> Wallet Transfer Failed',
+                    messageHTML: '<span>' + err + '</span>',
+                    cancelable: false
+                });
+            });
+        },
+
+
+        /**
+         * method is triggered when back button or device back button is clicked
+         */
+        backButtonClicked: function(){
+
+            // check if the side menu is open
+            if($('ons-splitter').get(0).right.isOpen){ // side menu open, so close it
+                $('ons-splitter').get(0).right.close();
+                return; // exit the method
+            }
+
+            // remove this page form the main navigator stack
+            $('#app-main-navigator').get(0).popPage();
+        },
+
+        /**
+         * method is triggered when the 'Pick Contact" button is clicked
+         */
+        pickContactButtonClicked: function(){
+
+            console.log("CONTACT BUTTON CLICKED");
+            // display the list of contacts from the user's phone address book
+            new Promise(function(resolve, reject){
+                window.plugins.contactNumberPicker.pick(resolve, reject);
+            }).
+            then(function(contact){ // retrieve picked contact
+
+                console.log("CONTACT PICKED");
+                // get the selected contact phone number
+                var contactPhoneNumber = contact.phoneNumber;
+
+                //format the retrieved phone number to acceptable app standards
+                contactPhoneNumber = contactPhoneNumber.replace(/\D/ig, ""); // remove any non-digit character between phone numbers
+                // if any number brings with '0' replace it with '+234'
+                if(contactPhoneNumber.startsWith("0")){ // the phone number starts with 0, replace it with international dialing code
+                    contactPhoneNumber = contactPhoneNumber.replace("0", "+234");
+                }
+
+                // update the recipient phone input field with the retrieved & formatted phone number
+                $('#wallet-transfer-form #wallet-transfer-receiver-phone-number').val(contactPhoneNumber);
+            }).
+            catch(function(){
+
+                // inform the user that there was an error
+                window.plugins.toast.showWithOptions({
+                    message: "phone contacts could not be accessed right now",
+                    duration: 4000,
+                    position: "top",
+                    styling: {
+                        opacity: 1,
+                        backgroundColor: '#ff0000', //red
+                        textColor: '#FFFFFF',
+                        textSize: 14
+                    }
+                }, function(toastEvent){
+                    if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                        window.plugins.toast.hide();
+                    }
+                });
+            });
+        }
+
     }
+
 
 };
