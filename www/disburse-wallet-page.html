@@ -1,0 +1,98 @@
+<ons-page id="disburse-wallet-page">
+    <ons-toolbar>
+        <div class="left">
+            <ons-toolbar-button onclick="utopiasoftware.ally.controller.fundWalletPageViewModel.backButtonClicked()">
+                <ons-icon icon="md-long-arrow-left"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+        <div class="center">Disburse Wallet</div>
+        <div class="right">
+            <ons-toolbar-button onclick="$('#side-menu').get(0).toggle()">
+                <ons-icon icon="md-menu"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+    </ons-toolbar>
+    <ons-progress-bar class="page-preloader" indeterminate style="display: block;"></ons-progress-bar>
+
+    <form id="disburse-wallet-form" autocomplete="off" data-parsley-inputs="ons-input,input,textarea,select"
+          data-parsley-excluded="input[type=button], input[type=submit],
+                              input[type=reset], input[type=hidden], [disabled], :hidden" style="display: none;">
+
+        <ons-list>
+            <ons-list-title>Disburse Fund To Bank Account</ons-list-title>
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-ally-icon-credit-card" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <div style="width: 80%; display: inline-block">
+                        <input id="disburse-wallet-account-number" type="number" required
+                               data-parsley-required-message="select/enter account number"
+                               data-length="10"
+                               data-parsley-type="digits"
+                               data-parsley-minlength="10"
+                               data-parsley-maxlength="10"
+                               data-parsley-type-message="account number must contain only numbers"
+                               data-parsley-minlength-message="account number cannot be less than 10 numbers"
+                               data-parsley-maxlength-message="account number cannot be more than 10 numbers"
+                               class="ally-input-tooltip">
+                    </div>
+                </div>
+            </ons-list-item>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-balance" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <div style="width: 85%; display: inline-block">
+                        <input id="disburse-wallet-bank" type="text" required
+                               data-parsley-required-message="select a bank"
+                               class="ally-input-tooltip">
+                    </div>
+
+                </div>
+            </ons-list-item>
+
+            <ons-list-title>Amount To be Disburse</ons-list-title>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-ally-icon-cash" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <ons-input id="disburse-wallet-amount" required placeholder="Amount (NGN)"
+                           data-parsley-type="number" type="tel"
+                           data-parsley-min="500"
+                           data-parsley-max="50000"
+                           data-parsley-required-message="enter amount"
+                           data-parsley-type-message="provide a valid cash amount"
+                           data-parsley-min-message="minimum amount allowed is 500"
+                           data-parsley-max-message="maximum amount allowed is 50,000"
+                           onchange="$(this).val(kendo.toString(kendo.parseFloat($(this).val()), 'n2'));"
+                               class="hint--bottom"></ons-input>
+                </div>
+            </ons-list-item>
+
+            <ons-list-title>Save Bank Account Details</ons-list-title>
+            <ons-list-item modifier="nodivider" style="margin-bottom: 300px;">
+                <div class="left">
+                    <ons-switch id="disburse-wallet-save-account-details"
+                                input-id="disburse-wallet-save-account-details-alt" checked disable-auto-styling>
+                    </ons-switch>
+                </div>
+                <div class="center">
+                    <label for="disburse-wallet-save-account-details-alt" style="font-size: 1.4em;">&nbsp;Save Bank Account</label>
+                </div>
+            </ons-list-item>
+
+        </ons-list>
+    </form>
+
+    <ons-bottom-toolbar style="height: 56px; !important;">
+        <div style="width: 60%; margin-left: 20%; margin-right: 20%; padding-top: 6px; padding-bottom: 6px">
+            <ons-button id="disburse-wallet-disburse-button" disable-auto-styling modifier="large"
+                        style="background-color: #30a401; color: #ffffff; border-radius: 21px;">Disburse Wallet</ons-button>
+        </div>
+    </ons-bottom-toolbar>
+</ons-page>
