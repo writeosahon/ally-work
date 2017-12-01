@@ -2020,6 +2020,7 @@ utopiasoftware.ally.controller = {
                         dataSource: cardCollectionArray,
                         fields: {text: 'CARDNUMBER2', value: 'CARDNUMBER2'},
                         placeholder: "Select Card",
+                        floatLabelType: "Auto",
                         popupHeight: "300px"
                     });
 
@@ -3237,6 +3238,7 @@ utopiasoftware.ally.controller = {
                         fields: {text: 'name', value: 'code'},
                         sortOrder: "Ascending",
                         placeholder: "Select Bank",
+                        floatLabelType: "Auto",
                         popupHeight: "300px"
                     });
 
@@ -3376,7 +3378,7 @@ utopiasoftware.ally.controller = {
                 // destroy other form components
                 utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.destroy();
                 utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.destroy();
-                utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip.destroy();
+                utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip.destroy();
             }
             catch(err){}
         },

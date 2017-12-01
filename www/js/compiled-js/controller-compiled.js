@@ -624,7 +624,7 @@ processData:true,data:formData// data to submit to server
 return serverResponse;// forward the server response i.e. collection of tokenised cards
 }).then(function(cardCollectionArray){// initialise the card DropDown widget
 utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList=new ej.dropdowns.DropDownList({//set the data to dataSource property
-dataSource:cardCollectionArray,fields:{text:'CARDNUMBER2',value:'CARDNUMBER2'},placeholder:"Select Card",popupHeight:"300px"});// render initialized card DropDownList
+dataSource:cardCollectionArray,fields:{text:'CARDNUMBER2',value:'CARDNUMBER2'},placeholder:"Select Card",floatLabelType:"Auto",popupHeight:"300px"});// render initialized card DropDownList
 utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList.appendTo('#fund-wallet-card-number');// initialise form tooltips
 utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip=new ej.popups.Tooltip({target:'.ally-input-tooltip',position:'top center',cssClass:'ally-input-tooltip',opensOn:'focus'});// render the initialized form tooltip
 utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip.appendTo('#fund-wallet-form');// initialise the amount field
@@ -959,7 +959,7 @@ utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox
 dataSource:promiseArray[0],fields:{text:'CARDNUMBER2',value:'CARDNUMBER2'},placeholder:"Account Number (NUBAN)",floatLabelType:"Auto",popupHeight:"300px",allowCustom:true});// render initialized card ComboBox
 utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.appendTo('#disburse-wallet-account-number');// initialise the bank DropDown widget
 utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList=new ej.dropdowns.DropDownList({//set the data to dataSource property
-dataSource:promiseArray[1],fields:{text:'name',value:'code'},sortOrder:"Ascending",placeholder:"Select Bank",popupHeight:"300px"});// render initialised bank dropdown list
+dataSource:promiseArray[1],fields:{text:'name',value:'code'},sortOrder:"Ascending",placeholder:"Select Bank",floatLabelType:"Auto",popupHeight:"300px"});// render initialised bank dropdown list
 utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.appendTo('#disburse-wallet-bank');// initialise form tooltips
 utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip=new ej.popups.Tooltip({target:'.ally-input-tooltip',position:'top center',cssClass:'ally-input-tooltip',opensOn:'focus'});// render the initialized form tooltip
 utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip.appendTo('#disburse-wallet-form');// initialise the amount field
@@ -996,7 +996,7 @@ utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.reset()
          */pageDestroy:function pageDestroy(event){try{// remove any tooltip being displayed on all forms on the page
 $('#disburse-wallet-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#disburse-wallet-page [data-hint]').removeAttr("title");$('#disburse-wallet-page [data-hint]').removeAttr("data-hint");// destroy the form validator objects on the page
 utopiasoftware.ally.controller.disburseWalletPageViewModel.amountFieldValidator.destroy();utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.destroy();// destroy other form components
-utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.destroy();utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.destroy();utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip.destroy();}catch(err){}},/**
+utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.destroy();utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.destroy();utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip.destroy();}catch(err){}},/**
          * method is triggered when the form is successfully validated
          */formValidated:function formValidated(){// check if Internet Connection is available before proceeding
 if(navigator.connection.type===Connection.NONE){// no Internet Connection
