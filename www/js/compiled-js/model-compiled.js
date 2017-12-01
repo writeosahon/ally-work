@@ -30,6 +30,8 @@ utopiasoftware.ally.model = {
    */
   ally_base_url: "https://myallyapp.com",
 
+  ally_app_share_link: "",
+
   /**
    * holds details about the currently logged in user
    */

@@ -342,3 +342,24 @@
     -moz-animation: ons-icon-spin 0.8s infinite linear;
     animation: ons-icon-spin 0.8s infinite linear;
 }
+/** STYLE FOR THE WALLET PAGE ENDS **/
+
+
+/** STYLE FOR THE WALLET TRANSFER PAGE BEGINS **/
+#wallet-transfer-page .page--material__content {
+    background-color: #ffffff;
+}
+#wallet-transfer-page .page--material__background {
+    background-color: #ffffff;
+}
+/** STYLE FOR THE WALLET TRANSFER PAGE ENDS **/
+
+
+/** STYLE FOR THE FUND WALLET PAGE BEGINS **/
+#fund-wallet-page .page--material__content {
+    background-color: #ffffff;
+}
+#fund-wallet-page .page--material__background {
+    background-color: #ffffff;
+}
+/** STYLE FOR THE FUND WALLET PAGE ENDS **/

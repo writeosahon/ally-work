@@ -1,12 +1,15 @@
 <ons-page id="wallet-transfer-page">
     <ons-toolbar>
         <div class="left">
-            <ons-toolbar-button onclick="utopiasoftware.ally.controller.fundWalletPageViewModel.backButtonClicked()">
+            <ons-toolbar-button onclick="utopiasoftware.ally.controller.walletTransferPageViewModel.backButtonClicked()">
                 <ons-icon icon="md-long-arrow-left"></ons-icon>
             </ons-toolbar-button>
         </div>
         <div class="center">Wallet Transfer</div>
         <div class="right">
+            <ons-toolbar-button onclick="$('#side-menu').get(0).toggle()">
+                <ons-icon icon="md-menu"></ons-icon>
+            </ons-toolbar-button>
         </div>
     </ons-toolbar>
     <ons-progress-bar class="page-preloader" indeterminate style="display: block;"></ons-progress-bar>
@@ -66,7 +69,7 @@
         </ons-list>
     </form>
 
-    <ons-bottom-toolbar style="height: 56px; !important;">
+    <ons-bottom-toolbar modifier="transparent" style="height: 56px; !important;">
         <div style="width: 60%; margin-left: 20%; margin-right: 20%; padding-top: 6px; padding-bottom: 6px">
             <ons-button id="wallet-transfer-transfer-button" disable-auto-styling modifier="large"
                         style="background-color: #30a401; color: #ffffff; border-radius: 21px;">Transfer</ons-button>

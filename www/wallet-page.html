@@ -11,6 +11,9 @@
                                 onclick="utopiasoftware.ally.controller.walletPageViewModel.refreshAccountButtonClicked()">
                 <ons-icon icon="md-refresh-alt"></ons-icon>
             </ons-toolbar-button>
+            <ons-toolbar-button onclick="$('#side-menu').get(0).toggle()">
+                <ons-icon icon="md-menu"></ons-icon>
+            </ons-toolbar-button>
         </div>
     </ons-toolbar>
 
@@ -49,15 +52,17 @@
                     <ons-col width="50%" style="margin-top: 1em;">
                         <ons-button id="wallet-wallet-transfer"  modifier="large"
                                     style="background-color: #0FD0D0; color: #ffffff; border-radius: 21px;"
-                                    onclick="$('#app-main-navigator').get(0).pushPage('wallet-transfer-page.html', {animation: 'fade-md'})">
-                            Wallet Transfer</ons-button>
+                                    onclick="">
+                            Disburse Wallet</ons-button>
                     </ons-col>
+                    <!--
                     <ons-col width="25%" style="margin-top: 1em;"></ons-col>
                     <ons-col width="50%" style="margin-top: 1em;">
                         <ons-button id="wallet-disburse-wallet"  modifier="large"
-                                    style="background-color: purple; color: #ffffff; border-radius: 21px;">Disburse Wallet</ons-button>
+                                    style="background-color: purple; color: #ffffff; border-radius: 21px;"></ons-button>
                     </ons-col>
                     <ons-col width="25%" style="margin-top: 1em;"></ons-col>
+                    -->
                 </ons-row>
             </ons-list-item>
 

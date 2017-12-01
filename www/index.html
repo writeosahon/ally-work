@@ -150,5 +150,33 @@
     </div>
 </ons-modal>
 
+<!-- modal is used to display sms notification confirmation for wallet transfers to unregistered users -->
+<ons-modal id="wallet-transfer-sms-confirm-modal" direction="up">
+    <div style="width: calc(100vw - 20vw); min-height: calc(50vh - 0px) !important; margin-left: 10vw; margin-right: 10vw;
+    display: block; position: relative; overflow-y: visible; background: rgba(211, 211, 211, 1) !important;">
+        <div style="width: 100%;top: -50px; display: block; z-index: 3 !important;
+    overflow-y: visible; position: relative; text-align: center;">
+            <img src="css/app-images/sms-notification-icon.png"
+                 style="height: 100px; width: auto;">
+
+            <div style="width: 100%; display: block; color: #000000; text-align: justify;">
+                <h3 style="display: block; width: 100%; text-align: center; color: #30a401;">
+                    Wallet Transfer SMS Confirmation
+                </h3>
+                <div style="padding: 1em; font-size: 1.01em; font-weight: 300;">
+                    An SMS confirmation message will be sent to the recipient of the wallet transfer.<br>
+                    Usual SMS charge from your phone network provider will apply.
+                    Please ensure you have sufficient airtime to send/receive one SMS</div>
+            </div>
+            <div style="width: 50%; margin-left: 25%; margin-right: 25%; bottom: -25px; position: relative;">
+                <ons-button id="wallet-transfer-sms-confirm-button" disable-auto-styling modifier="large"
+                            style="background-color: #30a401; color: #ffffff; border-radius: 21px;"
+                onclick="utopiasoftware.ally.controller.walletTransferPageViewModel.walletTransferSmsConfirmButtonClicked(this);">
+                    OK</ons-button>
+            </div>
+        </div>
+    </div>
+</ons-modal>
+
 </body>
 </html>

@@ -283,14 +283,14 @@ utopiasoftware.ally.controller = {
                 case 3:
                     $('#menu-tabbar ons-tab').removeAttr("label"); // remove all displaced labels
 
-                    $(event.originalEvent.tabItem).attr("label", "Account"); // update the label of the to-be displayed tab
+                    $(event.originalEvent.tabItem).attr("label", "Transfers"); // update the label of the to-be displayed tab
 
                     break;
 
                 case 4:
                     $('#menu-tabbar ons-tab').removeAttr("label"); // remove all displaced labels
 
-                    $(event.originalEvent.tabItem).attr("label", "Menu"); // update the label of the to-be displayed tab
+                    $(event.originalEvent.tabItem).attr("label", "Account"); // update the label of the to-be displayed tab
 
                     break;
             }
@@ -1344,7 +1344,7 @@ utopiasoftware.ally.controller = {
             // check if the menu tabbar exists
             if($('#menu-tabbar').get(0)){ // the menu tabbar object exists
                 // move to the previous tab
-                $('#menu-tabbar').get(0).setActiveTab(2);
+                $('#menu-tabbar').get(0).setActiveTab(3);
             }
         },
 
@@ -2623,6 +2623,12 @@ utopiasoftware.ally.controller = {
                 return Promise.all([...responseArray, $('#hour-glass-loader-modal').get(0).show()])
             }).
             then(function(responseArray){
+
+                // create the data object to be sent
+                var submitData = {raverefid: responseArray[0].data.flwRef, otp: responseArray[1],
+                    phone: utopiasoftware.ally.model.appUserDetails.phone};
+                submitData.savecard = $('#add-card-page #add-card-save-card-details').get(0).checked;
+
                 // submit the form data
                 return Promise.resolve($.ajax(
                     {
@@ -2635,8 +2641,7 @@ utopiasoftware.ally.controller = {
                         dataType: "text",
                         timeout: 240000, // wait for 4 minutes before timeout of request
                         processData: true,
-                        data: {raverefid: responseArray[0].data.flwRef, otp: responseArray[1],
-                            phone: utopiasoftware.ally.model.appUserDetails.phone} // data to submit to server
+                        data: submitData // data to submit to server
                     }
                 ));
             }).
@@ -2930,7 +2935,7 @@ utopiasoftware.ally.controller = {
                     messageHTML: `<div><ons-icon icon="ion-lock-combination" size="24px"
                     style="color: #30a401; float: left; width: 26px;"></ons-icon>
                     <span style="float: right; width: calc(100% - 26px);">
-                    ${responseArray[0].fullname.length > 0 ?
+                    ${responseArray[0].fullname.length > 1 ?
                         'RECIPIENT: ' +  responseArray[0].fullname + '<br>' :  ''}
                     TRANSFER FEE: ${kendo.toString(kendo.parseFloat(responseArray[0].appfee), 'n2')}<br>
                     AMOUNT TO CHARGE: ${kendo.toString(kendo.parseFloat(responseArray[0].total), 'n2')}<br>
@@ -2950,7 +2955,7 @@ utopiasoftware.ally.controller = {
                 confirmationData.lock = responseArray[1];
 
                 // submit the data
-                return Promise.resolve($.ajax(
+                return Promise.all([Promise.resolve($.ajax(
                     {
                         url: utopiasoftware.ally.model.ally_base_url + "/mobile/transfer-wallet-to-wallet-confirm.php",
                         type: "post",
@@ -2963,29 +2968,49 @@ utopiasoftware.ally.controller = {
                         processData: true,
                         data: confirmationData // data to submit to server
                     }
-                ));
+                )), responseArray[0]]);
             }).
-            then(function(serverResponse){
-                serverResponse +=  "";
-                serverResponse = JSON.parse(serverResponse.trim()); // get the new user object
+            then(function(serverResponse){ // NOTE: serverResponse is an array
+                serverResponse[0] = JSON.parse((serverResponse[0] +"").trim()); // get the new user object
 
                 // check if any error occurred
-                if(serverResponse.status == "error"){ // an error occured
+                if(serverResponse[0].status == "error"){ // an error occured
                     throw serverResponse.message; // throw the error message attached to this error
                 }
 
                 return serverResponse; // forward the serverResponse i.e the user details object
             }).
-            then(function(userDetails){
-                // save the user details to encrypted storage
-               return utopiasoftware.ally.saveUserAppDetails(userDetails);
+            then(function(responseDetailsArray){ // the parameter contains 2 items. item 1 - userDetails; item 2- details of the wallet transfer
+                // forward details of the wallet-transfer; also save the user details to encrypted storage;
+               return Promise.all([responseDetailsArray[1], utopiasoftware.ally.saveUserAppDetails(responseDetailsArray[0])]);
             }).
-            then(function(){
-                return $('#hour-glass-loader-modal').get(0).hide(); // hide loader
+            then(function(dataArray){
+                // forward details of the wallet-transfer and the user details
+                return Promise.all([...dataArray, $('#hour-glass-loader-modal').get(0).hide()]);
             }).
-            then(function(){
-                return Promise.all([ons.notification.toast("Wallet Transfer Successful!", {timeout:4000}),
-                    $('#app-main-navigator').get(0).popPage({data: {refresh: true}})]);
+            then(function(dataArray){
+                // check if the recipient of the wallet transfer is a registered user
+                if(dataArray[0].isregistereduser != "yes") {
+                    // append the json details for the wallet-transfer to the wallet-transfer-sms-confirm-modal confirmation button
+                    $($('#wallet-transfer-sms-confirm-modal #wallet-transfer-sms-confirm-button').get(0)).
+                    attr("data-wallet-transfer", JSON.stringify(dataArray[0]));
+                    // show the wallet-transfer-sms-confirm-modal to the user
+                    return $('#wallet-transfer-sms-confirm-modal').get(0).show();
+                }
+                else{ // recipient is registered
+                    return "registered recipient";
+                }
+            }).
+            then(function(result){
+                if(result === "registered recipient"){ // the recipient of the wallet transfer is already registered
+
+                    // reset the form for the wallet transfer page
+                    $('#wallet-transfer-page #wallet-transfer-form').get(0).reset();
+                    // reset the form validator object on the page
+                    utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.reset();
+
+                    return Promise.all([ons.notification.toast("Wallet Transfer Successful!", {timeout:4000})]); // conclude wallet transfer process
+                }
 
             }).
             catch(function(err){
@@ -3014,8 +3039,11 @@ utopiasoftware.ally.controller = {
                 return; // exit the method
             }
 
-            // remove this page form the main navigator stack
-            $('#app-main-navigator').get(0).popPage();
+            // check if the menu tabbar exists
+            if($('#menu-tabbar').get(0)){ // the menu tabbar object exists
+                // move to the previous tab
+                $('#menu-tabbar').get(0).setActiveTab(2);
+            }
         },
 
         /**
@@ -3040,6 +3068,10 @@ utopiasoftware.ally.controller = {
                 if(contactPhoneNumber.startsWith("0")){ // the phone number starts with 0, replace it with international dialing code
                     contactPhoneNumber = contactPhoneNumber.replace("0", "+234");
                 }
+                //ensure phone number begins with a '+'
+                if(!contactPhoneNumber.startsWith("+")){ // the phone number does not start with '+'
+                    contactPhoneNumber = "+" + contactPhoneNumber; // append the '+' to the beginning
+                }
 
                 // update the recipient phone input field with the retrieved & formatted phone number
                 $('#wallet-transfer-form #wallet-transfer-receiver-phone-number').val(contactPhoneNumber);
@@ -3063,6 +3095,33 @@ utopiasoftware.ally.controller = {
                     }
                 });
             });
+        },
+
+
+        walletTransferSmsConfirmButtonClicked: function(buttonElem){
+
+            // get the details of the wall transfer for which an sms confirmation is being sent
+            var walletTransferDetails = JSON.parse($(buttonElem).attr('data-wallet-transfer'));
+
+            // use a promise to send the sms confirmation message to the recipient
+            new Promise(function(resolve, reject){
+                // send sms
+                SMS.sendSMS(walletTransferDetails.receiver, "Hello, I just sent " +
+                    walletTransferDetails.amount + " to your ALLY wallet. Download ALLY using this link " +
+                    "and your phone number to receive your funds\r\n" +
+                    utopiasoftware.ally.model.ally_app_share_link, resolve, reject);
+            });
+
+            // hide the sms confirmation modal
+            $('#wallet-transfer-sms-confirm-modal').get(0).hide();
+
+            // reset the form for the wallet transfer page
+            $('#wallet-transfer-page #wallet-transfer-form').get(0).reset();
+            // reset the form validator object on the page
+            utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.reset();
+
+            return Promise.all([ons.notification.toast("Wallet Transfer Successful!", {timeout:4000})]); // conclude wallet transfer process
+
         }
 
     }
