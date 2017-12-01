@@ -170,4 +170,16 @@ $(document).on("hide", "#wallet-transfer-page", utopiasoftware.ally.controller.w
 // listen for when the Wallet Transfer page is destroyed
 $(document).on("destroy", "#wallet-transfer-page", utopiasoftware.ally.controller.walletTransferPageViewModel.pageDestroy);
 
+// listen for the initialisation of the Disburse Wallet page
+$(document).on("init", "#disburse-wallet-page", utopiasoftware.ally.controller.disburseWalletPageViewModel.pageInit);
+
+// listen for when the Disburse Wallet page is shown
+$(document).on("show", "#disburse-wallet-page", utopiasoftware.ally.controller.disburseWalletPageViewModel.pageShow);
+
+// listen for when the Disburse Wallet page is hidden
+$(document).on("hide", "#disburse-wallet-page", utopiasoftware.ally.controller.disburseWalletPageViewModel.pageHide);
+
+// listen for when the Disburse Wallet page is destroyed
+$(document).on("destroy", "#disburse-wallet-page", utopiasoftware.ally.controller.disburseWalletPageViewModel.pageDestroy);
+
 //# sourceMappingURL=model-compiled.js.map

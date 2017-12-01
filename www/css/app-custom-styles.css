@@ -363,3 +363,12 @@
     background-color: #ffffff;
 }
 /** STYLE FOR THE FUND WALLET PAGE ENDS **/
+
+/** STYLE FOR THE FUND WALLET PAGE BEGINS **/
+#disburse-wallet-page .page--material__content {
+    background-color: #ffffff;
+}
+#disburse-wallet-page .page--material__background {
+    background-color: #ffffff;
+}
+/** STYLE FOR THE FUND WALLET PAGE ENDS **/

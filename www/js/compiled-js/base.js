@@ -159,6 +159,45 @@ var utopiasoftware = {
                     reject(err); // reject the Promise with the provided error
                 })
             });
+        },
+
+        /**
+         * method is used to sort the collection of Nigerian Banks returned by MoneyWave.
+         * Banks objects are sorted in ascending order of bank name.
+         */
+        banksData: function(){
+            // return the Promise object
+            return new Promise(function(resolve, reject){
+                // retrieve the list of banks
+                Promise.resolve($.ajax(
+                    {
+                        url: "banks.json",
+                        type: "get",
+                        dataType: "json",
+                        timeout: 240000 // wait for 4 minutes before timeout of request
+
+                    }
+                )).
+                then(function(banksData){ // get the banks object
+                    var banksArray = []; // holds the banks array
+                    // convert each property and value of the banks object to an object
+                    // and store each object in a 'banks array'
+                    for(var prop in banksData){
+                        // create the bank object
+                        let bankObject = {};
+                        bankObject["code"] = prop;
+                        bankObject["name"] = banksData[prop];
+                        // add bank object to banks array
+                        banksArray.push(bankObject);
+                    }
+
+                    return banksArray; // return the banks array
+                }).
+                then(function(bankArrayData){ // receive the bank array
+                    resolve(bankArrayData); // resolve the promise with the bank array
+                }).
+                catch();
+            });
         }
     }
 };

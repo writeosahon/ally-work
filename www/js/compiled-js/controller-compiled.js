@@ -924,6 +924,163 @@ SMS.sendSMS(walletTransferDetails.receiver,"Hello, I just sent "+walletTransferD
 $('#wallet-transfer-sms-confirm-modal').get(0).hide();// reset the form for the wallet transfer page
 $('#wallet-transfer-page #wallet-transfer-form').get(0).reset();// reset the form validator object on the page
 utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.reset();return Promise.all([ons.notification.toast("Wallet Transfer Successful!",{timeout:4000})]);// conclude wallet transfer process
-}}};
+}},/**
+     * object is view-model for disburse-wallet page
+     */disburseWalletPageViewModel:{/**
+         * used to hold the parsley form validation object for the page
+         */formValidator:null,/**
+         * used to hold the parsley validator for the Amount field
+         */amountFieldValidator:null,/**
+         * used to hold the Account Number ComboBox component
+         */accountNumberComboBox:null,/**
+         * used to hold the Banks DropDownList component
+         */banksDropDownList:null,/**
+         ** used to hold the ej Tooltip component
+         */formTooltip:null,/**
+         * event is triggered when page is initialised
+         */pageInit:function pageInit(event){var $thisPage=$(event.target);// get the current page shown
+// call the function used to initialise the app page if the app is fully loaded
+loadPageOnAppReady();//function is used to initialise the page if the app is fully ready for execution
+function loadPageOnAppReady(){// check to see if onsen is ready and if all app loading has been completed
+if(!ons.isReady()||utopiasoftware.ally.model.isAppReady===false){setTimeout(loadPageOnAppReady,500);// call this function again after half a second
+return;}// listen for the back button event
+$('#app-main-navigator').get(0).topPage.onDeviceBackButton=utopiasoftware.ally.controller.disburseWalletPageViewModel.backButtonClicked;// display the page preloader
+$('.page-preloader',$thisPage).css('display',"block");// hide the form
+$('#disburse-wallet-form',$thisPage).css('display',"none");// create the form data to be sent
+var formData={phone:utopiasoftware.ally.model.appUserDetails.phone};// get the collection of stored bank accounts and bank names
+Promise.resolve(formData).then(function(){// submit the form data
+return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/get-my-cards.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
+processData:true,data:formData// data to submit to server
+}));}).then(function(serverResponse){serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// get the response object
+return Promise.all([serverResponse,utopiasoftware.ally.banksData()]);// forward the server response i.e. collection of bank accounts (and the list of banks)
+}).then(function(promiseArray){// this array contains the list of user bank accounts AND the list of bsnks in nigeria
+// initialise the account number combo box widget
+utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox=new ej.dropdowns.ComboBox({//set the data to dataSource property
+dataSource:promiseArray[0],fields:{text:'CARDNUMBER2',value:'CARDNUMBER2'},placeholder:"Account Number (NUBAN)",floatLabelType:"Auto",popupHeight:"300px",allowCustom:true});// render initialized card ComboBox
+utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.appendTo('#disburse-wallet-account-number');// initialise the bank DropDown widget
+utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList=new ej.dropdowns.DropDownList({//set the data to dataSource property
+dataSource:promiseArray[1],fields:{text:'name',value:'code'},sortOrder:"Ascending",placeholder:"Select Bank",popupHeight:"300px"});// render initialised bank dropdown list
+utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.appendTo('#disburse-wallet-bank');// initialise form tooltips
+utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip=new ej.popups.Tooltip({target:'.ally-input-tooltip',position:'top center',cssClass:'ally-input-tooltip',opensOn:'focus'});// render the initialized form tooltip
+utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip.appendTo('#disburse-wallet-form');// initialise the amount field
+utopiasoftware.ally.controller.disburseWalletPageViewModel.amountFieldValidator=$('#fund-wallet-amount').parsley({value:function value(parsley){// convert the amount back to a plain text without the thousand separator
+var parsedNumber=kendo.parseFloat($('#disburse-wallet-amount',$thisPage).val());return parsedNumber?parsedNumber:$('#disburse-wallet-amount',$thisPage).val();}});// initialise the form validation
+utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator=$('#disburse-wallet-form').parsley();// attach listener for the disburse wallet button on the page
+$('#disburse-wallet-disburse-button').get(0).onclick=function(){// run the validation method for the form
+utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.whenValidate();};// listen for the form field validation failure event
+utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.on('field:error',function(fieldInstance){// get the element that triggered the field validation error and use it to display tooltip
+// display tooltip
+$(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$(fieldInstance.$element).attr("data-hint",fieldInstance.getErrorsMessages()[0]);$(fieldInstance.$element).attr("title",fieldInstance.getErrorsMessages()[0]);});// listen for the form field validation success event
+utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.on('field:success',function(fieldInstance){// remove tooltip from element
+$(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$(fieldInstance.$element).removeAttr("data-hint");$(fieldInstance.$element).removeAttr("title");});// listen for the form validation success
+utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.on('form:success',utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidated);// hide the page preloader
+$('.page-preloader',$thisPage).css('display',"none");// display the form
+$('#disburse-wallet-form',$thisPage).css('display',"block");// hide the loader
+$('#loader-modal').get(0).hide();}).catch(function(){// hide the page preloader
+$('.page-preloader',$thisPage).css('display',"none");// display the form
+$('#disburse-wallet-form',$thisPage).css('display',"block");// inform the user that they cannot proceed without Internet
+window.plugins.toast.showWithOptions({message:"some content could be loaded without an Internet Connection",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#ff0000',//red
+textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
+window.plugins.toast.hide();}});});}},/**
+         * method is triggered when page is shown
+         *
+         * @param event
+         */pageShow:function pageShow(event){},/**
+         * method is triggered when the page is hidden
+         * @param event
+         */pageHide:function pageHide(event){try{// remove any tooltip being displayed on all forms on the page
+$('#disburse-wallet-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#disburse-wallet-page [title]').removeAttr("title");$('#disburse-wallet-page [data-hint]').removeAttr("data-hint");// reset the form validator object on the page
+utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.reset();}catch(err){}},/**
+         * method is triggered when the page is destroyed
+         * @param event
+         */pageDestroy:function pageDestroy(event){try{// remove any tooltip being displayed on all forms on the page
+$('#disburse-wallet-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#disburse-wallet-page [data-hint]').removeAttr("title");$('#disburse-wallet-page [data-hint]').removeAttr("data-hint");// destroy the form validator objects on the page
+utopiasoftware.ally.controller.disburseWalletPageViewModel.amountFieldValidator.destroy();utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.destroy();// destroy other form components
+utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.destroy();utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.destroy();utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip.destroy();}catch(err){}},/**
+         * method is triggered when the form is successfully validated
+         */formValidated:function formValidated(){// check if Internet Connection is available before proceeding
+if(navigator.connection.type===Connection.NONE){// no Internet Connection
+// inform the user that they cannot proceed without Internet
+window.plugins.toast.showWithOptions({message:"ALLY wallet cannot be funded without an Internet Connection",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#ff0000',//red
+textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
+window.plugins.toast.hide();}});return;// exit method immediately
+}// create the form data to be submitted
+/*var formData = {
+                firstname: utopiasoftware.ally.model.appUserDetails.firstname,
+                lastname: utopiasoftware.ally.model.appUserDetails.lastname,
+                phone: utopiasoftware.ally.model.appUserDetails.phone,
+                email: utopiasoftware.ally.model.appUserDetails.email ? utopiasoftware.ally.model.appUserDetails.email : "",
+                cardno: utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList.value,
+                amount: kendo.parseFloat($('#fund-wallet-page #fund-wallet-amount').val())
+            };
+
+            // display the loader message to indicate that account is being created;
+            $('#hour-glass-loader-modal .modal-message').html("Funding User Wallet...");
+            // forward the form data & show loader
+            Promise.all([formData, Promise.resolve($('#hour-glass-loader-modal').get(0).show())]).
+            then(function(dataArray){
+                // submit the form data
+                return Promise.resolve($.ajax(
+                    {
+                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/rave-payment-using-token.php",
+                        type: "post",
+                        contentType: "application/x-www-form-urlencoded",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                        },
+                        dataType: "text",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: true,
+                        data: dataArray[0] // data to submit to server
+                    }
+                ));
+            }).
+            then(function(serverResponse){
+                serverResponse +=  "";
+                serverResponse = JSON.parse(serverResponse.trim()); // get the response object
+
+                // check if any error occurred
+                if(serverResponse.status != "success"){ // an error occured
+                    throw serverResponse.message || serverResponse.data.message; // throw the error message attached to this error
+                }
+
+                return serverResponse; // forward the server response
+            }).
+            then(function(serverResponse){
+                // hide the loader
+                return Promise.all([serverResponse, $('#hour-glass-loader-modal').get(0).hide()]);
+            }).
+            then(function(responseArray){
+                // ask user for transaction otp
+                return Promise.all([responseArray[0], ons.notification.alert({title: '<ons-icon icon="md-check-circle" size="32px" ' +
+                'style="color: green;"></ons-icon> Wallet Funded',
+                    messageHTML: `<span>FUNDING FEE: ${kendo.toString(kendo.parseFloat(responseArray[0].data.appfee), 'n2')}<br>
+                    AMOUNT CHARGED: ${kendo.toString(kendo.parseFloat(responseArray[0].data.charged_amount), 'n2')}</span>`,
+                    cancelable: false
+                })]);
+            }).
+            then(function(){
+                return Promise.all([ons.notification.toast("Wallet Funded Successfully!", {timeout:4000}),
+                    $('#app-main-navigator').get(0).popPage({data: {refresh: true}})]);
+
+            }).
+            catch(function(err){
+                if(typeof err !== "string"){ // if err is NOT a String
+                    err = "Sorry. Your ALLY wallet could not be funded. Please retry"
+                }
+
+                $('#hour-glass-loader-modal').get(0).hide(); // hide loader
+                ons.notification.alert({title: '<ons-icon icon="md-close-circle-o" size="32px" ' +
+                'style="color: red;"></ons-icon> Wallet Funding Failed',
+                    messageHTML: '<span>' + err + '</span>',
+                    cancelable: false
+                });
+            }); */},/**
+         * method is triggered when back button or device back button is clicked
+         */backButtonClicked:function backButtonClicked(){// check if the side menu is open
+if($('ons-splitter').get(0).right.isOpen){// side menu open, so close it
+$('ons-splitter').get(0).right.close();return;// exit the method
+}// remove this page form the main navigator stack
+$('#app-main-navigator').get(0).popPage();}}};
 
 //# sourceMappingURL=controller-compiled.js.map
