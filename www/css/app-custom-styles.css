@@ -372,3 +372,20 @@
     background-color: #ffffff;
 }
 /** STYLE FOR THE FUND WALLET PAGE ENDS **/
+
+
+/** STYLE FOR THE PAYMENTS PAGE BEGINS **/
+#payments-page .page--material__content {
+    background-color: #ffffff;
+    position: absolute;
+    top: 120px;
+}
+#payments-page .page--material__background {
+    background-color: #ffffff;
+}
+#payments-page.transparent .page--material__content { /** style to make the page transparent for when the QRcode scanner is used **/
+    background-color: transparent;
+}
+#payments-page.transparent .page--material__background {
+    background-color: transparent;
+}

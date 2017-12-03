@@ -1,0 +1,27 @@
+<!-- payments page -->
+<ons-page id="payments-page">
+    <ons-toolbar style="height: 120px">
+        <div class="left">
+            <ons-toolbar-button onclick="">
+                <ons-icon icon="md-long-arrow-left"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+        <div class="center" style="height: 120px;">
+            <div>Merchant Payments</div>
+            <ons-segment id="payments-segments"  tabbar-id="payments-tabbar" style="width: 100%">
+                <button><ons-icon icon="fa-qrcode"></ons-icon> ALLY Scan</button>
+                <button><ons-icon icon="md-balance-wallet"></ons-icon> ALLY Direct</button>
+            </ons-segment>
+        </div>
+        <div class="right">
+            <ons-toolbar-button onclick="$('#side-menu').get(0).toggle()">
+                <ons-icon icon="md-menu"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+    </ons-toolbar>
+
+    <ons-tabbar id="payments-tabbar" hide-tabs>
+        <ons-tab page="payments-ally-scan-page.html" active></ons-tab>
+        <ons-tab page="payments-ally-direct-page.html"></ons-tab>
+    </ons-tabbar>
+</ons-page>
