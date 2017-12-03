@@ -117,6 +117,11 @@ var utopiasoftware = {
 
             return new Promise(function(resolve, reject){
 
+                // check if a timestamp has been appended to the user details
+                if(!userDetails._lastUpdatedDate){ // no timestamp, so attach one
+                    userDetails._lastUpdatedDate = Date.now(); // attach timestamp
+                }
+
                 // write the provided user details to encrypted storage
                 Promise.resolve(intel.security.secureData.
                 createFromData({"data": JSON.stringify(userDetails)})).

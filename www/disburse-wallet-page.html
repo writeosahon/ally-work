@@ -25,16 +25,11 @@
                     <ons-icon icon="md-ally-icon-credit-card" class="list-item__icon" fixed-width size="28px"></ons-icon>
                 </div>
                 <div class="center">
-                    <div style="width: 80%; display: inline-block">
-                        <input id="disburse-wallet-account-number" type="number" required
+                    <div style="width: 85%; display: inline-block">
+                        <input id="disburse-wallet-account-number" type="text" required
+                               pattern="(.+\s\-\s)?[0-9]{10}"
                                data-parsley-required-message="select/enter account number"
-                               data-length="10"
-                               data-parsley-type="digits"
-                               data-parsley-minlength="10"
-                               data-parsley-maxlength="10"
-                               data-parsley-type-message="account number must contain only numbers"
-                               data-parsley-minlength-message="account number cannot be less than 10 numbers"
-                               data-parsley-maxlength-message="account number cannot be more than 10 numbers"
+                               data-parsley-minlength-message="account number must be 10 numbers"
                                class="ally-input-tooltip">
                     </div>
                 </div>
@@ -51,6 +46,18 @@
                                class="ally-input-tooltip">
                     </div>
 
+                </div>
+            </ons-list-item>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-account-box-o" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <ons-input id="disburse-wallet-account-name" required placeholder="Account Nickname"
+                               type="text"
+                               data-parsley-required-message="Account Nickname is required"
+                               class="hint--bottom" style="width: 85%;"></ons-input>
                 </div>
             </ons-list-item>
 
