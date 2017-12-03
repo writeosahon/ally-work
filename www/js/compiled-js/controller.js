@@ -3499,8 +3499,8 @@ utopiasoftware.ally.controller = {
                     messageHTML: `<div><ons-icon icon="ion-lock-combination" size="24px"
                     style="color: #30a401; float: left; width: 26px;"></ons-icon>
                     <span style="float: right; width: calc(100% - 26px);">
-                    ${responseArray[0].fullname.length > 1 ?
-                    'RECIPIENT: ' +  responseArray[0].fullname + '<br>' :  ''}
+                    ${responseArray[0].accountno.length > 1 ?
+                    'ACCOUNT: ' +  responseArray[0].accountno + '<br>' :  ''}
                     TRANSFER FEE: ${kendo.toString(kendo.parseFloat(responseArray[0].appfee), 'n2')}<br>
                     AMOUNT TO CHARGE: ${kendo.toString(kendo.parseFloat(responseArray[0].total), 'n2')}<br>
                     Confirm wallet disbursal by providing your ALLY Secure PIN</span></div>`,
@@ -3518,8 +3518,7 @@ utopiasoftware.ally.controller = {
                 var confirmationData = responseArray[0];
                 confirmationData.lock = responseArray[1];
                 confirmationData.saveaccount = $('#disburse-wallet-page #disburse-wallet-save-account-details').get(0).checked;
-                confirmationData.sendername = utopiasoftware.ally.model.appUserDetails.firstname + " " +
-                    utopiasoftware.ally.model.appUserDetails.lastname;
+                confirmationData.recipientnickname = $('#disburse-wallet-page #disburse-wallet-account-name').val();
 
                 // submit the data
                 return Promise.all([Promise.resolve($.ajax(

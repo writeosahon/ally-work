@@ -377,8 +377,7 @@
 /** STYLE FOR THE PAYMENTS PAGE BEGINS **/
 #payments-page .page--material__content {
     background-color: #ffffff;
-    position: absolute;
-    top: 120px;
+    top: 60px;
 }
 #payments-page .page--material__background {
     background-color: #ffffff;
