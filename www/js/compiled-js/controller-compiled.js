@@ -1051,6 +1051,6 @@ ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+
 if($('ons-splitter').get(0).right.isOpen){// side menu open, so close it
 $('ons-splitter').get(0).right.close();return;// exit the method
 }// remove this page form the main navigator stack
-$('#app-main-navigator').get(0).popPage();}}};
+$('#app-main-navigator').get(0).popPage();}},testScan:function testScan(){$('html, body').addClass('ally-transparent');$('#payments-page').addClass('transparent');$('#payments-ally-scan-page').addClass('transparent');QRScanner.show(function(status){QRScanner.scan(function(err,qrCode){console.log("BEGIN SCAN");if(err){console.error(err._message);}});});}};
 
 //# sourceMappingURL=controller-compiled.js.map

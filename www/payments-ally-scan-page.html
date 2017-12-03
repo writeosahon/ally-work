@@ -58,13 +58,13 @@
         <ons-col width="50%" style="text-align: center;">
             <!-- display the QR code icon, scan button and pay button-->
             <div style="display: block; width: 100%; text-align: center">
-                <div style="display: inline-block; width: 200px; height: 200px;">
+                <div id="payments-scan-box" style="display: inline-block; width: 200px; height: 200px;">
                     <ons-icon icon="fa-qrcode" size="200px"></ons-icon>
                 </div>
                 <div style="width: 100%; text-align: center; display: block;">
                     <ons-button id="wallet-disburse-transfer"
                                 style="background-color: #0FD0D0; color: #ffffff; border-radius: 21px; width: 150px"
-                                onclick="">
+                                onclick="utopiasoftware.ally.controller.testScan();">
                         Scan</ons-button>
                 </div>
                 <div style="width: 100%; text-align: center;  display: block; margin-top: 1em;">

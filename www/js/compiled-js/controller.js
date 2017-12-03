@@ -3593,7 +3593,19 @@ utopiasoftware.ally.controller = {
             $('#app-main-navigator').get(0).popPage();
         }
 
+    },
+
+    testScan(){
+        $('html, body').addClass('ally-transparent');
+        $('#payments-page').addClass('transparent');
+        $('#payments-ally-scan-page').addClass('transparent');
+        QRScanner.show(function(status){
+            QRScanner.scan(function(err,qrCode){
+                console.log("BEGIN SCAN");
+                if(err){
+                    console.error(err._message);
+                }
+            });
+        });
     }
-
-
 };
