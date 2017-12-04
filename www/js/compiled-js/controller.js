@@ -3921,6 +3921,7 @@ utopiasoftware.ally.controller = {
                         let animatePayButton = new ej.base.Animation({name: 'ZoomIn', duration: 1000});
                         animatePayButton.addEventListener("end", function(){ // listener for when animation is completed
                             $('#payments-ally-scan-pay-button').css("transform", "scale(1)");
+                            console.log("ANIMATION ENDS");
                         });
                         animatePayButton.animate('#payments-ally-scan-pay-button');
 
