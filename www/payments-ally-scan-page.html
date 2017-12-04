@@ -1,6 +1,6 @@
 <!-- payments ally-scan page -->
 <ons-page id="payments-ally-scan-page">
-    <!-- create page layout -->
+    <!-- page layout -->
     <ons-row vertical-align="top" style="height: calc(100vh - (56px));">
         <ons-col width="50%" style="height: 100%;">
             <!-- create the payment form that displays all details for payment -->
@@ -24,11 +24,13 @@
 
                         <div class="center">
                             <div style="width: 90%; display: inline-block">
-                                <ons-input id="payments-ally-scan-merchant-code" required float placeholder="Merchant code"
+                                <ons-input id="payments-ally-scan-merchant-code" required readonly float placeholder="Merchant Code"
                                            style="font-size: 0.8em; text-transform: uppercase; width: 100%;"
                                            type="text"
                                            data-parsley-required-message="provide merchant code"
                                            class="hint--bottom"></ons-input>
+                                <!-- this input is hidden from user. It is used to store merchant phone number for onward submission -->
+                                <input id="payments-ally-scan-merchant-phone" type="hidden">
                             </div>
                         </div>
                     </ons-list-item>
@@ -71,8 +73,8 @@
                 </div>
                 <div style="width: 100%; text-align: center;  display: block; margin-top: 1em;">
                     <ons-button id="payments-ally-scan-pay-button"
-                                style="background-color: #30a401; color: #ffffff; border-radius: 21px; width: 150px"
-                                onclick="">
+                                style="background-color: #30a401; color: #ffffff; border-radius: 21px; width: 150px;
+                                transform: scale(0);">
                         Pay</ons-button>
                 </div>
 

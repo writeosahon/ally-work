@@ -70,16 +70,7 @@ $('ons-splitter-side').removeAttr("swipeable");// call the function used to init
 loadPageOnAppReady();//function is used to initialise the page if the app is fully ready for execution
 function loadPageOnAppReady(){// check to see if onsen is ready and if all app loading has been completed
 if(!ons.isReady()||utopiasoftware.ally.model.isAppReady===false){setTimeout(loadPageOnAppReady,500);// call this function again after half a second
-return;}// listen for the back button event
-/*$('#app-main-navigator').get(0).topPage.onDeviceBackButton = function(){
-                    ons.notification.confirm('Do you want to close the app?', {title: 'Exit',
-                            buttonLabels: ['No', 'Yes']}) // Ask for confirmation
-                        .then(function(index) {
-                            if (index === 1) { // OK button
-                                navigator.app.exitApp(); // Close the app
-                            }
-                        });
-                }; */// hide the loader
+return;}// hide the loader
 $('#loader-modal').get(0).hide();}},/**
          * method is triggered when page is shown
          */pageShow:function pageShow(){// disable the swipeable feature for the app splitter
@@ -904,9 +895,9 @@ if($('#menu-tabbar').get(0)){// the menu tabbar object exists
 // move to the previous tab
 $('#menu-tabbar').get(0).setActiveTab(2);}},/**
          * method is triggered when the 'Pick Contact" button is clicked
-         */pickContactButtonClicked:function pickContactButtonClicked(){console.log("CONTACT BUTTON CLICKED");// display the list of contacts from the user's phone address book
+         */pickContactButtonClicked:function pickContactButtonClicked(){// display the list of contacts from the user's phone address book
 new Promise(function(resolve,reject){window.plugins.contactNumberPicker.pick(resolve,reject);}).then(function(contact){// retrieve picked contact
-console.log("CONTACT PICKED");// get the selected contact phone number
+// get the selected contact phone number
 var contactPhoneNumber=contact.phoneNumber;//format the retrieved phone number to acceptable app standards
 contactPhoneNumber=contactPhoneNumber.replace(/\D/ig,"");// remove any non-digit character between phone numbers
 // if any number brings with '0' replace it with '+234'
@@ -967,7 +958,7 @@ utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.app
 utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip=new ej.popups.Tooltip({target:'.ally-input-tooltip',position:'top center',cssClass:'ally-input-tooltip',opensOn:'focus'});// render the initialized form tooltip
 utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip.appendTo('#disburse-wallet-form');// add the change event listener to listen for changes in the bank account number combo box
 utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.addEventListener("change",function(){var accountObj=this.getDataByValue(this.value);// get the object that matches the selected value
-if(accountObj){console.log(accountObj);// update the bank selection dropdown
+if(accountObj){// update the bank selection dropdown
 utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.value=accountObj["BANKCODE"];utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.enabled=false;// update the account nickname input
 $('#disburse-wallet-page #disburse-wallet-account-name').val(accountObj.RECIPIENTNAME);$('#disburse-wallet-page #disburse-wallet-account-name').attr("readonly",true);}else{// update the bank selection dropdown
 utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.enabled=true;utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.value=null;utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.text=null;// update the account nickname input
@@ -1089,13 +1080,17 @@ paymentsButtonSegment.setActiveButton(0);// move to the 1st button's page
          */formValidator:null,/**
          * used to hold the parsley validator for the Amount field
          */amountFieldValidator:null,/**
+         * property is used to track whether there is an active ongoing payment.
+         * A value of true means there is an active payment; any other value means there is none
+         */activePayment:null,/**
          * event is triggered when page is initialised
          */pageInit:function pageInit(event){var $thisPage=$(event.target);// get the current page shown
 // call the function used to initialise the app page if the app is fully loaded
 loadPageOnAppReady();//function is used to initialise the page if the app is fully ready for execution
 function loadPageOnAppReady(){// check to see if onsen is ready and if all app loading has been completed
 if(!ons.isReady()||utopiasoftware.ally.model.isAppReady===false){setTimeout(loadPageOnAppReady,500);// call this function again after half a second
-return;}// initialise the amount field
+return;}// initialise the 'active payment' status to false i.e. no active payment
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=false;// initialise the amount field
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.amountFieldValidator=$('#payments-ally-scan-amount').parsley({value:function value(parsley){// convert the amount back to a plain text without the thousand separator
 var parsedNumber=kendo.parseFloat($('#payments-ally-scan-amount',$thisPage).val());return parsedNumber?parsedNumber:$('#payments-ally-scan-amount',$thisPage).val();}});// initialise the form validation
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator=$('#payments-ally-scan-form').parsley();// attach listener for the pay button on the page
@@ -1114,29 +1109,49 @@ $('#loader-modal').get(0).hide();}},/**
          */pageShow:function pageShow(event){},/**
          * method is triggered when the page is hidden
          * @param event
-         */pageHide:function pageHide(event){try{// remove any tooltip being displayed on all forms on the page
+         */pageHide:function pageHide(event){try{// disable the webview transparency
+QRScanner.hide(function(status){// hide the "PAY" button
+$('#payments-ally-scan-pay-button').css("transform","scale(0)");// flag that no active payment is taking place
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=false;// remove the transparency from the webpage
+$('html, body').removeClass('ally-transparent');$('#payments-page').removeClass('transparent');$('#payments-ally-scan-page').removeClass('transparent');});// remove any tooltip being displayed on all forms on the page
 $('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-scan-page [title]').removeAttr("title");$('#payments-ally-scan-page [data-hint]').removeAttr("data-hint");// reset the form validator object on the page
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();}catch(err){}},/**
          * method is triggered when the page is destroyed
          * @param event
-         */pageDestroy:function pageDestroy(event){try{// remove any tooltip being displayed on all forms on the page
+         */pageDestroy:function pageDestroy(event){try{// destroy the current state of the QR Scanner &disable the webview transparency
+QRScanner.destroy(function(status){// hide the "PAY" button
+$('#payments-ally-scan-pay-button').css("transform","scale(0)");// flag that no active payment is taking place
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=false;// remove the transparency from the webpage
+$('html, body').removeClass('ally-transparent');$('#payments-page').removeClass('transparent');$('#payments-ally-scan-page').removeClass('transparent');});// remove any tooltip being displayed on all forms on the page
 $('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-scan-page [title]').removeAttr("title");$('#payments-ally-scan-page [data-hint]').removeAttr("data-hint");// destroy the form validator objects on the page
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.amountFieldValidator.destroy();utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.destroy();}catch(err){}},/**
          * method is triggered when the form is successfully validated
          */formValidated:function formValidated(){// check if Internet Connection is available before proceeding
 if(navigator.connection.type===Connection.NONE){// no Internet Connection
 // inform the user that they cannot proceed without Internet
-window.plugins.toast.showWithOptions({message:"ALLY wallet cannot be funded without an Internet Connection",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#ff0000',//red
+window.plugins.toast.showWithOptions({message:"merchant payment cannot be made without an Internet Connection",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#ff0000',//red
 textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
 window.plugins.toast.hide();}});return;// exit method immediately
 }},/**
          * method is triggered when the SCAN button is clicked
          */scanButtonClicked:function scanButtonClicked(){// make page transparent in preparation for QR code scanning
 $('html, body').addClass('ally-transparent');$('#payments-page').addClass('transparent');$('#payments-ally-scan-page').addClass('transparent');// start video display
-QRScanner.resumePreview(function(status){// show the view preview box and make the webview transparent
+QRScanner.resumePreview(function(status){// empty the view preview box and make the webview transparent
 $('#payments-ally-scan-page #payments-ally-scan-box').html("");QRScanner.show(function(status){// make webview transparent
 QRScanner.scan(function(err,qrCode){// begin scanning QR code
-if(err){console.error("ERROR ",err._message);return;// exit code after handling error
-}console.log(qrCode);});});});}}};
+if(err){// an error occurred, so inform the user
+// inform the user of the error
+ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> ALLY Payment Error',messageHTML:'<span>'+'Sorry, Merchant QR Code could not be scanned.<br> '+'You can try again OR proceed to ALLY Direct as an alternative'+'</span>',cancelable:false});// hide the "PAY" button
+$('#payments-ally-scan-pay-button').css("transform","scale(0)");// flag that no active payment is taking place
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=false;return;// exit after handling error
+}// end of error section
+// if code gets to this section below, then there was no error
+// show the "PAY" button
+new ej.base.Animation({name:'ZoomIn',duration:1000}).animate('#payments-ally-scan-pay-button');// flag that an active payment is taking place
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=true;// pause the video preview
+QRScanner.pausePreview(function(status){// get each content of the QR Code
+var qrCodeSegmentsArray=(qrCode+"").trim().split("|");// update the contents of the payment form with the qrCodeSegmentsArray
+$('#payments-ally-scan-page #payments-ally-scan-merchant-name').val(qrCodeSegmentsArray[0]);$('#payments-ally-scan-page #payments-ally-scan-merchant-code').val(qrCodeSegmentsArray[1]);$('#payments-ally-scan-page #payments-ally-scan-merchant-phone').val(qrCodeSegmentsArray[2]);// manually trigger form validation
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.whenValidate();});});});});}}};
 
 //# sourceMappingURL=controller-compiled.js.map
