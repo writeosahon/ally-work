@@ -1113,7 +1113,8 @@ $('#loader-modal').get(0).hide();}},/**
 QRScanner.hide(function(status){// hide the "PAY" button
 $('#payments-ally-scan-pay-button').css("transform","scale(0)");// flag that no active payment is taking place
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=false;// remove the transparency from the webpage
-$('html, body').removeClass('ally-transparent');$('#payments-page').removeClass('transparent');$('#payments-ally-scan-page').removeClass('transparent');});// remove any tooltip being displayed on all forms on the page
+$('html, body').removeClass('ally-transparent');$('#payments-page').removeClass('transparent');$('#payments-ally-scan-page').removeClass('transparent');// replace the content of the preview box
+$('#payments-ally-scan-page #payments-ally-scan-box').html('<ons-icon icon="fa-qrcode" size="180px"></ons-icon>');});// remove any tooltip being displayed on all forms on the page
 $('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-scan-page [title]').removeAttr("title");$('#payments-ally-scan-page [data-hint]').removeAttr("data-hint");// reset the form validator object on the page
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();}catch(err){}},/**
          * method is triggered when the page is destroyed
@@ -1122,7 +1123,8 @@ utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset
 QRScanner.destroy(function(status){// hide the "PAY" button
 $('#payments-ally-scan-pay-button').css("transform","scale(0)");// flag that no active payment is taking place
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=false;// remove the transparency from the webpage
-$('html, body').removeClass('ally-transparent');$('#payments-page').removeClass('transparent');$('#payments-ally-scan-page').removeClass('transparent');});// remove any tooltip being displayed on all forms on the page
+$('html, body').removeClass('ally-transparent');$('#payments-page').removeClass('transparent');$('#payments-ally-scan-page').removeClass('transparent');// replace the content of the preview box
+$('#payments-ally-scan-page #payments-ally-scan-box').html('<ons-icon icon="fa-qrcode" size="180px"></ons-icon>');});// remove any tooltip being displayed on all forms on the page
 $('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-scan-page [title]').removeAttr("title");$('#payments-ally-scan-page [data-hint]').removeAttr("data-hint");// destroy the form validator objects on the page
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.amountFieldValidator.destroy();utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.destroy();}catch(err){}},/**
          * method is triggered when the form is successfully validated
@@ -1134,7 +1136,10 @@ textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent
 window.plugins.toast.hide();}});return;// exit method immediately
 }},/**
          * method is triggered when the SCAN button is clicked
-         */scanButtonClicked:function scanButtonClicked(){// make page transparent in preparation for QR code scanning
+         */scanButtonClicked:function scanButtonClicked(){// remove any tooltip being displayed on all forms on the page
+$('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-scan-page [title]').removeAttr("title");$('#payments-ally-scan-page [data-hint]').removeAttr("data-hint");// reset the form validator object on the page
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();// reset the form
+$('#payments-ally-scan-page #payments-ally-scan-form').get(0).reset();// make page transparent in preparation for QR code scanning
 $('html, body').addClass('ally-transparent');$('#payments-page').addClass('transparent');$('#payments-ally-scan-page').addClass('transparent');// start video display
 QRScanner.resumePreview(function(status){// empty the view preview box and make the webview transparent
 $('#payments-ally-scan-page #payments-ally-scan-box').html("");QRScanner.show(function(status){// make webview transparent
@@ -1147,7 +1152,8 @@ utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=false
 }// end of error section
 // if code gets to this section below, then there was no error
 // show the "PAY" button
-new ej.base.Animation({name:'ZoomIn',duration:1000}).animate('#payments-ally-scan-pay-button');// flag that an active payment is taking place
+var animatePayButton=new ej.base.Animation({name:'ZoomIn',duration:1000});animatePayButton.addEventListener("end",function(){// listener for when animation is completed
+$('#payments-ally-scan-pay-button').css("transform","scale(1)");});animatePayButton.animate('#payments-ally-scan-pay-button');// flag that an active payment is taking place
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=true;// pause the video preview
 QRScanner.pausePreview(function(status){// get each content of the QR Code
 var qrCodeSegmentsArray=(qrCode+"").trim().split("|");// update the contents of the payment form with the qrCodeSegmentsArray
