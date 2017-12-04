@@ -394,7 +394,7 @@
 /** STYLE FOR THE PAYMENTS ALLY-SCAN PAGE BEGINS **/
 #payments-ally-scan-page .page--material__content {
     background-color: #ffffff;
-    top: 60px;
+    top: 56px;
 }
 #payments-ally-scan-page .page--material__background {
     background-color: #ffffff;
@@ -405,8 +405,17 @@
 #payments-ally-scan-page.transparent .page--material__background {
     background-color: transparent;
 }
-/** STYLE FOR THE PAYMENTS ALLY-SCAN PAGE ENDS **/
-.ally-transparent {
+.ally-transparent { /** style to be appended to html & body tag to help make webview transparent for QRcode scanner **/
     background-color: transparent;
     background: transparent;
 }
+
+
+#payments-ally-scan-page #payments-ally-scan-merchant-name { /** style for form input elements **/
+    border: none;
+    border-bottom: 2px lightgray solid;
+}
+#payments-ally-scan-page #payments-ally-scan-merchant-name:focus {
+    border-bottom: 2px green solid;
+}
+/** STYLE FOR THE PAYMENTS ALLY-SCAN PAGE ENDS **/

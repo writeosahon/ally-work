@@ -181,3 +181,27 @@ $(document).on("hide", "#disburse-wallet-page", utopiasoftware.ally.controller.d
 
 // listen for when the Disburse Wallet page is destroyed
 $(document).on("destroy", "#disburse-wallet-page", utopiasoftware.ally.controller.disburseWalletPageViewModel.pageDestroy);
+
+// listen for the initialisation of the Payments page
+$(document).on("init", "#payments-page", utopiasoftware.ally.controller.paymentsPageViewModel.pageInit);
+
+// listen for when the Payments page is shown
+$(document).on("show", "#payments-page", utopiasoftware.ally.controller.paymentsPageViewModel.pageShow);
+
+// listen for when the Payments page is hidden
+$(document).on("hide", "#payments-page", utopiasoftware.ally.controller.paymentsPageViewModel.pageHide);
+
+// listen for when the Payments page is destroyed
+$(document).on("destroy", "#payments-page", utopiasoftware.ally.controller.paymentsPageViewModel.pageDestroy);
+
+// listen for the initialisation of the Payments-Ally-Scan page
+$(document).on("init", "#payments-ally-scan-page", utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.pageInit);
+
+// listen for when the Payments-Ally-Scan age is shown
+$(document).on("show", "#payments-ally-scan-page", utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.pageShow);
+
+// listen for when the Payments-Ally-Scan page is hidden
+$(document).on("hide", "#payments-ally-scan-page", utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.pageHide);
+
+// listen for when the Payments-Ally-Scan page is destroyed
+$(document).on("destroy", "#payments-ally-scan-page", utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.pageDestroy);

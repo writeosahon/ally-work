@@ -1,74 +1,76 @@
 <!-- payments ally-scan page -->
 <ons-page id="payments-ally-scan-page">
     <!-- create page layout -->
-    <ons-row vertical-align="center">
-        <ons-col width="50%">
+    <ons-row vertical-align="top" style="height: calc(100vh - (56px));">
+        <ons-col width="50%" style="height: 100%;">
             <!-- create the payment form that displays all details for payment -->
-            <form id="fund-wallet-form" autocomplete="off" data-parsley-inputs="ons-input,input,textarea,select"
+            <form id="payments-ally-scan-form" autocomplete="off" data-parsley-inputs="ons-input,input,textarea,select"
                   data-parsley-excluded="input[type=button], input[type=submit],
-                              input[type=reset], input[type=hidden], [disabled], :hidden" style="display: block;">
+                              input[type=reset], input[type=hidden], [disabled], :hidden" style="height: 100%; display: block;">
 
-                <ons-list>
-                    <ons-list-title>Fund Wallet With Card</ons-list-title>
+                <ons-list style="height: 100%;">
+
                     <ons-list-item modifier="nodivider">
-                        <div class="left">
-                            <ons-icon icon="md-ally-icon-credit-card" class="list-item__icon" fixed-width size="28px"></ons-icon>
-                        </div>
                         <div class="center">
-                            <div style="width: 75%; display: inline-block">
-                                <input id="fund-wallet-card-number" type="tel" required
-                                       data-parsley-required-message="Card Number is required"
-                                       class="ally-input-tooltip">
+                            <label style="font-size: 0.8em; color: green;display: block">Merchant / Business Name</label>
+                            <div style="width: 90%; display: inline-block">
+                                <textarea id="payments-ally-scan-merchant-name" rows="2" readonly
+                                          style="font-size: 0.8em; text-transform: uppercase; width: 100%;"></textarea>
                             </div>
-                            <div style="width: 25%; text-align: center;">
-                                <!-- display the add card page -->
-                                <ons-fab id="fund-wallet-add-card" modifier="mini"
-                                         style="color: #ffffff; background-color: #30a401;"
-                                         onclick="$('#app-main-navigator').get(0).replacePage('add-card-page.html', {animation: 'slide-md'})">
-                                    <ons-icon icon="md-plus"></ons-icon>
-                                </ons-fab>
-                            </div>
-
                         </div>
                     </ons-list-item>
 
-                    <ons-list-title>Amount To be Funded</ons-list-title>
+                    <ons-list-item modifier="nodivider">
 
-                    <ons-list-item modifier="nodivider" style="">
-                        <div class="left">
-                            <ons-icon icon="md-ally-icon-cash" class="list-item__icon" fixed-width size="28px"></ons-icon>
-                        </div>
                         <div class="center">
-                            <ons-input id="fund-wallet-amount" required placeholder="Amount (NGN)"
-                                       data-parsley-type="number" type="tel"
-                                       data-parsley-min="500"
-                                       data-parsley-max="50000"
-                                       data-parsley-required-message="enter amount"
-                                       data-parsley-type-message="provide a valid cash amount"
-                                       data-parsley-min-message="minimum amount allowed is 500"
-                                       data-parsley-max-message="maximum amount allowed is 50,000"
-                                       onchange="$(this).val(kendo.toString(kendo.parseFloat($(this).val()), 'n2'));"
-                                       class="hint--bottom"></ons-input>
+                            <div style="width: 90%; display: inline-block">
+                                <ons-input id="payments-ally-scan-merchant-code" required float placeholder="Merchant code"
+                                           style="font-size: 0.8em; text-transform: uppercase; width: 100%;"
+                                           type="text"
+                                           data-parsley-required-message="provide merchant code"
+                                           class="hint--bottom"></ons-input>
+                            </div>
+                        </div>
+                    </ons-list-item>
+
+                    <ons-list-item modifier="nodivider">
+                        <div class="center">
+                            <div style="width: 90%; display: inline-block">
+                                <label style="font-size: 0.8em; color: green; display: block; margin-bottom: 0.2em">Amount To be Paid</label>
+                                <ons-input id="payments-ally-scan-amount" required placeholder="Amount (NGN)"
+                                           style="font-size: 0.8em; width: 100%"
+                                           data-parsley-type="number" type="tel"
+                                           data-parsley-min="500"
+                                           data-parsley-max="50000"
+                                           data-parsley-required-message="enter amount"
+                                           data-parsley-type-message="provide a valid cash amount"
+                                           data-parsley-min-message="minimum amount allowed is 500"
+                                           data-parsley-max-message="maximum amount allowed is 50,000"
+                                           onchange="$(this).val(kendo.toString(kendo.parseFloat($(this).val()), 'n2'));"
+                                           class="hint--bottom"></ons-input>
+                            </div>
                         </div>
                     </ons-list-item>
 
                 </ons-list>
             </form>
         </ons-col>
+
+        <!-- QR Code section -->
         <ons-col width="50%" style="text-align: center;">
             <!-- display the QR code icon, scan button and pay button-->
             <div style="display: block; width: 100%; text-align: center">
-                <div id="payments-scan-box" style="display: inline-block; width: 200px; height: 200px;">
-                    <ons-icon icon="fa-qrcode" size="200px"></ons-icon>
+                <div id="payments-ally-scan-box" style="display: inline-block; width: 180px; height: 180px;">
+                    <ons-icon icon="fa-qrcode" size="180px"></ons-icon>
                 </div>
                 <div style="width: 100%; text-align: center; display: block;">
-                    <ons-button id="wallet-disburse-transfer"
+                    <ons-button id="payments-ally-scan-scan-button"
                                 style="background-color: #0FD0D0; color: #ffffff; border-radius: 21px; width: 150px"
-                                onclick="utopiasoftware.ally.controller.testScan();">
+                                onclick="utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.scanButtonClicked()">
                         Scan</ons-button>
                 </div>
                 <div style="width: 100%; text-align: center;  display: block; margin-top: 1em;">
-                    <ons-button id="wallet-disburse-transfer"
+                    <ons-button id="payments-ally-scan-pay-button"
                                 style="background-color: #30a401; color: #ffffff; border-radius: 21px; width: 150px"
                                 onclick="">
                         Pay</ons-button>

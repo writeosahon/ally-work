@@ -1051,6 +1051,92 @@ ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+
 if($('ons-splitter').get(0).right.isOpen){// side menu open, so close it
 $('ons-splitter').get(0).right.close();return;// exit the method
 }// remove this page form the main navigator stack
-$('#app-main-navigator').get(0).popPage();}},testScan:function testScan(){$('html, body').addClass('ally-transparent');$('#payments-page').addClass('transparent');$('#payments-ally-scan-page').addClass('transparent');QRScanner.show(function(status){QRScanner.scan(function(err,qrCode){console.log("BEGIN SCAN");if(err){console.error(err._message);}});});}};
+$('#app-main-navigator').get(0).popPage();}},/**
+     * object is view-model for dashboard page
+     */paymentsPageViewModel:{/**
+         * event is triggered when page is initialised
+         */pageInit:function pageInit(event){var $thisPage=$(event.target);// get the current page shown
+// disable the swipeable feature for the app splitter
+$('ons-splitter-side').removeAttr("swipeable");// call the function used to initialise the app page if the app is fully loaded
+loadPageOnAppReady();//function is used to initialise the page if the app is fully ready for execution
+function loadPageOnAppReady(){// check to see if onsen is ready and if all app loading has been completed
+if(!ons.isReady()||utopiasoftware.ally.model.isAppReady===false){setTimeout(loadPageOnAppReady,500);// call this function again after half a second
+return;}// listen for the back button event
+$thisPage.get(0).onDeviceBackButton=utopiasoftware.ally.controller.paymentsPageViewModel.backButtonClicked;// hide the loader
+$('#loader-modal').get(0).hide();}},/**
+         * method is triggered when page is shown
+         */pageShow:function pageShow(event){var $thisPage=$(event.target);// get the current page shown
+// disable the swipeable feature for the app splitter
+$('ons-splitter-side').removeAttr("swipeable");},/**
+         * method is triggered when page is hidden
+         */pageHide:function pageHide(){},/**
+         * method is triggered when page is destroyed
+         */pageDestroy:function pageDestroy(){},/**
+         * method is triggered when back button or device back button is clicked
+         */backButtonClicked:function backButtonClicked(){// check if the side menu is open
+if($('ons-splitter').get(0).right.isOpen){// side menu open, so close it
+$('ons-splitter').get(0).right.close();return;// exit the method
+}// get the payments button segment object
+var paymentsButtonSegment=$('#payments-page #payments-segments').get(0);// check which button in the button segment is active
+if(paymentsButtonSegment.getActiveButtonIndex()==0){// the 1st button in the segment is active
+// move to the previous tab in the menu-tabbar
+$('#menu-tabbar').get(0).setActiveTab(0);return;}else{// the 2nd button is active, move to the 1st button's page
+paymentsButtonSegment.setActiveButton(0);// move to the 1st button's page
+}}},/**
+     * object is view-model for payments-ally-scan page
+     */paymentsAllyScanPageViewModel:{/**
+         * used to hold the parsley form validation object for the page
+         */formValidator:null,/**
+         * used to hold the parsley validator for the Amount field
+         */amountFieldValidator:null,/**
+         * event is triggered when page is initialised
+         */pageInit:function pageInit(event){var $thisPage=$(event.target);// get the current page shown
+// call the function used to initialise the app page if the app is fully loaded
+loadPageOnAppReady();//function is used to initialise the page if the app is fully ready for execution
+function loadPageOnAppReady(){// check to see if onsen is ready and if all app loading has been completed
+if(!ons.isReady()||utopiasoftware.ally.model.isAppReady===false){setTimeout(loadPageOnAppReady,500);// call this function again after half a second
+return;}// initialise the amount field
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.amountFieldValidator=$('#payments-ally-scan-amount').parsley({value:function value(parsley){// convert the amount back to a plain text without the thousand separator
+var parsedNumber=kendo.parseFloat($('#payments-ally-scan-amount',$thisPage).val());return parsedNumber?parsedNumber:$('#payments-ally-scan-amount',$thisPage).val();}});// initialise the form validation
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator=$('#payments-ally-scan-form').parsley();// attach listener for the pay button on the page
+$('#payments-ally-scan-pay-button').get(0).onclick=function(){// run the validation method for the form
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.whenValidate();};// listen for the form field validation failure event
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.on('field:error',function(fieldInstance){// get the element that triggered the field validation error and use it to display tooltip
+// display tooltip
+$(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$(fieldInstance.$element).attr("data-hint",fieldInstance.getErrorsMessages()[0]);$(fieldInstance.$element).attr("title",fieldInstance.getErrorsMessages()[0]);});// listen for the form field validation success event
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.on('field:success',function(fieldInstance){// remove tooltip from element
+$(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$(fieldInstance.$element).removeAttr("data-hint");$(fieldInstance.$element).removeAttr("title");});// listen for the form validation success
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.on('form:success',utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidated);// hide the loader
+$('#loader-modal').get(0).hide();}},/**
+         * method is triggered when page is shown
+         *
+         * @param event
+         */pageShow:function pageShow(event){},/**
+         * method is triggered when the page is hidden
+         * @param event
+         */pageHide:function pageHide(event){try{// remove any tooltip being displayed on all forms on the page
+$('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-scan-page [title]').removeAttr("title");$('#payments-ally-scan-page [data-hint]').removeAttr("data-hint");// reset the form validator object on the page
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();}catch(err){}},/**
+         * method is triggered when the page is destroyed
+         * @param event
+         */pageDestroy:function pageDestroy(event){try{// remove any tooltip being displayed on all forms on the page
+$('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-scan-page [title]').removeAttr("title");$('#payments-ally-scan-page [data-hint]').removeAttr("data-hint");// destroy the form validator objects on the page
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.amountFieldValidator.destroy();utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.destroy();}catch(err){}},/**
+         * method is triggered when the form is successfully validated
+         */formValidated:function formValidated(){// check if Internet Connection is available before proceeding
+if(navigator.connection.type===Connection.NONE){// no Internet Connection
+// inform the user that they cannot proceed without Internet
+window.plugins.toast.showWithOptions({message:"ALLY wallet cannot be funded without an Internet Connection",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#ff0000',//red
+textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
+window.plugins.toast.hide();}});return;// exit method immediately
+}},/**
+         * method is triggered when the SCAN button is clicked
+         */scanButtonClicked:function scanButtonClicked(){// make page transparent in preparation for QR code scanning
+$('html, body').addClass('ally-transparent');$('#payments-page').addClass('transparent');$('#payments-ally-scan-page').addClass('transparent');// start video display
+QRScanner.resumePreview(function(status){// show the view preview box and make the webview transparent
+$('#payments-ally-scan-page #payments-ally-scan-box').html("");QRScanner.show(function(status){// make webview transparent
+QRScanner.scan(function(err,qrCode){// begin scanning QR code
+if(err){console.error("ERROR ",err._message);return;// exit code after handling error
+}console.log(qrCode);});});});}}};
 
 //# sourceMappingURL=controller-compiled.js.map
