@@ -3917,12 +3917,10 @@ utopiasoftware.ally.controller = {
 
                         // if code gets to this section below, then there was no error
 
-                        // show the "PAY" button
-                        let animatePayButton = new ej.base.Animation({name: 'ZoomIn', duration: 1000});
-                        animatePayButton.addEventListener("end", function(){ // listener for when animation is completed
+                        // show the "PAY" button (in an animation)
+                        let animatePayButton = new ej.base.Animation({name: 'ZoomIn', duration: 1000, end: function(){
                             $('#payments-ally-scan-pay-button').css("transform", "scale(1)");
-                            console.log("ANIMATION ENDS");
-                        });
+                        }});
                         animatePayButton.animate('#payments-ally-scan-pay-button');
 
                         // flag that an active payment is taking place

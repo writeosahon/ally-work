@@ -1152,9 +1152,8 @@ $('#payments-ally-scan-pay-button').css("transform","scale(0)");// flag that no 
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=false;return;// exit after handling error
 }// end of error section
 // if code gets to this section below, then there was no error
-// show the "PAY" button
-var animatePayButton=new ej.base.Animation({name:'ZoomIn',duration:1000});animatePayButton.addEventListener("end",function(){// listener for when animation is completed
-$('#payments-ally-scan-pay-button').css("transform","scale(1)");console.log("ANIMATION ENDS");});animatePayButton.animate('#payments-ally-scan-pay-button');// flag that an active payment is taking place
+// show the "PAY" button (in an animation)
+var animatePayButton=new ej.base.Animation({name:'ZoomIn',duration:1000,end:function end(){$('#payments-ally-scan-pay-button').css("transform","scale(1)");}});animatePayButton.animate('#payments-ally-scan-pay-button');// flag that an active payment is taking place
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=true;// pause the video preview
 QRScanner.pausePreview(function(status){// get each content of the QR Code
 var qrCodeSegmentsArray=(qrCode+"").trim().split("|");// update the contents of the payment form with the qrCodeSegmentsArray
