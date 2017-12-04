@@ -1116,7 +1116,8 @@ utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=false
 $('html, body').removeClass('ally-transparent');$('#payments-page').removeClass('transparent');$('#payments-ally-scan-page').removeClass('transparent');// replace the content of the preview box
 $('#payments-ally-scan-page #payments-ally-scan-box').html('<ons-icon icon="fa-qrcode" size="180px"></ons-icon>');});// remove any tooltip being displayed on all forms on the page
 $('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-scan-page [title]').removeAttr("title");$('#payments-ally-scan-page [data-hint]').removeAttr("data-hint");// reset the form validator object on the page
-utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();}catch(err){}},/**
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();// reset the form
+$('#payments-ally-scan-page #payments-ally-scan-form').get(0).reset();}catch(err){}},/**
          * method is triggered when the page is destroyed
          * @param event
          */pageDestroy:function pageDestroy(event){try{// destroy the current state of the QR Scanner &disable the webview transparency

@@ -3798,6 +3798,8 @@ utopiasoftware.ally.controller = {
                 $('#payments-ally-scan-page [data-hint]').removeAttr("data-hint");
                 // reset the form validator object on the page
                 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();
+                // reset the form
+                $('#payments-ally-scan-page #payments-ally-scan-form').get(0).reset();
             }
             catch(err){}
         },
