@@ -421,3 +421,24 @@
     border-bottom: 2px green solid;
 }
 /** STYLE FOR THE PAYMENTS ALLY-SCAN PAGE ENDS **/
+
+
+/** STYLE FOR THE PAYMENTS ALLY-DIRECT PAGE BEGINS **/
+#payments-ally-direct-page .page--material__content {
+    background-color: #ffffff;
+    top: 56px;
+}
+#payments-ally-direct-page .page--material__background {
+    background-color: #ffffff;
+}
+
+#payments-ally-direct-page #payments-ally-direct-merchant-name { /** style for form input elements **/
+    color: green;
+    font-family: 'Roboto', 'Noto', sans-serif;
+    border: none;
+    border-bottom: 2px lightgray solid;
+}
+#payments-ally-direct-page #payments-ally-direct-merchant-name:focus {
+    border-bottom: 2px green solid;
+}
+/** STYLE FOR THE PAYMENTS ALLY-SCAN PAGE ENDS **/

@@ -197,7 +197,7 @@ $(document).on("destroy", "#payments-page", utopiasoftware.ally.controller.payme
 // listen for the initialisation of the Payments-Ally-Scan page
 $(document).on("init", "#payments-ally-scan-page", utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.pageInit);
 
-// listen for when the Payments-Ally-Scan age is shown
+// listen for when the Payments-Ally-Scan page is shown
 $(document).on("show", "#payments-ally-scan-page", utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.pageShow);
 
 // listen for when the Payments-Ally-Scan page is hidden
@@ -205,3 +205,15 @@ $(document).on("hide", "#payments-ally-scan-page", utopiasoftware.ally.controlle
 
 // listen for when the Payments-Ally-Scan page is destroyed
 $(document).on("destroy", "#payments-ally-scan-page", utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.pageDestroy);
+
+// listen for the initialisation of the Payments-Ally-Direct page
+$(document).on("init", "#payments-ally-direct-page", utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.pageInit);
+
+// listen for when the Payments-Ally-Direct page is shown
+$(document).on("show", "#payments-ally-direct-page", utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.pageShow);
+
+// listen for when the Payments-Ally-Direct page is hidden
+$(document).on("hide", "#payments-ally-direct-page", utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.pageHide);
+
+// listen for when the Payments-Ally-Direct page is destroyed
+$(document).on("destroy", "#payments-ally-direct-page", utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.pageDestroy);
