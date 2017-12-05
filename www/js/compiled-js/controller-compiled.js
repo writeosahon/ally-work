@@ -1070,9 +1070,20 @@ $('ons-splitter').get(0).right.close();return;// exit the method
 }// get the payments button segment object
 var paymentsButtonSegment=$('#payments-page #payments-segments').get(0);// check which button in the button segment is active
 if(paymentsButtonSegment.getActiveButtonIndex()==0){// the 1st button in the segment is active
+// check if there is an active payment is ongoing
+if(utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment===true){// there is an active payment
+// caution tohe user about leaving the page when an active payment is ongoing
+ons.notification.confirm({title:'<ons-icon icon="md-alert-triangle" size="36px" '+'style="color: orange;"></ons-icon> Cancel Payment',messageHTML:'<span>Merchant payment is in progress. <br>'+'If you leave, all information on payment will be lost.<br>'+'Do you want to leave?</span>',cancelable:false,buttonLabels:["No","Yes"]}).then(function(buttonIndex){// check which button was selected
+if(buttonIndex===0){// user chose not to leave the page
+return;// exit
+}// user chose to leave, so call the hide method for the currently active page
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.pageHide();// move to the previous tab in the menu-tabbar
+$('#menu-tabbar').get(0).setActiveTab(0);}).catch();}else{// there is no active payment
 // move to the previous tab in the menu-tabbar
-$('#menu-tabbar').get(0).setActiveTab(0);return;}else{// the 2nd button is active, move to the 1st button's page
+$('#menu-tabbar').get(0).setActiveTab(0);}return;// exit
+}if(paymentsButtonSegment.getActiveButtonIndex()==1){// the 2nd button is active, move to the 1st button's page
 paymentsButtonSegment.setActiveButton(0);// move to the 1st button's page
+return;// exit
 }}},/**
      * object is view-model for payments-ally-scan page
      */paymentsAllyScanPageViewModel:{/**
@@ -1116,7 +1127,8 @@ $('html, body').removeClass('ally-transparent');$('#payments-page').removeClass(
 $('#payments-ally-scan-page #payments-ally-scan-box').html('<ons-icon icon="fa-qrcode" size="180px"></ons-icon>');// remove any tooltip being displayed on all forms on the page
 $('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-scan-page [title]').removeAttr("title");$('#payments-ally-scan-page [data-hint]').removeAttr("data-hint");// reset the form validator object on the page
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();// reset the form
-$('#payments-ally-scan-page #payments-ally-scan-form').get(0).reset();// disable the webview transparency
+$('#payments-ally-scan-page #payments-ally-scan-form').get(0).reset();// reset the page scroll position to the top
+$('#payments-ally-scan-page .page__content').scrollTop(0);// disable the webview transparency
 QRScanner.hide(function(status){QRScanner.resumePreview(function(){});});}catch(err){}},/**
          * method is triggered when the page is destroyed
          * @param event
@@ -1157,7 +1169,8 @@ utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset
 $('#payments-ally-scan-page #payments-ally-scan-form').get(0).reset();// make page transparent in preparation for QR code scanning
 $('html, body').removeClass('ally-transparent');$('#payments-page').removeClass('transparent');$('#payments-ally-scan-page').removeClass('transparent');// hide the "PAY" button
 $('#payments-ally-scan-pay-button').css("transform","scale(0)");// replace the content of the preview box
-$('#payments-ally-scan-page #payments-ally-scan-box').html('<ons-icon icon="fa-qrcode" size="180px"></ons-icon>');// forward details of the wallet-transfer and the user details
+$('#payments-ally-scan-page #payments-ally-scan-box').html('<ons-icon icon="fa-qrcode" size="180px"></ons-icon>');// reset the page scroll position to the top
+$('#payments-ally-scan-page .page__content').scrollTop(0);// forward details of the wallet-transfer and the user details
 return Promise.all([$('#hour-glass-loader-modal').get(0).hide(),ons.notification.toast("Merchant Payment Successful!",{timeout:4000})]);}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
 err='Sorry, Merchant QR Code could not be scanned.<br> '+'You can try again OR proceed to ALLY Direct as an alternative';}$('#hour-glass-loader-modal').get(0).hide();// hide loader
 ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> ALLY Payment Error',messageHTML:'<span>'+err+'</span>',cancelable:false});});},/**

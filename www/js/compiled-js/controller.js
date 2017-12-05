@@ -3659,12 +3659,43 @@ utopiasoftware.ally.controller = {
 
             // check which button in the button segment is active
             if(paymentsButtonSegment.getActiveButtonIndex() == 0){ // the 1st button in the segment is active
-                // move to the previous tab in the menu-tabbar
-                $('#menu-tabbar').get(0).setActiveTab(0);
-                return;
+
+                // check if there is an active payment is ongoing
+                if(utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment === true){ // there is an active payment
+                    // caution tohe user about leaving the page when an active payment is ongoing
+                    ons.notification.confirm({title: '<ons-icon icon="md-alert-triangle" size="36px" ' +
+                    'style="color: orange;"></ons-icon> Cancel Payment',
+                        messageHTML: '<span>Merchant payment is in progress. <br>' +
+                        'If you leave, all information on payment will be lost.<br>' +
+                        'Do you want to leave?</span>',
+                        cancelable: false,
+                        buttonLabels: ["No", "Yes"]
+                    }).
+                    then(function(buttonIndex){ // check which button was selected
+                        if(buttonIndex === 0){ // user chose not to leave the page
+                            return; // exit
+                        }
+
+                        // user chose to leave, so call the hide method for the currently active page
+                        utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.pageHide();
+                        // move to the previous tab in the menu-tabbar
+                        $('#menu-tabbar').get(0).setActiveTab(0);
+
+                    }).catch();
+                }
+                else{ // there is no active payment
+
+                    // move to the previous tab in the menu-tabbar
+                    $('#menu-tabbar').get(0).setActiveTab(0);
+                }
+
+                return; // exit
             }
-            else{ // the 2nd button is active, move to the 1st button's page
+
+            if(paymentsButtonSegment.getActiveButtonIndex() == 1){ // the 2nd button is active, move to the 1st button's page
                 paymentsButtonSegment.setActiveButton(0); // move to the 1st button's page
+
+                return; // exit
             }
         }
     },
@@ -3795,6 +3826,9 @@ utopiasoftware.ally.controller = {
                 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();
                 // reset the form
                 $('#payments-ally-scan-page #payments-ally-scan-form').get(0).reset();
+
+                // reset the page scroll position to the top
+                $('#payments-ally-scan-page .page__content').scrollTop(0);
 
                 // disable the webview transparency
                 QRScanner.hide(function(status){
@@ -3955,6 +3989,9 @@ utopiasoftware.ally.controller = {
                 // replace the content of the preview box
                 $('#payments-ally-scan-page #payments-ally-scan-box').
                 html('<ons-icon icon="fa-qrcode" size="180px"></ons-icon>');
+
+                // reset the page scroll position to the top
+                $('#payments-ally-scan-page .page__content').scrollTop(0);
 
 
                 // forward details of the wallet-transfer and the user details
