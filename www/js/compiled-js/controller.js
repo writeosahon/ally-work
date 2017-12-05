@@ -3774,23 +3774,18 @@ utopiasoftware.ally.controller = {
         pageHide: (event) => {
             try {
 
-                // disable the webview transparency
-                QRScanner.hide(function(status){
+                // hide the "PAY" button
+                $('#payments-ally-scan-pay-button').css("transform", "scale(0)");
+                // flag that no active payment is taking place
+                utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment = false;
 
-                    // hide the "PAY" button
-                    $('#payments-ally-scan-pay-button').css("transform", "scale(0)");
-                    // flag that no active payment is taking place
-                    utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment = false;
-
-                    // remove the transparency from the webpage
-                    $('html, body').removeClass('ally-transparent');
-                    $('#payments-page').removeClass('transparent');
-                    $('#payments-ally-scan-page').removeClass('transparent');
-                    // replace the content of the preview box
-                    $('#payments-ally-scan-page #payments-ally-scan-box').
-                    html('<ons-icon icon="fa-qrcode" size="180px"></ons-icon>');
-
-                });
+                // remove the transparency from the webpage
+                $('html, body').removeClass('ally-transparent');
+                $('#payments-page').removeClass('transparent');
+                $('#payments-ally-scan-page').removeClass('transparent');
+                // replace the content of the preview box
+                $('#payments-ally-scan-page #payments-ally-scan-box').
+                html('<ons-icon icon="fa-qrcode" size="180px"></ons-icon>');
 
                 // remove any tooltip being displayed on all forms on the page
                 $('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
@@ -3800,6 +3795,11 @@ utopiasoftware.ally.controller = {
                 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();
                 // reset the form
                 $('#payments-ally-scan-page #payments-ally-scan-form').get(0).reset();
+
+                // disable the webview transparency
+                QRScanner.hide(function(status){
+                    QRScanner.resumePreview(function(){});
+                });
             }
             catch(err){}
         },
@@ -3812,23 +3812,18 @@ utopiasoftware.ally.controller = {
 
             try{
 
-                // destroy the current state of the QR Scanner &disable the webview transparency
-                QRScanner.destroy(function(status){
+                // hide the "PAY" button
+                $('#payments-ally-scan-pay-button').css("transform", "scale(0)");
+                // flag that no active payment is taking place
+                utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment = false;
 
-                    // hide the "PAY" button
-                    $('#payments-ally-scan-pay-button').css("transform", "scale(0)");
-                    // flag that no active payment is taking place
-                    utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment = false;
-
-                    // remove the transparency from the webpage
-                    $('html, body').removeClass('ally-transparent');
-                    $('#payments-page').removeClass('transparent');
-                    $('#payments-ally-scan-page').removeClass('transparent');
-                    // replace the content of the preview box
-                    $('#payments-ally-scan-page #payments-ally-scan-box').
-                    html('<ons-icon icon="fa-qrcode" size="180px"></ons-icon>');
-
-                });
+                // remove the transparency from the webpage
+                $('html, body').removeClass('ally-transparent');
+                $('#payments-page').removeClass('transparent');
+                $('#payments-ally-scan-page').removeClass('transparent');
+                // replace the content of the preview box
+                $('#payments-ally-scan-page #payments-ally-scan-box').
+                html('<ons-icon icon="fa-qrcode" size="180px"></ons-icon>');
 
                 // remove any tooltip being displayed on all forms on the page
                 $('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
@@ -3837,6 +3832,12 @@ utopiasoftware.ally.controller = {
                 // destroy the form validator objects on the page
                 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.amountFieldValidator.destroy();
                 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.destroy();
+
+
+                // destroy the current state of the QR Scanner &disable the webview transparency
+                QRScanner.destroy(function(status){
+
+                });
             }
             catch(err){}
         },
@@ -3868,6 +3869,114 @@ utopiasoftware.ally.controller = {
                 return; // exit method immediately
             }
 
+
+            // create the form data to be submitted
+            var formData = {
+                phone_sender: utopiasoftware.ally.model.appUserDetails.phone,
+                phone_receiver: $('#payments-ally-scan-page #payments-ally-scan-merchant-phone').val(),
+                merchantcode: $('#payments-ally-scan-page #payments-ally-scan-merchant-code').val(),
+                amount: kendo.parseFloat($('#payments-ally-scan-page #payments-ally-scan-amount').val()),
+                merchantname: $('#payments-ally-scan-page #payments-ally-scan-merchant-name').val()
+            };
+
+            ons.notification.prompt({title: "ALLY Secure PIN Confirmation",
+                id: 'pin-security-check2',
+                messageHTML: `<div><ons-icon icon="ion-lock-combination" size="24px"
+                    style="color: #30a401; float: left; width: 26px;"></ons-icon>
+                    <span style="float: right; width: calc(100% - 26px);">
+                    Confirm merchant payment by providing your ALLY Secure PIN</span></div>`,
+                cancelable: false, placeholder: "Secure PIN", inputType: "number", defaultValue: "", autofocus: false,
+                submitOnEnter: true
+            }).
+            then(function(userInput){ // get the user input
+
+                // update the form data to be submitted
+                formData.lock = userInput; // add the user secure pin
+
+                // display the loader message to indicate that account is being created;
+                $('#hour-glass-loader-modal .modal-message').html("Authorizing Merchant Payment...");
+
+                return Promise.all([formData, $('#hour-glass-loader-modal').get(0).show()]); // forward the data to be submitted
+            }).
+            then(function(promiseDataArray){
+
+                return Promise.resolve($.ajax(
+                    {
+                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/pay-merchant-qrcode.php",
+                        type: "post",
+                        contentType: "application/x-www-form-urlencoded",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                        },
+                        dataType: "text",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: true,
+                        data: promiseDataArray[0] // data to submit to server
+                    }
+                ));
+            }).
+            then(function(serverResponse){
+                serverResponse = JSON.parse((serverResponse +"").trim()); // get the new user object
+
+                // check if any error occurred
+                if(serverResponse.status == "error"){ // an error occured
+                    throw serverResponse.message; // throw the error message attached to this error
+                }
+
+                return serverResponse; // forward the serverResponse i.e the user details object
+            }).
+            then(function(responseDetails){
+                // forward details of the save the user details to encrypted storage;
+                return Promise.all([utopiasoftware.ally.saveUserAppDetails(responseDetails)]);
+            }).
+            then(function(dataArray){
+                // update local copy of user app details
+                utopiasoftware.ally.model.appUserDetails = dataArray[0];
+
+                // flag that no active payment is taking place
+                utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment = false;
+
+                // remove any tooltip being displayed on all forms on the page
+                $('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                $('#payments-ally-scan-page [title]').removeAttr("title");
+                $('#payments-ally-scan-page [data-hint]').removeAttr("data-hint");
+                // reset the form validator object on the page
+                utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();
+                // reset the form
+                $('#payments-ally-scan-page #payments-ally-scan-form').get(0).reset();
+
+                // make page transparent in preparation for QR code scanning
+                $('html, body').removeClass('ally-transparent');
+                $('#payments-page').removeClass('transparent');
+                $('#payments-ally-scan-page').removeClass('transparent');
+                // hide the "PAY" button
+                $('#payments-ally-scan-pay-button').css("transform", "scale(0)");
+
+                // replace the content of the preview box
+                $('#payments-ally-scan-page #payments-ally-scan-box').
+                html('<ons-icon icon="fa-qrcode" size="180px"></ons-icon>');
+
+
+                // forward details of the wallet-transfer and the user details
+                return Promise.all([$('#hour-glass-loader-modal').get(0).hide(),
+                    ons.notification.toast("Merchant Payment Successful!", {timeout:4000})]);
+            }).
+            catch(function(err){
+                if(typeof err !== "string"){ // if err is NOT a String
+                    err = 'Sorry, Merchant QR Code could not be scanned.<br> ' +
+                    'You can try again OR proceed to ALLY Direct as an alternative';
+                }
+
+                $('#hour-glass-loader-modal').get(0).hide(); // hide loader
+                ons.notification.alert({title: '<ons-icon icon="md-close-circle-o" size="32px" ' +
+                'style="color: red;"></ons-icon> ALLY Payment Error',
+                    messageHTML: '<span>' + err + '</span>',
+                    cancelable: false
+                });
+            });
+
+
+
         },
 
         /**
@@ -3888,6 +3997,8 @@ utopiasoftware.ally.controller = {
             $('html, body').addClass('ally-transparent');
             $('#payments-page').addClass('transparent');
             $('#payments-ally-scan-page').addClass('transparent');
+            // hide the "PAY" button
+            $('#payments-ally-scan-pay-button').css("transform", "scale(0)");
 
             // start video display
             QRScanner.resumePreview(function(status){
