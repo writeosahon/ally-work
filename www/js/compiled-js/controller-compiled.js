@@ -1307,7 +1307,8 @@ window.plugins.toast.hide();}});return;// exit method immediately
 if(utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantCodeValidator.validate()!==true){// validation failed, exit
 return;}// hide the 'PAY' button
 $('#payments-ally-direct-page #payments-ally-direct-pay-button').css("transform","scale(0)");// hide the merchant details form inputs
-$('#payments-ally-direct-page .pay-ally-direct-merchant-details').css("visibility","hidden");// display the loader message to indicate that account is being created;
+$('#payments-ally-direct-page .pay-ally-direct-merchant-details').css("visibility","hidden");// remove any tooltip being displayed on all forms on the page
+$('#payments-ally-direct-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-direct-page [title]').removeAttr("title");$('#payments-ally-direct-page [data-hint]').removeAttr("data-hint");// display the loader message to indicate that account is being created;
 $('#hour-glass-loader-modal .modal-message').html("Finding Merchant Details...");// create the form data to be submitted
 var formData={merchantcode:$('#payments-ally-direct-page #payments-ally-direct-merchant-code').val()};Promise.all([formData,$('#hour-glass-loader-modal').get(0).show()]).then(function(promiseDataArray){return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/pay-merchant-normal.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
 processData:true,data:promiseDataArray[0]// data to submit to server

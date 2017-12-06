@@ -4466,6 +4466,10 @@ utopiasoftware.ally.controller = {
             $('#payments-ally-direct-page #payments-ally-direct-pay-button').css("transform", "scale(0)");
             // hide the merchant details form inputs
             $('#payments-ally-direct-page .pay-ally-direct-merchant-details').css("visibility", "hidden");
+            // remove any tooltip being displayed on all forms on the page
+            $('#payments-ally-direct-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+            $('#payments-ally-direct-page [title]').removeAttr("title");
+            $('#payments-ally-direct-page [data-hint]').removeAttr("data-hint");
 
             // display the loader message to indicate that account is being created;
             $('#hour-glass-loader-modal .modal-message').html("Finding Merchant Details...");
