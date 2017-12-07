@@ -49,6 +49,9 @@
     <!-- script library for ej2 components -->
     <script src="js/ej2-components-15.4.17/ej2.min.js"></script>
 
+    <!-- script library for anime -->
+    <script src="js/anime-2.2.0.min.js"></script>
+
     <!-- hybrid script libraries for intel xdk and cordova -->
     <script src="cordova.js"></script>
 
@@ -175,6 +178,37 @@
                     OK</ons-button>
             </div>
         </div>
+    </div>
+</ons-modal>
+
+<!-- modal for QR Code Scan -->
+<ons-modal id="payments-ally-scan-modal" style="background-color: rgba(0, 0, 0, 0) !important;">
+    <ons-fab id="payments-ally-scan-modal-back-button" modifier="mini" position="top left"
+             style="color: #ffffff; background-color: #30a401; z-index: 3">
+        <ons-icon icon="md-long-arrow-left"></ons-icon>
+    </ons-fab>
+
+    <div style="width: 100vw; height: 100vh; position: relative">
+        <ons-row style="position: absolute; top: 0; ">
+            <ons-col width="100%" style="height: calc((100vh - 180px) / 2);
+            background-color: rgba(0, 0, 0, 0.9)"></ons-col>
+        </ons-row>
+        <ons-row style="position: absolute; top: calc((100vh - 180px) / 2);">
+            <ons-col width="calc((100% - 180px) / 2 )" style="height: 180px;
+            background-color: rgba(0, 0, 0, 0.9)"></ons-col>
+            <! -- this block displays the QR Code boundry -->
+            <ons-col width="180px" style="overflow: hidden; height: 180px; background-color: transparent; margin: 0; padding: 0;">
+                <ons-icon icon="md-fullscreen" size="418px" style="color: green !important;
+                margin-left: -32px !important; margin-top: -12px; margin-right: -25px; padding: 0px !important;
+                text-align:left !important; line-height: 205px !important; font-size: 418px !important;"></ons-icon>
+            </ons-col>
+            <ons-col width="calc((100% - 180px) / 2 )" style="height: 180px;
+            background-color: rgba(0, 0, 0, 0.9)"></ons-col>
+        </ons-row>
+        <ons-row style="position: absolute; bottom: 0; ">
+            <ons-col width="100%" style="height: calc((100vh - 180px) / 2);
+            background-color: rgba(0, 0, 0, 0.9)"></ons-col>
+        </ons-row>
     </div>
 </ons-modal>
 

@@ -17,19 +17,29 @@
         <ons-list-item modifier="nodivider">
             <ons-row valign="bottom">
                 <ons-col width="50%"></ons-col>
-                <ons-col width="50%">
+                <ons-col width="50%" class="dashboard-period-select-col">
                     <select id="dashboard-period-select">
                         <option value="" disabled selected>Select Period</option>
-                        <option value="1">Daily</option>
-                        <option value="2">Weekly</option>
-                        <option value="3">Monthly</option>
+                        <option value="today">Today</option>
+                        <option value="weekly">Last 7 Days</option>
+                        <option value="monthly">Last 30 Days</option>
                     </select>
                 </ons-col>
             </ons-row>
         </ons-list-item>
 
-        <ons-list-item modifier="nodivider">
-            <ons-card style="height: 15em; width: 100%; background-color: #e8e8e8"></ons-card>
+        <ons-list-item id="dashboard-ally-wallet-list-item" modifier="nodivider" lock-on-drag="true">
+            <ons-card style="width: 100%;">
+                <div class="title" style="font-size: 0.8em;">
+                    ALLY Wallet Balance
+                </div>
+                <div class="content">
+                    <span id="dashboard-ally-wallet"
+                          style="color: #30a401; font-size: 2.1em; display: none">
+                    </span>
+                    <ons-progress-circular id="dashboard-ally-wallet-loader" indeterminate></ons-progress-circular>
+                </div>
+            </ons-card>
         </ons-list-item>
 
         <ons-list-item modifier="nodivider">

@@ -1,17 +1,13 @@
 <!-- payments page -->
 <ons-page id="payments-page">
-    <ons-toolbar style="height: 120px">
+    <ons-toolbar>
         <div class="left">
             <ons-toolbar-button onclick="utopiasoftware.ally.controller.paymentsPageViewModel.backButtonClicked();">
                 <ons-icon icon="md-long-arrow-left"></ons-icon>
             </ons-toolbar-button>
         </div>
-        <div class="center" style="height: 120px;">
+        <div class="center">
             <div>Merchant Payments</div>
-            <ons-segment id="payments-segments"  tabbar-id="payments-tabbar" style="width: 100%">
-                <button><ons-icon icon="fa-qrcode"></ons-icon> ALLY Scan</button>
-                <button><ons-icon icon="md-balance-wallet"></ons-icon> ALLY Direct</button>
-            </ons-segment>
         </div>
         <div class="right">
             <ons-toolbar-button onclick="$('#side-menu').get(0).toggle()">

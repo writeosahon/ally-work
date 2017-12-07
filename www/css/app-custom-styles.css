@@ -377,16 +377,17 @@
 /** STYLE FOR THE PAYMENTS PAGE BEGINS **/
 #payments-page .page--material__content {
     background-color: #ffffff;
-    top: 60px;
 }
 #payments-page .page--material__background {
     background-color: #ffffff;
 }
 #payments-page.transparent .page--material__content { /** style to make the page transparent for when the QRcode scanner is used **/
     background-color: transparent;
+    opacity: 0;
 }
 #payments-page.transparent .page--material__background {
     background-color: transparent;
+    opacity: 0;
 }
 /** STYLE FOR THE PAYMENTS PAGE ENDS **/
 
@@ -394,17 +395,22 @@
 /** STYLE FOR THE PAYMENTS ALLY-SCAN PAGE BEGINS **/
 #payments-ally-scan-page .page--material__content {
     background-color: #ffffff;
-    top: 56px;
 }
 #payments-ally-scan-page .page--material__background {
     background-color: #ffffff;
 }
 #payments-ally-scan-page.transparent .page--material__content { /** style to make the page transparent for when the QRcode scanner is used **/
     background-color: transparent;
+    opacity: 0;
 }
 #payments-ally-scan-page.transparent .page--material__background {
     background-color: transparent;
+    opacity: 0;
 }
+#payments-ally-scan-page.transparent ons-bottom-toolbar {
+    opacity: 0;
+}
+
 .ally-transparent { /** style to be appended to html & body tag to help make webview transparent for QRcode scanner **/
     background-color: transparent;
     background: transparent;
