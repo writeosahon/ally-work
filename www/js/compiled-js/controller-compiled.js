@@ -81,7 +81,8 @@ $('ons-splitter-side').removeAttr("swipeable");$('#menu-tabbar .tabbar__border')
 },/**
          * method is used to track changes on the tabbar tabs
          * @param event
-         */tabbarPreChange:function tabbarPreChange(event){// determine the tab that was clicked
+         */tabbarPreChange:function tabbarPreChange(event){// run the hide method of the payment page to ensure webpage is NOT transparent
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.pageHide();// determine the tab that was clicked
 switch(event.originalEvent.index){case 0:$('#menu-tabbar ons-tab').removeAttr("label");// remove all displaced labels
 $(event.originalEvent.tabItem).attr("label","Dashboard");// update the label of the to-be displayed tab
 break;case 1:$('#menu-tabbar ons-tab').removeAttr("label");// remove all displaced labels
@@ -1132,8 +1133,9 @@ return;}// initialise the 'active payment' status to false i.e. no active paymen
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=false;// initialise the form validation
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator=$('#payments-ally-scan-form').parsley();// attach listener for the FIND button on the page
 $('#payments-ally-scan-find-button').get(0).onclick=function(){// run the validation method for the form
-utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.whenValidate();};// attach listener for the
-$('#payments-ally-scan-modal').get(0).onDeviceBackButton=$('#payments-ally-scan-modal-back-button').get(0).onclick=function(){// call the hide method for the currently active page
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.whenValidate();};// attach listener for the payments-ally-scan-modal back buttons
+$('#payments-ally-scan-modal').get(0).onDeviceBackButton=$('#payments-ally-scan-modal-back-button').get(0).onclick=function(){// hide the payments-ally-scan-modal
+$('#payments-ally-scan-modal').get(0).hide();// call the hide method for the currently active page
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.pageHide();};// listen for the form field validation failure event
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.on('field:error',function(fieldInstance){// get the element that triggered the field validation error and use it to display tooltip
 // display tooltip
@@ -1151,9 +1153,9 @@ $('#loader-modal').get(0).hide();}},/**
          */pageHide:function pageHide(event){try{// flag that no active payment is taking place
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=false;// remove the transparency from the webpage
 $('html, body').removeClass('ally-transparent');$('#payments-page').removeClass('transparent');$('#payments-ally-scan-page').removeClass('transparent');// remove any tooltip being displayed on all forms on the page
-$('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-scan-page [title]').removeAttr("title");$('#payments-ally-scan-page [data-hint]').removeAttr("data-hint");// reset the form validator object on the page
-utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();// reset the form
-$('#payments-ally-scan-page #payments-ally-scan-form').get(0).reset();// reset the page scroll position to the top
+$('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-scan-page [title]').removeAttr("title");$('#payments-ally-scan-page [data-hint]').removeAttr("data-hint");// reset the form
+$('#payments-ally-scan-page #payments-ally-scan-form').get(0).reset();// reset the form validator object on the page
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();// reset the page scroll position to the top
 $('#payments-ally-scan-page .page__content').scrollTop(0);// disable the webview transparency
 QRScanner.hide(function(status){QRScanner.resumePreview(function(){});});}catch(err){}},/**
          * method is triggered when the page is destroyed
@@ -1217,11 +1219,11 @@ utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=false
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=true;// pause the video preview
 QRScanner.pausePreview(function(status){// get each content of the QR Code
 var qrCodeSegmentsArray=(qrCode+"").trim().split("|");// update the contents of the payment form with the qrCodeSegmentsArray
-//$('#payments-ally-scan-page #payments-ally-scan-merchant-name').val(qrCodeSegmentsArray[0]);
-//$('#payments-ally-scan-page #payments-ally-scan-merchant-code').val(qrCodeSegmentsArray[1]);
-//$('#payments-ally-scan-page #payments-ally-scan-merchant-phone').val(qrCodeSegmentsArray[2]);
-// hide the payment-ally-scan-modal
-$('#payments-ally-scan-modal').get(0).hide();});});});});}},/**
+$('#payments-ally-direct-page #payments-ally-direct-merchant-name').val(qrCodeSegmentsArray[0]);$('#payments-ally-direct-page #payments-ally-direct-merchant-code').val(qrCodeSegmentsArray[1]);$('#payments-ally-direct-page #payments-ally-direct-merchant-phone').val(qrCodeSegmentsArray[2]);// wait for some time before proceeding to payment
+window.setTimeout(function(){// remove page transparency
+$('html, body').removeClass('ally-transparent');$('#payments-page').removeClass('transparent');$('#payments-ally-scan-page').removeClass('transparent');// hide the payment-ally-scan-modal
+$('#payments-ally-scan-modal').get(0).hide();// proceed to payment
+$('#payments-page #payments-tabbar').get(0).setActiveTab(1);},1000);});});});});}},/**
      * object is view-model for payments-ally-direct page
      */paymentsAllyDirectPageViewModel:{/**
          * used to hold the parsley form validation object for the page

@@ -246,6 +246,9 @@ utopiasoftware.ally.controller = {
          */
         tabbarPreChange(event){
 
+            // run the hide method of the payment page to ensure webpage is NOT transparent
+            utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.pageHide();
+
             // determine the tab that was clicked
             switch(event.originalEvent.index){
                 case 0:
@@ -3869,10 +3872,13 @@ utopiasoftware.ally.controller = {
                     utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.whenValidate();
                 };
 
-                // attach listener for the
+                // attach listener for the payments-ally-scan-modal back buttons
                 $('#payments-ally-scan-modal').get(0).onDeviceBackButton =
                     $('#payments-ally-scan-modal-back-button').get(0).onclick =
                         function(){
+
+                            // hide the payments-ally-scan-modal
+                            $('#payments-ally-scan-modal').get(0).hide();
 
                             // call the hide method for the currently active page
                             utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.pageHide();
@@ -3935,10 +3941,11 @@ utopiasoftware.ally.controller = {
                 $('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
                 $('#payments-ally-scan-page [title]').removeAttr("title");
                 $('#payments-ally-scan-page [data-hint]').removeAttr("data-hint");
-                // reset the form validator object on the page
-                utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();
+
                 // reset the form
                 $('#payments-ally-scan-page #payments-ally-scan-form').get(0).reset();
+                // reset the form validator object on the page
+                utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();
 
                 // reset the page scroll position to the top
                 $('#payments-ally-scan-page .page__content').scrollTop(0);
@@ -4179,12 +4186,24 @@ utopiasoftware.ally.controller = {
                             // get each content of the QR Code
                             var qrCodeSegmentsArray = (qrCode + "").trim().split("|");
                             // update the contents of the payment form with the qrCodeSegmentsArray
-                            //$('#payments-ally-scan-page #payments-ally-scan-merchant-name').val(qrCodeSegmentsArray[0]);
-                            //$('#payments-ally-scan-page #payments-ally-scan-merchant-code').val(qrCodeSegmentsArray[1]);
-                            //$('#payments-ally-scan-page #payments-ally-scan-merchant-phone').val(qrCodeSegmentsArray[2]);
+                            $('#payments-ally-direct-page #payments-ally-direct-merchant-name').val(qrCodeSegmentsArray[0]);
+                            $('#payments-ally-direct-page #payments-ally-direct-merchant-code').val(qrCodeSegmentsArray[1]);
+                            $('#payments-ally-direct-page #payments-ally-direct-merchant-phone').val(qrCodeSegmentsArray[2]);
 
-                            // hide the payment-ally-scan-modal
-                            $('#payments-ally-scan-modal').get(0).hide();
+                            // wait for some time before proceeding to payment
+                            window.setTimeout(function(){
+
+                                // remove page transparency
+                                $('html, body').removeClass('ally-transparent');
+                                $('#payments-page').removeClass('transparent');
+                                $('#payments-ally-scan-page').removeClass('transparent');
+
+                                // hide the payment-ally-scan-modal
+                                $('#payments-ally-scan-modal').get(0).hide();
+                                // proceed to payment
+                                $('#payments-page #payments-tabbar').get(0).setActiveTab(1);
+                            }, 1000);
+
 
                         });
                     });
