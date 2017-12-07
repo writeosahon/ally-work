@@ -10,7 +10,7 @@
 
                 <ons-list>
 
-                    <ons-list-item modifier="nodivider">
+                    <ons-list-item modifier="nodivider" style="margin-bottom: 3em">
                         <div class="left">
                             <ons-icon icon="md-ally-icon-account-card-details" class="list-item__icon" fixed-width size="28px"></ons-icon>
                         </div>
@@ -36,14 +36,15 @@
         <ons-col width="25%" style="text-align: center;">
             <!-- display the add card page -->
             <ons-fab id="payments-ally-scan-find-button" modifier="mini"
-                     style="color: #ffffff; background-color: #30a401;">
+                     style="color: #ffffff; background-color: #30a401;"
+            onclick="utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.findButtonClicked()">
                 <ons-icon icon="md-ally-icon-account-search"></ons-icon>
             </ons-fab>
         </ons-col>
     </ons-row>
 
     <!-- this section displays the QR Code icon -->
-    <ons-row vertical-align="top" style="margin-top: 1.5em;">
+    <ons-row vertical-align="top">
         <ons-col width="calc((100% - 180px) / 2 )" style="height: 180px"></ons-col>
         <ons-col width="180px" style="height: 180px">
             <ons-icon icon="fa-qrcode" size="180px"></ons-icon>

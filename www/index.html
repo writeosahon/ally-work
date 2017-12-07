@@ -68,35 +68,9 @@
 
 <!-- splitter container housing the app -->
 <ons-splitter>
-    <ons-splitter-side id="side-menu" side="right" collapse width="100px">
+    <ons-splitter-side id="side-menu" side="right" collapse>
         <ons-page id="side-menu-page">
-            <ons-toolbar modifier="noshadow" style="background-color: #1b5e20">
-            </ons-toolbar>
-            <div class="row" style="background-color: #1b5e20">
-                <div class="col s12 waves-effect waves-light"
-                     style="text-align: center; color: #eeff41; border-bottom: solid 1px lightgray;
-                     padding-top: 0.5em;"
-                     onclick="utopiasoftware.edoae.controller.sideMenuViewModel.sideMenuListClicked('events schedule')">
-                    <ons-icon icon="md-edoae-icon-calendar-multiple"
-                              size="20px"></ons-icon>
-                    <span style="display: block; font-size: 0.7em;">
-                        Events Schedule
-                    </span>
-                </div>
 
-                <div class="col s12 waves-effect waves-light"
-                     style="text-align: center; color: #eeff41; border-bottom: solid 1px lightgray;
-                padding-top: 0.5em;"
-                     onclick="utopiasoftware.edoae.controller.sideMenuViewModel.sideMenuListClicked('hotels')">
-                    <ons-icon icon="md-city-alt"
-                              size="20px"></ons-icon>
-                    <span style="display: block; font-size: 0.7em;">
-                        Hotels
-                    </span>
-                </div>
-
-
-            </div>
         </ons-page>
     </ons-splitter-side>
     <ons-splitter-content id="splitter-content"></ons-splitter-content>

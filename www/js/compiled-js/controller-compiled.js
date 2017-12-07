@@ -82,7 +82,8 @@ $('ons-splitter-side').removeAttr("swipeable");$('#menu-tabbar .tabbar__border')
          * method is used to track changes on the tabbar tabs
          * @param event
          */tabbarPreChange:function tabbarPreChange(event){// run the hide method of the payment page to ensure webpage is NOT transparent
-utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.pageHide();// determine the tab that was clicked
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.pageHide();// proceed to to the 1st hidden tab on the payment page (i.e. reset payment)
+$('#payments-page #payments-tabbar').get(0).setActiveTab(0);// determine the tab that was clicked
 switch(event.originalEvent.index){case 0:$('#menu-tabbar ons-tab').removeAttr("label");// remove all displaced labels
 $(event.originalEvent.tabItem).attr("label","Dashboard");// update the label of the to-be displayed tab
 break;case 1:$('#menu-tabbar ons-tab').removeAttr("label");// remove all displaced labels
@@ -348,7 +349,7 @@ function loadPageOnAppReady(){// check to see if onsen is ready and if all app l
 if(!ons.isReady()||utopiasoftware.ally.model.isAppReady===false){setTimeout(loadPageOnAppReady,500);// call this function again after half a second
 return;}// listen for the back button event
 $thisPage.get(0).onDeviceBackButton=utopiasoftware.ally.controller.dashboardPageViewModel.backButtonClicked;// initialise the DropDownList
-utopiasoftware.ally.controller.dashboardPageViewModel.periodDropDownListObject=new ej.dropdowns.DropDownList({});// render initialized DropDownList
+utopiasoftware.ally.controller.dashboardPageViewModel.periodDropDownListObject=new ej.dropdowns.DropDownList({placeholder:"Select Period",floatLabelType:'Auto'});// render initialized DropDownList
 utopiasoftware.ally.controller.dashboardPageViewModel.periodDropDownListObject.appendTo('#dashboard-period-select');// update the wallet balance dashboard
 utopiasoftware.ally.controller.dashboardPageViewModel.updateWalletDashboard();// hide the loader
 $('#loader-modal').get(0).hide();}},/**
@@ -865,7 +866,9 @@ window.plugins.toast.showWithOptions({message:"ALLY wallet transfer cannot be pe
 textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
 window.plugins.toast.hide();}});return;// exit method immediately
 }// create the form data to be submitted
-var formData={phone_sender:utopiasoftware.ally.model.appUserDetails.phone,phone_receiver:$('#wallet-transfer-page #wallet-transfer-receiver-phone-number').val(),amount:kendo.parseFloat($('#wallet-transfer-page #wallet-transfer-amount').val())};// display the loader message to indicate that account is being created;
+var formData={phone_sender:utopiasoftware.ally.model.appUserDetails.phone,phone_receiver:$('#wallet-transfer-page #wallet-transfer-receiver-phone-number').val(),amount:kendo.parseFloat($('#wallet-transfer-page #wallet-transfer-amount').val())};// check if the phone_receiver parameter is properly formatted for sending
+if(formData.phone_receiver.startsWith("0")){// the phone number starts with 0, replace it with international dialing code
+formData.phone_receiver=formData.phone_receiver.replace("0","+234");}// display the loader message to indicate that account is being created;
 $('#hour-glass-loader-modal .modal-message').html("Completing Wallet Transfer...");// forward the form data & show loader
 Promise.all([formData,Promise.resolve($('#hour-glass-loader-modal').get(0).show())]).then(function(dataArray){// submit the form data
 return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/transfer-wallet-to-wallet.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
@@ -1142,7 +1145,7 @@ utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.on('f
 $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$(fieldInstance.$element).attr("data-hint",fieldInstance.getErrorsMessages()[0]);$(fieldInstance.$element).attr("title",fieldInstance.getErrorsMessages()[0]);});// listen for the form field validation success event
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.on('field:success',function(fieldInstance){// remove tooltip from element
 $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$(fieldInstance.$element).removeAttr("data-hint");$(fieldInstance.$element).removeAttr("title");});// listen for the form validation success
-utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.on('form:success',utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidated);// hide the loader
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.on('form:success',utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.findButtonClicked);// hide the loader
 $('#loader-modal').get(0).hide();}},/**
          * method is triggered when page is shown
          *
@@ -1216,22 +1219,47 @@ utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=false
 }// end of error section
 // if code gets to this section below, then there was no error
 // flag that an active payment is taking place
-utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=true;// pause the video preview
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=true;// flag that an active payment is taking place
+utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment=true;// pause the video preview
 QRScanner.pausePreview(function(status){// get each content of the QR Code
 var qrCodeSegmentsArray=(qrCode+"").trim().split("|");// update the contents of the payment form with the qrCodeSegmentsArray
 $('#payments-ally-direct-page #payments-ally-direct-merchant-name').val(qrCodeSegmentsArray[0]);$('#payments-ally-direct-page #payments-ally-direct-merchant-code').val(qrCodeSegmentsArray[1]);$('#payments-ally-direct-page #payments-ally-direct-merchant-phone').val(qrCodeSegmentsArray[2]);// wait for some time before proceeding to payment
 window.setTimeout(function(){// remove page transparency
-$('html, body').removeClass('ally-transparent');$('#payments-page').removeClass('transparent');$('#payments-ally-scan-page').removeClass('transparent');// hide the payment-ally-scan-modal
+$('html, body').removeClass('ally-transparent');$('#payments-page').removeClass('transparent');$('#payments-ally-scan-page').removeClass('transparent');// reset the form validator object on the page
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();// reset the form
+$('#payments-ally-scan-page #payments-ally-scan-form').get(0).reset();// hide the payment-ally-scan-modal
 $('#payments-ally-scan-modal').get(0).hide();// proceed to payment
-$('#payments-page #payments-tabbar').get(0).setActiveTab(1);},1000);});});});});}},/**
+$('#payments-page #payments-tabbar').get(0).setActiveTab(1);},1000);});});});});},/**
+         * method is triggered when the FIND button is clicked
+         */findButtonClicked:function findButtonClicked(){// check if Internet Connection is available before proceeding
+if(navigator.connection.type===Connection.NONE){// no Internet Connection
+// inform the user that they cannot proceed without Internet
+window.plugins.toast.showWithOptions({message:"merchant details cannot be found without an Internet Connection",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#ff0000',//red
+textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
+window.plugins.toast.hide();}});return;// exit method immediately
+}// display the loader message to indicate that account is being created;
+$('#hour-glass-loader-modal .modal-message').html("Finding Merchant Details...");// create the form data to be submitted
+var formData={merchantcode:$('#payments-ally-scan-page #payments-ally-scan-merchant-code').val().trim()};Promise.all([formData,$('#hour-glass-loader-modal').get(0).show()]).then(function(promiseDataArray){return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/pay-merchant-normal.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
+processData:true,data:promiseDataArray[0]// data to submit to server
+}));}).then(function(serverResponse){serverResponse=JSON.parse((serverResponse+"").trim());// get the new user object
+// check if any error occurred
+if(serverResponse.status=="error"){// an error occured
+throw serverResponse.message;// throw the error message attached to this error
+}return serverResponse;// forward the serverResponse i.e the user details object
+}).then(function(serverResponse){// update the payment form with the data retrieved
+$('#payments-ally-direct-page #payments-ally-direct-merchant-code').val(serverResponse.usercode);$('#payments-ally-direct-page #payments-ally-direct-merchant-phone').val(serverResponse.phone);$('#payments-ally-direct-page #payments-ally-direct-merchant-name').val(serverResponse.merchantname);// flag that merchant payment is active
+utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment=true;// call the page pageHide method for this currently active page
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.pageHide();// proceed to payment section
+return $('#payments-page #payments-tabbar').get(0).setActiveTab(1);}).then(function(){$('#hour-glass-loader-modal').get(0).hide();// hide loader
+}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
+err='Sorry, merchant details could not be retrieved.<br> '+'You can try again OR use ALLY Scan as an alternative';}$('#hour-glass-loader-modal').get(0).hide();// hide loader
+ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> ALLY Payment Error',messageHTML:'<span>'+err+'</span>',cancelable:false});});}},/**
      * object is view-model for payments-ally-direct page
      */paymentsAllyDirectPageViewModel:{/**
          * used to hold the parsley form validation object for the page
          */formValidator:null,/**
          * used to hold the parsley validator for the Amount field
          */amountFieldValidator:null,/**
-         * used to hold the parsley validator for the Merchant Code field
-         */merchantCodeValidator:null,/**
          * property is used to track whether there is an active ongoing payment.
          * A value of true means there is an active payment; any other value means there is none
          */activePayment:null,/**
@@ -1244,8 +1272,7 @@ if(!ons.isReady()||utopiasoftware.ally.model.isAppReady===false){setTimeout(load
 return;}// initialise the 'active payment' status to false i.e. no active payment
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment=false;// initialise the amount field
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.amountFieldValidator=$('#payments-ally-direct-amount').parsley({value:function value(parsley){// convert the amount back to a plain text without the thousand separator
-var parsedNumber=kendo.parseFloat($('#payments-ally-direct-amount',$thisPage).val());return parsedNumber?parsedNumber:$('#payments-ally-direct-amount',$thisPage).val();}});// initialise the merchant code field
-utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantCodeValidator=$('#payments-ally-direct-merchant-code').parsley();// initialise the form validation
+var parsedNumber=kendo.parseFloat($('#payments-ally-direct-amount',$thisPage).val());return parsedNumber?parsedNumber:$('#payments-ally-direct-amount',$thisPage).val();}});// initialise the form validation
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.formValidator=$('#payments-ally-direct-form').parsley();// attach listener for the pay button on the page
 $('#payments-ally-direct-pay-button').get(0).onclick=function(){// run the validation method for the form
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.formValidator.whenValidate();};// listen for the form field validation failure event
@@ -1304,12 +1331,10 @@ utopiasoftware.ally.model.appUserDetails=dataArray[0];// flag that no active pay
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment=false;// remove any tooltip being displayed on all forms on the page
 $('#payments-ally-direct-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-direct-page [title]').removeAttr("title");$('#payments-ally-direct-page [data-hint]').removeAttr("data-hint");// reset the form validator object on the page
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.formValidator.reset();// reset the form
-$('#payments-ally-direct-page #payments-ally-direct-form').get(0).reset();// hide the "PAY" button
-$('#payments-ally-direct-pay-button').css("transform","scale(0)");// hide form elements
-$('#payments-ally-direct-page .pay-ally-direct-merchant-details').css("visibility","hidden");// reset the page scroll position to the top
+$('#payments-ally-direct-page #payments-ally-direct-form').get(0).reset();// reset the page scroll position to the top
 $('#payments-ally-direct-page .page__content').scrollTop(0);// forward details of the wallet-transfer and the user details
-return Promise.all([$('#hour-glass-loader-modal').get(0).hide(),ons.notification.toast("Merchant Payment Successful!",{timeout:4000})]);}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
-err='Sorry, merchant payment could not be made.<br> '+'You can try again OR proceed to ALLY Direct as an alternative';}$('#hour-glass-loader-modal').get(0).hide();// hide loader
+return Promise.all([$('#hour-glass-loader-modal').get(0).hide(),$('#payments-page #payments-tabbar').get(0).setActiveTab(0),ons.notification.toast("Merchant Payment Successful!",{timeout:4000})]);}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
+err='Sorry, merchant payment could not be made.<br> '+'You can try again OR scan the QR Code to pay merchant';}$('#hour-glass-loader-modal').get(0).hide();// hide loader
 ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> ALLY Payment Error',messageHTML:'<span>'+err+'</span>',cancelable:false});});},/**
          * method is triggered when the FIND button is clicked
          */findButtonClicked:function findButtonClicked(){// check if Internet Connection is available before proceeding

@@ -1,20 +1,23 @@
 <!-- payments ally-direct page -->
 <ons-page id="payments-ally-direct-page">
     <!-- page layout -->
-    <ons-row vertical-align="top" style="height: calc(100vh - (56px));">
-        <ons-col width="50%" style="height: 100%;">
+    <ons-row vertical-align="top" style="margin-top: 2em;">
+        <ons-col width="100%">
             <!-- create the payment form that displays all details for payment -->
             <form id="payments-ally-direct-form" autocomplete="off" data-parsley-inputs="ons-input,input,textarea,select"
                   data-parsley-excluded="input[type=button], input[type=submit],
                               input[type=reset], input[type=hidden], [disabled], :hidden" style="height: 100%; display: block;">
 
-                <ons-list style="height: 100%;">
+                <ons-list>
 
                     <ons-list-item modifier="nodivider">
+                        <div class="left">
+                            <ons-icon icon="md-ally-icon-account-card-details" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                        </div>
                         <div class="center">
-                            <label style="font-size: 0.8em; color: green;display: block">Enter Merchant Code</label>
-                            <div style="width: 90%; display: inline-block">
-                                <ons-input id="payments-ally-direct-merchant-code" required placeholder="Merchant Code"
+                            <label style="font-size: 0.8em; color: green; display: block; margin-bottom: 0.2em">Merchant Code</label>
+                            <div style="width: 75%; display: inline-block">
+                                <ons-input id="payments-ally-direct-merchant-code" required readonly placeholder="Merchant Code"
                                            style="font-size: 0.8em; text-transform: uppercase; width: 100%;"
                                            type="text"
                                            data-parsley-required-message="provide merchant code"
@@ -26,18 +29,20 @@
                     </ons-list-item>
 
                     <ons-list-item modifier="nodivider">
-                        <div class="center pay-ally-direct-merchant-details" style="visibility: hidden">
+                        <ons-icon icon="md-city-alt" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                        <div class="center">
                             <label style="font-size: 0.8em; color: green;display: block">Merchant / Business Name</label>
-                            <div style="width: 90%; display: inline-block">
+                            <div style="width: 80%; display: inline-block">
                                 <textarea id="payments-ally-direct-merchant-name" rows="2" readonly
-                                          style="font-size: 0.8em; text-transform: uppercase; width: 100%;"></textarea>
+                                          style="font-size: 1em; text-transform: uppercase; width: 100%;"></textarea>
                             </div>
                         </div>
                     </ons-list-item>
 
-                    <ons-list-item modifier="nodivider">
-                        <div class="center pay-ally-direct-merchant-details" style="visibility: hidden">
-                            <div style="width: 90%; display: inline-block">
+                    <ons-list-item modifier="nodivider" style="margin-bottom: 50px;">
+                        <ons-icon icon="md-ally-icon-cash" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                        <div class="center">
+                            <div style="width: 70%; display: inline-block">
                                 <label style="font-size: 0.8em; color: green; display: block; margin-bottom: 0.2em">Amount To be Paid</label>
                                 <ons-input id="payments-ally-direct-amount" required placeholder="Amount (NGN)"
                                            style="font-size: 0.8em; width: 100%;
@@ -57,24 +62,13 @@
                 </ons-list>
             </form>
         </ons-col>
-
-        <!-- payment buttons section -->
-        <ons-col width="50%" style="text-align: center;">
-            <!-- display the QR code icon, scan button and pay button-->
-            <div style="display: block; width: 100%; text-align: center">
-                <div style="width: 100%; text-align: center; display: block; margin-top: 1em;">
-                    <ons-button id="payments-ally-direct-find-button"
-                                style="background-color: #0FD0D0; color: #ffffff; border-radius: 21px; width: 150px"
-                                onclick="utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.findButtonClicked()">
-                        Find</ons-button>
-                </div>
-                <div style="width: 100%; text-align: center;  display: block; margin-top: 1em;">
-                    <ons-button id="payments-ally-direct-pay-button"
-                                style="background-color: #30a401; color: #ffffff; border-radius: 21px; width: 150px;
-                                transform: scale(0);">
-                        Pay</ons-button>
-                </div>
-            </div>
-        </ons-col>
     </ons-row>
+
+    <ons-bottom-toolbar modifier="transparent" style="height: 56px; !important;">
+        <div style="width: 60%; margin-left: 20%; margin-right: 20%; padding-top: 6px; padding-bottom: 6px">
+            <ons-button id="payments-ally-direct-pay-button" disable-auto-styling modifier="large"
+                        style="background-color: #30a401; color: #ffffff; border-radius: 21px;">Pay</ons-button>
+        </div>
+    </ons-bottom-toolbar>
+
 </ons-page>
