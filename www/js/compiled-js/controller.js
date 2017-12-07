@@ -1230,7 +1230,7 @@ utopiasoftware.ally.controller = {
                 anime({
                     targets: tempObj,
                     balance: userDetailsData.balance,
-                    duration: 1500,
+                    duration: 1200,
                     easing: 'linear',
                     begin: function(){
                         $('#dashboard-ally-wallet-loader').css("display", "none");

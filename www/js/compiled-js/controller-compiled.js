@@ -379,7 +379,7 @@ if(userDetailsData.status=="error"){// an error occurred
 throw userDetailsData.message;// throw the error message attached to this error
 }return userDetailsData;},function(){return utopiasoftware.ally.loadUserCachedAppDetails();}).then(function(userDetailsData){// save the user details in the local app data and also cache it
 utopiasoftware.ally.model.appUserDetails=userDetailsData;return utopiasoftware.ally.saveUserAppDetails(userDetailsData);}).then(function(userDetailsData){var walletElement=$('#dashboard-ally-wallet');// holds the wallet element
-anime({targets:tempObj,balance:userDetailsData.balance,duration:1500,easing:'linear',begin:function begin(){$('#dashboard-ally-wallet-loader').css("display","none");$('#dashboard-ally-wallet').css("display","inline-block");},update:function update(){walletElement.html(tempObj.balance);},complete:function complete(){walletElement.html(kendo.toString(kendo.parseFloat(tempObj.balance),"n2"));}});});}},/**
+anime({targets:tempObj,balance:userDetailsData.balance,duration:1200,easing:'linear',begin:function begin(){$('#dashboard-ally-wallet-loader').css("display","none");$('#dashboard-ally-wallet').css("display","inline-block");},update:function update(){walletElement.html(tempObj.balance);},complete:function complete(){walletElement.html(kendo.toString(kendo.parseFloat(tempObj.balance),"n2"));}});});}},/**
      * object is view-model for account page
      */accountPageViewModel:{/**
          * used to hold the parsley form validation object for the page
