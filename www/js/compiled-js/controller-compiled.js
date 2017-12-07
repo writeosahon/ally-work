@@ -369,7 +369,9 @@ $('ons-splitter').get(0).right.close();return;// exit the method
 }ons.notification.confirm('Do you want to close the app?',{title:'Exit',buttonLabels:['No','Yes']})// Ask for confirmation
 .then(function(index){if(index===1){// OK button
 navigator.app.exitApp();// Close the app
-}});},updateWalletDashboard:function updateWalletDashboard(){// create an object that contains the balance of the user wallet
+}});},/**
+         * method is used to update the ALLY Wallet Balance on the dashboard
+         */updateWalletDashboard:function updateWalletDashboard(){// create an object that contains the balance of the user wallet
 var tempObj={balance:0};// show appropriate loader
 $('#dashboard-ally-wallet-loader').css("display","inline-block");$('#dashboard-ally-wallet').css("display","none");$('#dashboard-ally-wallet').html("0");// try to retrieve user updated wallet details
 Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/get-profile.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
@@ -381,7 +383,8 @@ if(userDetailsData.status=="error"){// an error occurred
 throw userDetailsData.message;// throw the error message attached to this error
 }return userDetailsData;},function(){return utopiasoftware.ally.loadUserCachedAppDetails();}).then(function(userDetailsData){// save the user details in the local app data and also cache it
 utopiasoftware.ally.model.appUserDetails=userDetailsData;return utopiasoftware.ally.saveUserAppDetails(userDetailsData);}).then(function(userDetailsData){var walletElement=$('#dashboard-ally-wallet');// holds the wallet element
-anime({targets:tempObj,balance:userDetailsData.balance,duration:1200,easing:'linear',begin:function begin(){$('#dashboard-ally-wallet-loader').css("display","none");$('#dashboard-ally-wallet').css("display","inline-block");},update:function update(){walletElement.html(tempObj.balance);},complete:function complete(){walletElement.html(kendo.toString(kendo.parseFloat(tempObj.balance),"n2"));}});});}},/**
+anime({targets:tempObj,balance:userDetailsData.balance,duration:1200,easing:'linear',begin:function begin(){$('#dashboard-ally-wallet-loader').css("display","none");$('#dashboard-ally-wallet').css("display","inline-block");},update:function update(){walletElement.html(tempObj.balance);},complete:function complete(){walletElement.html(kendo.toString(kendo.parseFloat(tempObj.balance),"n2"));}});});},updateWalletIncomingDashboard:function updateWalletIncomingDashboard(periodType){// 
+}},/**
      * object is view-model for account page
      */accountPageViewModel:{/**
          * used to hold the parsley form validation object for the page
@@ -1169,38 +1172,6 @@ $('html, body').removeClass('ally-transparent');$('#payments-page').removeClass(
 $('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-scan-page [title]').removeAttr("title");$('#payments-ally-scan-page [data-hint]').removeAttr("data-hint");// destroy the form validator objects on the page
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.amountFieldValidator.destroy();utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.destroy();// destroy the current state of the QR Scanner &disable the webview transparency
 QRScanner.destroy(function(status){});}catch(err){}},/**
-         * method is triggered when the form is successfully validated
-         */formValidated:function formValidated(){// check if Internet Connection is available before proceeding
-if(navigator.connection.type===Connection.NONE){// no Internet Connection
-// inform the user that they cannot proceed without Internet
-window.plugins.toast.showWithOptions({message:"merchant payment cannot be made without an Internet Connection",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#ff0000',//red
-textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
-window.plugins.toast.hide();}});return;// exit method immediately
-}// create the form data to be submitted
-var formData={phone_sender:utopiasoftware.ally.model.appUserDetails.phone,phone_receiver:$('#payments-ally-scan-page #payments-ally-scan-merchant-phone').val(),merchantcode:$('#payments-ally-scan-page #payments-ally-scan-merchant-code').val(),amount:kendo.parseFloat($('#payments-ally-scan-page #payments-ally-scan-amount').val()),merchantname:$('#payments-ally-scan-page #payments-ally-scan-merchant-name').val()};ons.notification.prompt({title:"ALLY Secure PIN Confirmation",id:'pin-security-check2',messageHTML:'<div><ons-icon icon="ion-lock-combination" size="24px"\n                    style="color: #30a401; float: left; width: 26px;"></ons-icon>\n                    <span style="float: right; width: calc(100% - 26px);">\n                    Confirm merchant payment by providing your ALLY Secure PIN</span></div>',cancelable:false,placeholder:"Secure PIN",inputType:"number",defaultValue:"",autofocus:false,submitOnEnter:true}).then(function(userInput){// get the user input
-// update the form data to be submitted
-formData.lock=userInput;// add the user secure pin
-// display the loader message to indicate that account is being created;
-$('#hour-glass-loader-modal .modal-message').html("Authorizing Merchant Payment...");return Promise.all([formData,$('#hour-glass-loader-modal').get(0).show()]);// forward the data to be submitted
-}).then(function(promiseDataArray){return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/pay-merchant-qrcode.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
-processData:true,data:promiseDataArray[0]// data to submit to server
-}));}).then(function(serverResponse){serverResponse=JSON.parse((serverResponse+"").trim());// get the new user object
-// check if any error occurred
-if(serverResponse.status=="error"){// an error occured
-throw serverResponse.message;// throw the error message attached to this error
-}return serverResponse;// forward the serverResponse i.e the user details object
-}).then(function(responseDetails){// forward details of the save the user details to encrypted storage;
-return Promise.all([utopiasoftware.ally.saveUserAppDetails(responseDetails)]);}).then(function(dataArray){// update local copy of user app details
-utopiasoftware.ally.model.appUserDetails=dataArray[0];// flag that no active payment is taking place
-utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=false;// remove any tooltip being displayed on all forms on the page
-$('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-scan-page [title]').removeAttr("title");$('#payments-ally-scan-page [data-hint]').removeAttr("data-hint");// reset the form validator object on the page
-utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();// reset the form
-$('#payments-ally-scan-page #payments-ally-scan-form').get(0).reset();// make page transparent in preparation for QR code scanning
-$('html, body').removeClass('ally-transparent');$('#payments-page').removeClass('transparent');$('#payments-ally-scan-page').removeClass('transparent');// reset the page scroll position to the top
-$('#payments-ally-scan-page .page__content').scrollTop(0);// forward details of the wallet-transfer and the user details
-return Promise.all([$('#hour-glass-loader-modal').get(0).hide(),ons.notification.toast("Merchant Payment Successful!",{timeout:4000})]);}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
-err='Sorry, merchant payment could not be made.<br> '+'You can try again OR proceed to ALLY Direct as an alternative';}$('#hour-glass-loader-modal').get(0).hide();// hide loader
-ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> ALLY Payment Error',messageHTML:'<span>'+err+'</span>',cancelable:false});});},/**
          * method is triggered when the SCAN button is clicked
          */scanButtonClicked:function scanButtonClicked(){// remove any tooltip being displayed on all forms on the page
 $('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-scan-page [title]').removeAttr("title");$('#payments-ally-scan-page [data-hint]').removeAttr("data-hint");// reset the form validator object on the page
@@ -1332,36 +1303,6 @@ $('#payments-ally-direct-page #payments-ally-direct-form').get(0).reset();// res
 $('#payments-ally-direct-page .page__content').scrollTop(0);// forward details of the wallet-transfer and the user details
 return Promise.all([$('#hour-glass-loader-modal').get(0).hide(),$('#payments-page #payments-tabbar').get(0).setActiveTab(0),ons.notification.toast("Merchant Payment Successful!",{timeout:4000})]);}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
 err='Sorry, merchant payment could not be made.<br> '+'You can try again OR scan the QR Code to pay merchant';}$('#hour-glass-loader-modal').get(0).hide();// hide loader
-ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> ALLY Payment Error',messageHTML:'<span>'+err+'</span>',cancelable:false});});},/**
-         * method is triggered when the FIND button is clicked
-         */findButtonClicked:function findButtonClicked(){// check if Internet Connection is available before proceeding
-if(navigator.connection.type===Connection.NONE){// no Internet Connection
-// inform the user that they cannot proceed without Internet
-window.plugins.toast.showWithOptions({message:"merchant payment cannot be made without an Internet Connection",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#ff0000',//red
-textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
-window.plugins.toast.hide();}});return;// exit method immediately
-}// check if merchant code has been inputed
-if(utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantCodeValidator.validate()!==true){// validation failed, exit
-return;}// hide the 'PAY' button
-$('#payments-ally-direct-page #payments-ally-direct-pay-button').css("transform","scale(0)");// hide the merchant details form inputs
-$('#payments-ally-direct-page .pay-ally-direct-merchant-details').css("visibility","hidden");// remove any tooltip being displayed on all forms on the page
-$('#payments-ally-direct-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-direct-page [title]').removeAttr("title");$('#payments-ally-direct-page [data-hint]').removeAttr("data-hint");// display the loader message to indicate that account is being created;
-$('#hour-glass-loader-modal .modal-message').html("Finding Merchant Details...");// create the form data to be submitted
-var formData={merchantcode:$('#payments-ally-direct-page #payments-ally-direct-merchant-code').val()};Promise.all([formData,$('#hour-glass-loader-modal').get(0).show()]).then(function(promiseDataArray){return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/pay-merchant-normal.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
-processData:true,data:promiseDataArray[0]// data to submit to server
-}));}).then(function(serverResponse){serverResponse=JSON.parse((serverResponse+"").trim());// get the new user object
-// check if any error occurred
-if(serverResponse.status=="error"){// an error occured
-throw serverResponse.message;// throw the error message attached to this error
-}return serverResponse;// forward the serverResponse i.e the user details object
-}).then(function(serverResponse){// update the payment form with the data retrieved
-$('#payments-ally-direct-page #payments-ally-direct-merchant-phone').val(serverResponse.phone);$('#payments-ally-direct-page #payments-ally-direct-merchant-name').val(serverResponse.merchantname);// flag that merchant payment is active
-utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment=true;// display the 'PAY' button via animation
-var animatePayButton=new ej.base.Animation({name:'ZoomIn',duration:1000,end:function end(){$('#payments-ally-direct-pay-button').css("transform","scale(1)");}});animatePayButton.animate('#payments-ally-direct-pay-button');// display the form input elements
-// show the merchant details form inputs
-$('#payments-ally-direct-page .pay-ally-direct-merchant-details').css("visibility","visible");}).then(function(){$('#hour-glass-loader-modal').get(0).hide();// hide loader
-}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
-err='Sorry, merchant details could not be retrieved.<br> '+'You can try again OR use ALLY Scan as an alternative';}$('#hour-glass-loader-modal').get(0).hide();// hide loader
 ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> ALLY Payment Error',messageHTML:'<span>'+err+'</span>',cancelable:false});});}}};
 
 //# sourceMappingURL=controller-compiled.js.map
