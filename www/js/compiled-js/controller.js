@@ -4433,11 +4433,6 @@ utopiasoftware.ally.controller = {
         pageHide: (event) => {
             try {
 
-                // hide the "PAY" button
-                $('#payments-ally-direct-pay-button').css("transform", "scale(0)");
-                // hide the form elements
-                $('#payments-ally-direct-page .pay-ally-direct-merchant-details').css("visibility", "hidden");
-
                 // flag that no active payment is taking place
                 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment = false;
 
@@ -4465,8 +4460,6 @@ utopiasoftware.ally.controller = {
 
             try{
 
-                // hide the "PAY" button
-                $('#payments-ally-direct-pay-button').css("transform", "scale(0)");
                 // flag that no active payment is taking place
                 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment = false;
 

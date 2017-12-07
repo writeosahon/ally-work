@@ -1289,9 +1289,7 @@ $('#loader-modal').get(0).hide();}},/**
          */pageShow:function pageShow(event){},/**
          * method is triggered when the page is hidden
          * @param event
-         */pageHide:function pageHide(event){try{// hide the "PAY" button
-$('#payments-ally-direct-pay-button').css("transform","scale(0)");// hide the form elements
-$('#payments-ally-direct-page .pay-ally-direct-merchant-details').css("visibility","hidden");// flag that no active payment is taking place
+         */pageHide:function pageHide(event){try{// flag that no active payment is taking place
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment=false;// remove any tooltip being displayed on all forms on the page
 $('#payments-ally-direct-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-direct-page [title]').removeAttr("title");$('#payments-ally-direct-page [data-hint]').removeAttr("data-hint");// reset the form validator object on the page
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.formValidator.reset();// reset the form
@@ -1299,8 +1297,7 @@ $('#payments-ally-direct-page #payments-ally-direct-form').get(0).reset();// res
 $('#payments-ally-direct-page .page__content').scrollTop(0);}catch(err){}},/**
          * method is triggered when the page is destroyed
          * @param event
-         */pageDestroy:function pageDestroy(event){try{// hide the "PAY" button
-$('#payments-ally-direct-pay-button').css("transform","scale(0)");// flag that no active payment is taking place
+         */pageDestroy:function pageDestroy(event){try{// flag that no active payment is taking place
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment=false;// remove the transparency from the webpage
 $('html, body').removeClass('ally-transparent');$('#payments-page').removeClass('transparent');$('#payments-ally-direct-page').removeClass('transparent');// remove any tooltip being displayed on all forms on the page
 $('#payments-ally-direct-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-direct-page [title]').removeAttr("title");$('#payments-ally-direct-page [data-hint]').removeAttr("data-hint");// destroy the form validator objects on the page
