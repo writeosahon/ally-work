@@ -28,26 +28,34 @@
         </ons-list-item>
 
         <ons-list-item id="dashboard-ally-wallet-list-item" modifier="nodivider" lock-on-drag="true">
-            <ons-card style="width: 100%;">
+            <ons-card style="width: 100%; background-color: #30a401; !important; color: #ffffff !important;">
                 <div class="title" style="font-size: 0.85em;">
                     ALLY Wallet Balance
                 </div>
                 <div class="content">
                     <span id="dashboard-ally-wallet"
-                          style="color: #30a401; font-size: 2.1em; display: none">
+                          style="color: #ffffff; font-size: 2.1em; display: none">
                     </span>
-                    <ons-icon id="dashboard-ally-wallet-loader" icon="md-settings" size="28px" style="color: #30a401;" spin>
-                    </ons-icon>
+                    <ons-icon id="dashboard-ally-wallet-loader" icon="md-settings" size="28px" spin
+                    style="color: #ffffff;"></ons-icon>
+                        <ons-row>
+                            <ons-col width="45%" style="font-size: 0.8em; color: #ffffff; padding-right: 1em">
+                                Last Updated:
+                            </ons-col>
+                            <ons-col id="dashboard-ally-wallet-last-updated" width="45%"
+                                     style="font-size: 0.8em; color: #ffffff; padding-right: 0.5em">
+                            </ons-col>
+                        </ons-row>
                 </div>
             </ons-card>
         </ons-list-item>
 
         <ons-list-item id="dashboard-wallet-incoming-list-item" modifier="nodivider">
-            <ons-card id="dashboard-wallet-incoming-chart" style="height: 15em; width: 100%; background-color: #e8e8e8">
-                <div class="title" style="font-size: 0.85em;">
-                    ALLY Wallet Incoming
+            <ons-card id="dashboard-wallet-incoming-chart" style="width: 100%; padding: 0 !important; background-color: #ffffff">
+                <div class="title" style="font-size: 0.85em; padding: 0.5em;">
+                    ALLY Wallet Incoming Funds
                 </div>
-                <div class="content">
+                <div class="content" style="padding: 0.5em;">
 
                     <ons-icon icon="md-settings" size="28px" style="color: #30a401;" spin>
                     </ons-icon>

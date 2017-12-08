@@ -1092,6 +1092,11 @@ utopiasoftware.ally.controller = {
          */
         periodDropDownListObject: null,
 
+        /**
+         * property is used to hold the "Wallet Incoming" Chart
+         */
+        walletIncomingChart: null,
+
 
         /**
          * event is triggered when page is initialised
@@ -1116,6 +1121,10 @@ utopiasoftware.ally.controller = {
                 // listen for the back button event
                 $thisPage.get(0).onDeviceBackButton = utopiasoftware.ally.controller.dashboardPageViewModel.backButtonClicked;
 
+                // inject the the modules required to create various charts for the dashboard page
+                ej.charts.Chart.Inject(ej.charts.Legend, ej.charts.LineSeries, ej.charts.DateTime,
+                ej.charts.Tooltip);
+
                 // initialise the DropDownList
                 utopiasoftware.ally.controller.dashboardPageViewModel.periodDropDownListObject =
                     new ej.dropdowns.DropDownList({
@@ -1129,6 +1138,10 @@ utopiasoftware.ally.controller = {
 
                 // update the wallet balance dashboard
                 utopiasoftware.ally.controller.dashboardPageViewModel.updateWalletDashboard();
+
+                // update the wallet-incoming chart using the value of the select Period dropdown list
+                utopiasoftware.ally.controller.dashboardPageViewModel.
+                updateWalletIncomingDashboard(utopiasoftware.ally.controller.dashboardPageViewModel.periodDropDownListObject.value);
 
                 // hide the loader
                 $('#loader-modal').get(0).hide();
@@ -1196,6 +1209,7 @@ utopiasoftware.ally.controller = {
             $('#dashboard-ally-wallet-loader').css("display", "inline-block");
             $('#dashboard-ally-wallet').css("display", "none");
             $('#dashboard-ally-wallet').html("0");
+            $('#dashboard-ally-wallet-last-updated').html("");
 
             // try to retrieve user updated wallet details
             Promise.resolve($.ajax(
@@ -1245,13 +1259,15 @@ utopiasoftware.ally.controller = {
                     easing: 'linear',
                     begin: function(){
                         $('#dashboard-ally-wallet-loader').css("display", "none");
-                        $('#dashboard-ally-wallet').css("display", "inline-block");
+                        walletElement.css("display", "inline-block");
                     },
                     update: function() {
                         walletElement.html(tempObj.balance);
                     },
                     complete: function(){
                         walletElement.html(kendo.toString(kendo.parseFloat(tempObj.balance), "n2"));
+                        $('#dashboard-ally-wallet-last-updated').
+                        html(kendo.toString(new Date(userDetailsData._lastUpdatedDate), "MMM d yyyy, h:mmtt"));
                     }
                 });
             });
@@ -1262,7 +1278,111 @@ utopiasoftware.ally.controller = {
 
         updateWalletIncomingDashboard: function(periodType){
 
-            //
+            // check if the walletIncoming Chart has been created before, of so destroy it
+            if(utopiasoftware.ally.controller.dashboardPageViewModel.walletIncomingChart){ // chart has previously been created
+                // destroy the chart object
+                utopiasoftware.ally.controller.dashboardPageViewModel.walletIncomingChart.destroy();
+            }
+
+            // display chart loading indicator
+            $('#dashboard-page #dashboard-wallet-incoming-chart').
+            html(`<div class="title" style="font-size: 0.85em; padding: 0.5em;">
+                    ALLY Wallet Incoming Funds
+                </div>
+                <div class="content" style="padding: 0.5em;">
+
+                    <ons-icon icon="md-settings" size="28px" style="color: #30a401;" spin>
+                    </ons-icon>
+                </div>`);
+
+            // request for the user wallet incoming data for the provided time period
+            Promise.resolve($.ajax(
+                {
+                    //url: utopiasoftware.ally.model.ally_base_url + "/mobile/in-wallet-chart.php",
+                    url: "in-wallet-chart-dummy.json",
+                    type: "post",
+                    contentType: "application/x-www-form-urlencoded",
+                    beforeSend: function(jqxhr) {
+                        jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                    },
+                    dataType: "text",
+                    timeout: 240000, // wait for 4 minutes before timeout of request
+                    processData: true,
+                    data: {phone: utopiasoftware.ally.model.appUserDetails.phone, duration: periodType} // data to submit to server
+                }
+            )).
+            then(function(serverResponse){// retrieve the server response
+                serverResponse +=  "";
+                return serverResponse = JSON.parse(serverResponse.trim()); // return the server response as an object
+            }).
+            then(function(chartDataArray){ // get the chart data array to be used by chart
+                // format the chart data array so it can be properly used
+                return chartDataMapping(chartDataArray);
+            }).
+            then(function(chartDataArray){
+                utopiasoftware.ally.controller.dashboardPageViewModel.walletIncomingChart =
+                    new ej.charts.Chart({
+                        // Width and height for chart in pixel
+                        width: '100%',
+                        height: '100%',
+                        margin: { left: 0, right: 15, top: 0, bottom: 0 },
+                        palettes: ["#30A401"],
+                        title: "ALLY Wallet Incoming Funds",
+                        titleStyle: {
+                            size: '1em'
+                        },
+                        tooltip: { enable: true,
+                            format: 'Amount: ${point.y}'
+                        },
+                        // Legend for chart
+                        legendSettings: {
+                            visible: true
+                        },
+                        primaryXAxis: {
+                            title: 'Time (GMT +1)',
+                            valueType: 'DateTime',
+                            labelFormat: 'ha',
+                            //interval: 3,
+                            //interval type as years in primary x axis
+                            intervalType: 'Hours'
+                        },
+                        primaryYAxis: {
+                            title: 'Amount in thousands (N)',
+                            valueType: 'Double',
+                            labelFormat: '{value}k'
+                        },
+                        series: [{
+                            dataSource: chartDataArray,
+                            width: 2,
+                            marker: {visible: true, width: 8, height:8},
+                            xName: 'DDATE', yName: 'AMOUNT',
+                            name: 'Incoming Funds',
+                            //Series type as line
+                            type: 'Line'
+                        }]
+                    });
+
+                // remove the loader content
+                $('#dashboard-page #dashboard-wallet-incoming-chart').html("");
+                //append the newly created chart
+                utopiasoftware.ally.controller.dashboardPageViewModel.walletIncomingChart.
+                appendTo('#dashboard-wallet-incoming-chart');
+            });
+
+
+            /**
+             * function is used to map the chart data into an appropriate forma that can be displayed inby the chart
+             * @param chartDataArray {Array} array containing chart data objects to be mapped
+             *
+             * @return {Array} an array containing properly formatted objects that can be used by the chart
+             */
+            function chartDataMapping(chartDataArray){
+                return chartDataArray.map(function(dataObject){
+                    dataObject.AMOUNT = (kendo.parseFloat(dataObject.AMOUNT)) / 1000; // divide amount by 1000
+                    dataObject.DDATE = kendo.parseDate(dataObject.DDATE, "yyyy-MM-dd HH:mm:ss");
+                    return dataObject; // return the modified object
+                });
+            }
         }
 
     },
