@@ -451,3 +451,70 @@
     border-bottom: 2px green solid;
 }
 /** STYLE FOR THE PAYMENTS ALLY-SCAN PAGE ENDS **/
+
+
+/** STYLE FOR THE LOCK-SCREEN MODAL BEGINS **/
+#lock-screen-modal #lock-screen-lock-pin {
+    text-align: center;
+    font-size: 2em;
+    line-height: 2em;
+    color: #ffffff !important;
+    border: none !important;
+}
+#lock-screen-modal #lock-screen-lock-pin input {
+    -webkit-text-security: disc;
+    text-align: center;
+    line-height: 2em;
+    background-image: none !important;
+    /*font-size: 3em;*/
+}
+
+
+.text-input--ally-lockscreen {
+    box-sizing: border-box;
+    background-clip: padding-box;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: #ffffff;
+    border: none !important;
+}
+.text-input--ally-lockscreen__label {
+    font-family: 'Roboto', 'Noto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-weight: 400;
+    color: #ffffff;
+    position: absolute;
+    left: 0;
+    top: 2px;
+    /*font-size: 16px;*/
+    font-weight: 400;
+    pointer-events: none;
+}
+.text-input--ally-lockscreen__label--active {
+    color: #ffffff;
+    -webkit-transform: translate(0, -75%) scale(0.75);
+    transform: translate(0, -75%) scale(0.75);
+    -webkit-transform-origin: left top;
+    transform-origin: left top;
+    -webkit-transition: color 0.1s ease-in, -webkit-transform 0.1s ease-in;
+    transition: color 0.1s ease-in, -webkit-transform 0.1s ease-in;
+    transition: transform 0.1s ease-in, color 0.1s ease-in;
+    transition: transform 0.1s ease-in, color 0.1s ease-in, -webkit-transform 0.1s ease-in;
+}
+.text-input--ally-lockscreen::-webkit-input-placeholder {
+    color: #ffffff;
+    line-height: 20px;
+}
+.text-input--ally-lockscreen::-moz-placeholder {
+    color: #ffffff;
+    line-height: 20px;
+}
+.text-input--ally-lockscreen:-ms-input-placeholder {
+    color: #ffffff;
+    line-height: 20px;
+}
+.text-input--ally-lockscreen::placeholder {
+    color: #ffffff;
+    line-height: 20px;
+}

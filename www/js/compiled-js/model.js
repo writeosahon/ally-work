@@ -28,13 +28,22 @@ utopiasoftware.ally.model = {
      */
     ally_base_url: "https://myallyapp.com",
 
+
+    /**
+     * property holds the google app share/dynamic link for this app
+     */
     ally_app_share_link: "",
 
 
     /**
      * holds details about the currently logged in user
      */
-    appUserDetails: null
+    appUserDetails: null,
+
+    /**
+     * holds the cached app secure pin for the logged in user
+     */
+    appSecurePin: null
 };
 
 

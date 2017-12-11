@@ -21,13 +21,23 @@ if(window.localStorage.getItem("app-status")&&window.localStorage.getItem("app-s
 //set the first page to be displayed to be the login page
 $('ons-splitter').get(0).content.load("login-template");}else{// user has NOT been logged in
 // set the first page to be displayed to be the onboarding page
-$('ons-splitter').get(0).content.load("onboarding-template");}// set the content page for the app
-//$('ons-splitter').get(0).content.load("app-main-template");
-});// END OF ONSEN LIBRARY READY EVENT
+$('ons-splitter').get(0).content.load("onboarding-template");}// listen to when the device back button is clicked when the lock screen modal is shown
+$('#lock-screen-modal').get(0).onDeviceBackButton=utopiasoftware.ally.controller.lockScreenModalViewModel.exitButtonClicked;// listen for "HOLD" events that are triggered in the app
+document.addEventListener('hold',function(event){// check if the backspace button in the 'lock-screen-modal' is held
+if($(event.target).closest('#lock-screen-backspace-col','#lock-screen-modal').is('#lock-screen-backspace-col')){//backspace button has been held
+// remove the entire contents of the input field
+$('#lock-screen-modal #lock-screen-lock-pin').val("");return;// exit
+}});});// END OF ONSEN LIBRARY READY EVENT
 // add listener for when the Internet network connection is offline
 document.addEventListener("offline",function(){// display a toast message to let user no there is no Internet connection
 window.plugins.toast.showWithOptions({message:"No Internet Connection. App functionality may be limited",duration:4000,// 4000 ms
-position:"bottom",styling:{opacity:1,backgroundColor:'#000000',textColor:'#FFFFFF',textSize:14}});},false);try{// lock the orientation of the device to 'PORTRAIT'
+position:"bottom",styling:{opacity:1,backgroundColor:'#000000',textColor:'#FFFFFF',textSize:14}});},false);// add listener for when the device is going into the background i.e. paused
+document.addEventListener("pause",function(){// get the current page view
+var currentPageView=$('ons-splitter').get(0).content.page;// if user is on the onboarding or login screens, do nothing
+if(currentPageView.toString()=='onboarding-template'||currentPageView.toString()=='login-template'){return;// exit
+}cordova.plugins.Keyboard.close();// hide the keyboard, if it is visible
+// show the lock screen modal
+$('#lock-screen-modal').get(0).show();},false);try{// lock the orientation of the device to 'PORTRAIT'
 screen.lockOrientation('portrait');}catch(err){}// set status bar color
 StatusBar.backgroundColorByHexString("#2C8E01");// prepare the inapp browser plugin
 window.open=cordova.InAppBrowser.open;// use Promises to load the other cordova plugins
@@ -36,10 +46,10 @@ window.setTimeout(function(){resolve();// resolve the promise
 },0);}).then(function(){// load the securely stored / encrypted data into the app
 // check if the user is currently logged in
 if(!window.localStorage.getItem("app-status")||window.localStorage.getItem("app-status")==""){// user is not logged in
-return null;}return Promise.resolve(intel.security.secureStorage.read({"id":"ally-user-details"}));}).then(function(instanceId){if(instanceId==null){// user is not logged in
-return null;}return Promise.resolve(intel.security.secureData.getData(instanceId));}).then(function(secureData){if(secureData==null){// user is not logged in
-return null;}utopiasoftware.ally.model.appUserDetails=JSON.parse(secureData);// transfer the collected user details to the app
-// update the first name being displayed in the side menu
+return null;}return Promise.all([Promise.resolve(intel.security.secureStorage.read({"id":"ally-user-details"})),Promise.resolve(intel.security.secureStorage.read({"id":"ally-user-secure-pin"}))]);}).then(function(instanceIdArray){if(instanceIdArray==null||instanceIdArray[0]==null||instanceIdArray[1]==null){// user is not logged in
+return null;}return Promise.all([Promise.resolve(intel.security.secureData.getData(instanceIdArray[0])),Promise.resolve(intel.security.secureData.getData(instanceIdArray[1]))]);}).then(function(secureDataArray){if(secureDataArray==null||secureDataArray[0]==null||secureDataArray[1]==null){// user is not logged in
+return null;}utopiasoftware.ally.model.appUserDetails=JSON.parse(secureDataArray[0]);// transfer the collected user details to the app
+utopiasoftware.ally.model.appSecurePin=secureDataArray[1];// update the first name being displayed in the side menu
 //$('#side-menu-username').html(utopiasoftware.saveup.model.appUserDetails.firstName);
 return null;}).then(function(){// notify the app that the app has been successfully initialised and is ready for further execution (set app ready flag to true)
 utopiasoftware.ally.model.isAppReady=true;// hide the splash screen
@@ -61,6 +71,52 @@ $('ons-splitter').get(0).left.close().then(function(){$('#app-main-navigator').g
 // close the side menu
 $('ons-splitter').get(0).left.close().then(function(){$('#app-main-navigator').get(0).bringPageTop("hotels-page.html",{});// navigate to the specified page
 }).catch(function(){});return;}}},/**
+     * object is the view-model for the app lock-screen-modal
+     */lockScreenModalViewModel:{/**
+         * property holds the input field jquery object used in the
+         * security pin lock modal
+         */$pinLockInputField:null,/**
+         * holds the unique id assigned to every timer which is used to
+         * change the input field entry from 'visible' to 'hidden'
+         */clearTimeoutId:-1,/**
+         * method is triggered when a number key on the app security pin lock is tapped
+         *
+         * @param numberInput {String} number input
+         */numberButtonClicked:function numberButtonClicked(numberInput){// check if the input field jquery object is null. if so, initialise it
+if(!utopiasoftware.ally.controller.lockScreenModalViewModel.$pinLockInputField){// initialise the input property
+utopiasoftware.ally.controller.lockScreenModalViewModel.$pinLockInputField=$('#lock-screen-modal #lock-screen-lock-pin');}// hide the WRONG PIN message that may be displayed
+$('#lock-screen-modal #lock-screen-message').css("visibility","hidden");// update the security input field with the provided number input
+utopiasoftware.ally.controller.lockScreenModalViewModel.$pinLockInputField.val(utopiasoftware.ally.controller.lockScreenModalViewModel.$pinLockInputField.val()+numberInput);// update the input field css text input style, so user can see the inputed number
+$('input',utopiasoftware.ally.controller.lockScreenModalViewModel.$pinLockInputField).css('-webkit-text-security','none');// clear any previous timeout that may have been set
+window.clearTimeout(utopiasoftware.ally.controller.lockScreenModalViewModel.clearTimeoutId);utopiasoftware.ally.controller.lockScreenModalViewModel.clearTimeoutId=setTimeout(function(){// wait for 1 second
+// update the input field css text input style, so user cannot see the inputed number
+$('input',utopiasoftware.ally.controller.lockScreenModalViewModel.$pinLockInputField).css('-webkit-text-security','disc');},1000);},/**
+         * method is triggered when the exit button on the app security pin is clicked
+         */exitButtonClicked:function exitButtonClicked(){ons.notification.confirm('Do you want to close the app?',{title:'Exit',buttonLabels:['No','Yes']})// Ask for confirmation
+.then(function(index){if(index===1){// OK button
+navigator.app.exitApp();// Close the app
+}});},/**
+         * method is triggered when the "ok" button on the
+         * app security pin is clicked
+         */okButtonClicked:function okButtonClicked(){// check if the input field jquery object is null. if so, initialise it
+if(!utopiasoftware.saveup.controller.securityPinLockModalViewModel.$pinLockInputField){// initialise the input property
+utopiasoftware.saveup.controller.securityPinLockModalViewModel.$pinLockInputField=$('#security-pin-lock-modal #security-pin-lock-pin');}if(utopiasoftware.saveup.controller.securityPinLockModalViewModel.$pinLockInputField.val()===utopiasoftware.saveup.model.appUserDetails.securePin){// authentication successful
+$('#security-pin-lock-modal').get(0).hide();// hide the security pin modal
+}else{// authentication failed
+$('#security-pin-lock-modal #security-pin-lock-message').html("WRONG INPUT!");}// reset the input value of the security pin modal
+utopiasoftware.saveup.controller.securityPinLockModalViewModel.$pinLockInputField.val("");},/**
+         * method is triggered when the backspace button on the
+         * app security pin is clicked
+         */backspaceButtonClicked:function backspaceButtonClicked(){// check if the input field jquery object is null. if so, initialise it
+if(!utopiasoftware.ally.controller.lockScreenModalViewModel.$pinLockInputField){// initialise the input property
+utopiasoftware.ally.controller.lockScreenModalViewModel.$pinLockInputField=$('#lock-screen-modal #lock-screen-lock-pin');}var inputString=$('#lock-screen-modal #lock-screen-lock-pin').val();// get the value from the input
+// remove the last character from the input field
+$('#lock-screen-modal #lock-screen-lock-pin').val(inputString.substring(0,inputString.length-1));},/**
+         * method is used to prevent the device from displaying the content menu for
+         * devices
+         * @param event
+         * @returns {boolean}
+         */preventContextMenuForInput:function preventContextMenuForInput(event){event.preventDefault();event.stopPropagation();return false;}},/**
      * object is view-model for main-menu page
      */mainMenuPageViewModel:{/**
          * event is triggered when page is initialised
@@ -142,7 +198,7 @@ return;}// listen for the back button event
 $('#login-navigator').get(0).topPage.onDeviceBackButton=function(){$('ons-splitter').get(0).content.load('onboarding-template');};// check if the user is currently logged in
 if(window.localStorage.getItem("app-status")&&window.localStorage.getItem("app-status")!=""){// user is logged in
 // display the user's save phone number on the login page phonenumber input
-$('#login-page #login-phone-number').val(utopiasoftware.ally.model.appUserDetails.phone);}// initialise the login form validation
+$('#login-page #login-phone-number').val(window.localStorage.getItem("app-status"));}// initialise the login form validation
 utopiasoftware.ally.controller.loginPageViewModel.formValidator=$('#login-form').parsley();// attach listener for the log in button click event on the login page
 $('#login-signin').get(0).onclick=function(){// run the validation method for the sign-in form
 utopiasoftware.ally.controller.loginPageViewModel.formValidator.whenValidate();};// listen for log in form field validation failure event
@@ -167,12 +223,27 @@ $('#login-page [data-hint]').removeClass("hint--always hint--success hint--mediu
 utopiasoftware.ally.controller.loginPageViewModel.formValidator.destroy();}catch(err){}},/**
          * method is triggered when sign-in form is successfully validated
          *
-         */loginFormValidated:function loginFormValidated(){// check if Internet Connection is available before proceeding
-if(navigator.connection.type===Connection.NONE){// no Internet Connection
-// inform the user that they cannot proceed without Internet
+         */loginFormValidated:function loginFormValidated(){// check if Internet Connection is available AND if user has been logged in  before proceeding
+if(navigator.connection.type===Connection.NONE&&window.localStorage.getItem("app-status")&&window.localStorage.getItem("app-status")!==""){// no Internet Connection, but user has been previously logged in
+// inform the user that cached data will be used for log in
+window.plugins.toast.showWithOptions({message:"No Internet Connection. Previously cached data will be used for log in",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#008000',textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
+window.plugins.toast.hide();}});// begin login process
+Promise.resolve().then(function(){// display the loader message to indicate that account is being created;
+$('#loader-modal-message').html("Completing User Login...");return Promise.resolve($('#loader-modal').get(0).show());// show loader
+}).then(function(){// get the log-in credentials from the form
+var formData={lock:$('#login-page #login-pin').val(),phone:$('#login-page #login-phone-number').val().startsWith("0")?$('#login-page #login-phone-number').val().replace("0","+234"):$('#login-page #login-phone-number').val()};return formData;}).then(function(formData){// check that the log-in credentials are valid
+if(formData.phone===utopiasoftware.ally.model.appUserDetails.phone&&formData.lock===utopiasoftware.ally.model.appSecurePin){// user provided valid credentials
+// log user in
+return $('ons-splitter').get(0).content.load("app-main-template");}else{// user provided invalid credentials, so throw error
+throw"Invalid phone number or PIN";}}).then(function(){// log in completed
+return Promise.all([$('#loader-modal').get(0).hide(),ons.notification.toast("Login complete! Welcome",{timeout:3000})]);}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
+err="Sorry. Login could not be completed";}$('#loader-modal').get(0).hide();// hide loader
+ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> Log In Failed',messageHTML:'<span>'+err+'</span>',cancelable:false});});return;// exit method
+}// no internet connection to log user in remotely
+if(navigator.connection.type===Connection.NONE){// inform user of this
 window.plugins.toast.showWithOptions({message:"user cannot login to ALLY account without an Internet Connection",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#ff0000',//red
 textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
-window.plugins.toast.hide();}});return;// exit method immediately
+window.plugins.toast.hide();}});return;// exit method
 }// create the form data to be submitted
 var formData={lock:$('#login-page #login-pin').val(),phone:$('#login-page #login-phone-number').val().startsWith("0")?$('#login-page #login-phone-number').val().replace("0","+234"):$('#login-page #login-phone-number').val()};// begin login process
 Promise.resolve().then(function(){// display the loader message to indicate that account is being created;
@@ -181,6 +252,9 @@ $('#loader-modal-message').html("Completing User Login...");return Promise.resol
 var promisesArray=[];// holds all the Promise objects for all data being deleted
 var promiseObject=new Promise(function(resolve,reject){// delete the user app details from secure storage if it exists
 Promise.resolve(intel.security.secureStorage.delete({'id':'ally-user-details'})).then(function(){resolve();},function(){resolve();});// ALWAYS resolve the promise
+});// add the promise object to the promise array
+promisesArray.push(promiseObject);promiseObject=new Promise(function(resolve,reject){// delete the user secure pin from secure storage if it exists
+Promise.resolve(intel.security.secureStorage.delete({'id':'ally-user-secure-pin'})).then(function(){resolve();},function(){resolve();});// ALWAYS resolve the promise
 });// add the promise object to the promise array
 promisesArray.push(promiseObject);// return promise when all operations have completed
 return Promise.all(promisesArray);}).then(function(){// clear all data in the device local/session storage
@@ -193,10 +267,11 @@ if(newUser.status=="error"){// an error occured
 throw newUser.message;// throw the error message attached to this error
 }// store user data
 utopiasoftware.ally.model.appUserDetails=newUser;// store the user details
-return newUser;// return user data
-}).then(function(newUser){// create a cypher data of the user details
-return Promise.resolve(intel.security.secureData.createFromData({"data":JSON.stringify(newUser)}));}).then(function(instanceId){// store the cyphered data in secure persistent storage
-return Promise.resolve(intel.security.secureStorage.write({"id":"ally-user-details","instanceID":instanceId}));}).then(function(){// set app-status local storage (as user phone number)
+// store the user secure pin
+utopiasoftware.ally.model.appSecurePin=formData.lock;return newUser;// return user data
+}).then(function(newUser){// create a cypher data of the user details & secure pin
+return Promise.all([Promise.resolve(intel.security.secureData.createFromData({"data":JSON.stringify(newUser)})),Promise.resolve(intel.security.secureData.createFromData({"data":utopiasoftware.ally.model.appSecurePin}))]);}).then(function(instanceIdArray){// store the cyphered user data & secure pin in secure persistent storage
+return Promise.all([Promise.resolve(intel.security.secureStorage.write({"id":"ally-user-details","instanceID":instanceIdArray[0]})),Promise.resolve(intel.security.secureStorage.write({"id":"ally-user-secure-pin","instanceID":instanceIdArray[1]}))]);}).then(function(){// set app-status local storage (as user phone number)
 window.localStorage.setItem("app-status",utopiasoftware.ally.model.appUserDetails.phone);// update the first name being displayed in the side menu
 //$('#side-menu-username').html(utopiasoftware.saveup.model.appUserDetails.firstName);
 return $('#loader-modal').get(0).hide();// hide loader
@@ -295,6 +370,9 @@ var promisesArray=[];// holds all the Promise objects for all data being deleted
 var promiseObject=new Promise(function(resolve,reject){// delete the user app details from secure storage if it exists
 Promise.resolve(intel.security.secureStorage.delete({'id':'ally-user-details'})).then(function(){resolve();},function(){resolve();});// ALWAYS resolve the promise
 });// add the promise object to the promise array
+promisesArray.push(promiseObject);promiseObject=new Promise(function(resolve,reject){// delete the user secure pin from secure storage if it exists
+Promise.resolve(intel.security.secureStorage.delete({'id':'ally-user-secure-pin'})).then(function(){resolve();},function(){resolve();});// ALWAYS resolve the promise
+});// add the promise object to the promise array
 promisesArray.push(promiseObject);// return promise when all operations have completed
 return Promise.all(promisesArray);}).then(function(){// clear all data in the device local/session storage
 window.localStorage.clear();window.sessionStorage.clear();return null;}).then(function(){// upload the user details to the server
@@ -304,10 +382,10 @@ processData:true,data:createAcctFormData}));}).then(function(serverResponseText)
 newUser._lastUpdatedDate=Date.now();// check if any error occurred
 if(newUser.status=="error"){// an error occured
 throw newUser.message;// throw the error message attached to this error
-}// store user data
-utopiasoftware.ally.model.appUserDetails=newUser;return newUser;}).then(function(newUser){// create a cypher data of the user details
-return Promise.resolve(intel.security.secureData.createFromData({"data":JSON.stringify(newUser)}));}).then(function(instanceId){// store the cyphered data in secure persistent storage
-return Promise.resolve(intel.security.secureStorage.write({"id":"ally-user-details","instanceID":instanceId}));}).then(function(){// set app-status local storage (as user phone number)
+}// store user data & secure pin
+utopiasoftware.ally.model.appUserDetails=newUser;utopiasoftware.ally.model.appSecurePin=createAcctFormData.lock;return newUser;}).then(function(newUser){// create a cypher data of the user details & secure pin
+return Promise.all([Promise.resolve(intel.security.secureData.createFromData({"data":JSON.stringify(newUser)})),Promise.resolve(intel.security.secureData.createFromData({"data":createAcctFormData.lock}))]);}).then(function(instanceIdArray){// store the cyphered data & secure pin in secure persistent storage
+return Promise.all([Promise.resolve(intel.security.secureStorage.write({"id":"ally-user-details","instanceID":instanceIdArray[0]})),Promise.resolve(intel.security.secureStorage.write({"id":"ally-user-secure-pin","instanceID":instanceIdArray[1]}))]);}).then(function(){// set app-status local storage (as user phone number)
 window.localStorage.setItem("app-status",utopiasoftware.ally.model.appUserDetails.phone);// update the first name being displayed in the side menu
 //$('#side-menu-username').html(utopiasoftware.saveup.model.appUserDetails.firstName);
 return $('#loader-modal').get(0).hide();// hide loader
@@ -531,7 +609,6 @@ $('#account-page #account-edit-fab').css("display","none");// show the save acco
 $('#account-page #account-save').css("display","inline-block");$('#hour-glass-loader-modal').get(0).hide();// hide loader
 ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> Account Update Failed',messageHTML:'<span>'+err+'</span>',cancelable:false});});},/**
          * method is used to load the user account data either from
-         * the locally cached data OR directly from the remote server
          * the locally cached data OR directly from the remote server
          */loadUserAccountData:function loadUserAccountData(){return new Promise(function(resolve,reject){// check if there is internet connection
 if(navigator.connection.type===Connection.NONE){// no internet connection
