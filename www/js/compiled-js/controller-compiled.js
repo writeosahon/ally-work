@@ -36,7 +36,9 @@ document.addEventListener("pause",function(){// get the current page view
 var currentPageView=$('ons-splitter').get(0).content.page;// if user is on the onboarding or login screens, do nothing
 if(currentPageView.toString()=='onboarding-template'||currentPageView.toString()=='login-template'){return;// exit
 }cordova.plugins.Keyboard.close();// hide the keyboard, if it is visible
-// show the lock screen modal
+// reset the input that was previously displayed
+$('#lock-screen-modal #lock-screen-lock-pin').val("");// hide the screen pin display message
+$('#lock-screen-modal #lock-screen-message').css("visibility","hidden");// show the lock screen modal
 $('#lock-screen-modal').get(0).show();},false);try{// lock the orientation of the device to 'PORTRAIT'
 screen.lockOrientation('portrait');}catch(err){}// set status bar color
 StatusBar.backgroundColorByHexString("#2C8E01");// prepare the inapp browser plugin
@@ -96,15 +98,16 @@ $('input',utopiasoftware.ally.controller.lockScreenModalViewModel.$pinLockInputF
 .then(function(index){if(index===1){// OK button
 navigator.app.exitApp();// Close the app
 }});},/**
-         * method is triggered when the "ok" button on the
+         * method is triggered when the "confirm" button on the
          * app security pin is clicked
-         */okButtonClicked:function okButtonClicked(){// check if the input field jquery object is null. if so, initialise it
-if(!utopiasoftware.saveup.controller.securityPinLockModalViewModel.$pinLockInputField){// initialise the input property
-utopiasoftware.saveup.controller.securityPinLockModalViewModel.$pinLockInputField=$('#security-pin-lock-modal #security-pin-lock-pin');}if(utopiasoftware.saveup.controller.securityPinLockModalViewModel.$pinLockInputField.val()===utopiasoftware.saveup.model.appUserDetails.securePin){// authentication successful
-$('#security-pin-lock-modal').get(0).hide();// hide the security pin modal
+         */confirmButtonClicked:function confirmButtonClicked(){// check if the input field jquery object is null. if so, initialise it
+// check if the input field jquery object is null. if so, initialise it
+if(!utopiasoftware.ally.controller.lockScreenModalViewModel.$pinLockInputField){// initialise the input property
+utopiasoftware.ally.controller.lockScreenModalViewModel.$pinLockInputField=$('#lock-screen-modal #lock-screen-lock-pin');}if(utopiasoftware.ally.controller.lockScreenModalViewModel.$pinLockInputField.val()===utopiasoftware.ally.model.appSecurePin){// authentication successful
+$('#lock-screen-modal').get(0).hide();// hide the security pin modal
 }else{// authentication failed
-$('#security-pin-lock-modal #security-pin-lock-message').html("WRONG INPUT!");}// reset the input value of the security pin modal
-utopiasoftware.saveup.controller.securityPinLockModalViewModel.$pinLockInputField.val("");},/**
+$('#lock-screen-modal #lock-screen-message').css("visibility","visible");}// reset the input value of the security pin modal
+utopiasoftware.ally.controller.lockScreenModalViewModel.$pinLockInputField.val("");},/**
          * method is triggered when the backspace button on the
          * app security pin is clicked
          */backspaceButtonClicked:function backspaceButtonClicked(){// check if the input field jquery object is null. if so, initialise it

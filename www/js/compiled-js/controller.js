@@ -96,6 +96,11 @@ utopiasoftware.ally.controller = {
 
             cordova.plugins.Keyboard.close(); // hide the keyboard, if it is visible
 
+            // reset the input that was previously displayed
+            $('#lock-screen-modal #lock-screen-lock-pin').val("");
+            // hide the screen pin display message
+            $('#lock-screen-modal #lock-screen-message').css("visibility", "hidden");
+
             // show the lock screen modal
             $('#lock-screen-modal').get(0).show();
         }, false);
@@ -288,29 +293,30 @@ utopiasoftware.ally.controller = {
         },
 
         /**
-         * method is triggered when the "ok" button on the
+         * method is triggered when the "confirm" button on the
          * app security pin is clicked
          */
-        okButtonClicked: function(){
+        confirmButtonClicked: function(){
 
             // check if the input field jquery object is null. if so, initialise it
-            if(!utopiasoftware.saveup.controller.securityPinLockModalViewModel.$pinLockInputField){
+            // check if the input field jquery object is null. if so, initialise it
+            if(!utopiasoftware.ally.controller.lockScreenModalViewModel.$pinLockInputField){
                 // initialise the input property
-                utopiasoftware.saveup.controller.securityPinLockModalViewModel.$pinLockInputField =
-                    $('#security-pin-lock-modal #security-pin-lock-pin');
+                utopiasoftware.ally.controller.lockScreenModalViewModel.$pinLockInputField =
+                    $('#lock-screen-modal #lock-screen-lock-pin');
             }
 
-            if(utopiasoftware.saveup.controller.securityPinLockModalViewModel.$pinLockInputField.val() ===
-                utopiasoftware.saveup.model.appUserDetails.securePin){ // authentication successful
+            if(utopiasoftware.ally.controller.lockScreenModalViewModel.$pinLockInputField.val() ===
+                utopiasoftware.ally.model.appSecurePin){ // authentication successful
 
-                $('#security-pin-lock-modal').get(0).hide(); // hide the security pin modal
+                $('#lock-screen-modal').get(0).hide(); // hide the security pin modal
             }
             else{ // authentication failed
-                $('#security-pin-lock-modal #security-pin-lock-message').html("WRONG INPUT!");
+                $('#lock-screen-modal #lock-screen-message').css("visibility", "visible");
             }
 
             // reset the input value of the security pin modal
-            utopiasoftware.saveup.controller.securityPinLockModalViewModel.$pinLockInputField.val("");
+            utopiasoftware.ally.controller.lockScreenModalViewModel.$pinLockInputField.val("");
         },
 
 
