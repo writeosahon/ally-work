@@ -50,10 +50,10 @@
             </ons-card>
         </ons-list-item>
 
-        <ons-list-item id="dashboard-wallet-incoming-list-item" modifier="nodivider">
+        <ons-list-item id="dashboard-wallet-incoming-list-item" modifier="nodivider" lock-on-drag="true">
             <ons-card id="dashboard-wallet-incoming-chart" style="width: 100%; padding: 0 !important; background-color: #ffffff">
                 <div class="title" style="font-size: 0.85em; padding: 0.5em;">
-                    ALLY Wallet Incoming Funds
+                    ALLY Wallet Transfers In
                 </div>
                 <div class="content" style="padding: 0.5em;">
 
@@ -63,8 +63,17 @@
             </ons-card>
         </ons-list-item>
 
-        <ons-list-item modifier="nodivider">
-            <ons-card style="height: 15em; width: 100%; background-color: #e8e8e8"></ons-card>
+        <ons-list-item id="dashboard-wallet-outgoing-list-item" modifier="nodivider" lock-on-drag="true">
+            <ons-card id="dashboard-wallet-outgoing-chart" style="width: 100%; padding: 0 !important; background-color: #ffffff">
+                <div class="title" style="font-size: 0.85em; padding: 0.5em;">
+                    ALLY Wallet Transfers Out
+                </div>
+                <div class="content" style="padding: 0.5em;">
+
+                    <ons-icon icon="md-settings" size="28px" style="color: #30a401;" spin>
+                    </ons-icon>
+                </div>
+            </ons-card>
         </ons-list-item>
 
         <ons-list-item modifier="nodivider">
