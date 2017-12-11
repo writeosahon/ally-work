@@ -260,7 +260,7 @@ promisesArray.push(promiseObject);promiseObject=new Promise(function(resolve,rej
 Promise.resolve(intel.security.secureStorage.delete({'id':'ally-user-secure-pin'})).then(function(){resolve();},function(){resolve();});// ALWAYS resolve the promise
 });// add the promise object to the promise array
 promisesArray.push(promiseObject);// add the promise object used to delete the cached chart data
-promisesArray.push(utopiasoftware.ally.dashboardCharts.deleteWalletTransferInData());// return promise when all operations have completed
+promisesArray.push(utopiasoftware.ally.dashboardCharts.deleteWalletTransferInData(),utopiasoftware.ally.dashboardCharts.deleteWalletTransferOutData());// return promise when all operations have completed
 return Promise.all(promisesArray);}).then(function(){// clear all data in the device local/session storage
 window.localStorage.clear();window.sessionStorage.clear();return null;}).then(function(){// upload the user details to the server
 return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/login.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
@@ -378,7 +378,7 @@ promisesArray.push(promiseObject);promiseObject=new Promise(function(resolve,rej
 Promise.resolve(intel.security.secureStorage.delete({'id':'ally-user-secure-pin'})).then(function(){resolve();},function(){resolve();});// ALWAYS resolve the promise
 });// add the promise object to the promise array
 promisesArray.push(promiseObject);// add the promise object used to delete the cached chart data
-promisesArray.push(utopiasoftware.ally.dashboardCharts.deleteWalletTransferInData());// return promise when all operations have completed
+promisesArray.push(utopiasoftware.ally.dashboardCharts.deleteWalletTransferInData(),utopiasoftware.ally.dashboardCharts.deleteWalletTransferOutData());// return promise when all operations have completed
 return Promise.all(promisesArray);}).then(function(){// clear all data in the device local/session storage
 window.localStorage.clear();window.sessionStorage.clear();return null;}).then(function(){// upload the user details to the server
 return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/signup.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
@@ -423,8 +423,10 @@ inputElement.value="";}}},/**
      */dashboardPageViewModel:{/**
          * property is used to hold the "Period Select" dropdown list
          */periodDropDownListObject:null,/**
-         * property is used to hold the "Wallet Incoming" Chart
+         * property is used to hold the "Transfers In" Chart
          */walletIncomingChart:null,/**
+         * property is used to hold the "Transfers Out" Chart
+         */walletOutgoingChart:null,/**
          * event is triggered when page is initialised
          */pageInit:function pageInit(event){var $thisPage=$(event.target);// get the current page shown
 // disable the swipeable feature for the app splitter
@@ -438,7 +440,8 @@ ej.charts.Chart.Inject(ej.charts.Legend,ej.charts.LineSeries,ej.charts.DateTime,
 utopiasoftware.ally.controller.dashboardPageViewModel.periodDropDownListObject=new ej.dropdowns.DropDownList({placeholder:"Select Period",floatLabelType:'Auto'});// render initialized DropDownList
 utopiasoftware.ally.controller.dashboardPageViewModel.periodDropDownListObject.appendTo('#dashboard-period-select');// update the wallet balance dashboard
 utopiasoftware.ally.controller.dashboardPageViewModel.updateWalletDashboard();// update the wallet-incoming chart using the value of the select Period dropdown list
-utopiasoftware.ally.controller.dashboardPageViewModel.updateWalletIncomingDashboard(utopiasoftware.ally.controller.dashboardPageViewModel.periodDropDownListObject.value);// hide the loader
+utopiasoftware.ally.controller.dashboardPageViewModel.updateWalletIncomingDashboard(utopiasoftware.ally.controller.dashboardPageViewModel.periodDropDownListObject.value);// update the wallet-outgoing chart using the value of the select Period dropdown list
+utopiasoftware.ally.controller.dashboardPageViewModel.updateWalletOutgoingDashboard(utopiasoftware.ally.controller.dashboardPageViewModel.periodDropDownListObject.value);// hide the loader
 $('#loader-modal').get(0).hide();}},/**
          * method is triggered when page is shown
          */pageShow:function pageShow(){// disable the swipeable feature for the app splitter
@@ -489,7 +492,7 @@ utopiasoftware.ally.dashboardCharts.loadWalletTransferInData().then(function(cha
 // format the chart data array so it can be properly used
 return chartDataMapping(chartDataArray);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.walletIncomingChart=new ej.charts.Chart({// Width and height for chart in pixel
 width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#30A401"],title:chartCustomisableSettings.chartTitle,titleStyle:{size:'1em'},tooltip:{enable:true,format:'Amount: ${point.y}'},// Legend for chart
-legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k'},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Incoming Funds',//Series type as line
+legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k'},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Incoming Transfers',//Series type as line
 type:'Line'}]});// remove the loader content
 $('#dashboard-page #dashboard-wallet-incoming-chart').html("");//append the newly created chart
 utopiasoftware.ally.controller.dashboardPageViewModel.walletIncomingChart.appendTo('#dashboard-wallet-incoming-chart');});return;// exit method
@@ -504,13 +507,56 @@ return serverResponse;}).then(function(chartDataArray){// save the chart array d
 return utopiasoftware.ally.dashboardCharts.saveWalletTransferInData(chartDataArray);}).then(function(chartDataArray){// get the chart data array to be used by chart
 // format the chart data array so it can be properly used
 return chartDataMapping(chartDataArray);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.walletIncomingChart=new ej.charts.Chart({// Width and height for chart in pixel
-width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#30A401"],title:"ALLY Wallet Transfers In",titleStyle:{size:'1em'},tooltip:{enable:true,format:'Amount: ${point.y}'},// Legend for chart
-legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:'ha',//interval: 3,
-//interval type as years in primary x axis
-intervalType:'Hours'},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k'},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Incoming Funds',//Series type as line
+width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#30A401"],title:chartCustomisableSettings.chartTitle,titleStyle:{size:'1em'},tooltip:{enable:true,format:'Amount: ${point.y}'},// Legend for chart
+legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k'},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Incoming Transfers',//Series type as line
 type:'Line'}]});// remove the loader content
 $('#dashboard-page #dashboard-wallet-incoming-chart').html("");//append the newly created chart
 utopiasoftware.ally.controller.dashboardPageViewModel.walletIncomingChart.appendTo('#dashboard-wallet-incoming-chart');});/**
+             * function is used to map the chart data into an appropriate forma that can be displayed inby the chart
+             * @param chartDataArray {Array} array containing chart data objects to be mapped
+             *
+             * @return {Array} an array containing properly formatted objects that can be used by the chart
+             */function chartDataMapping(chartDataArray){return chartDataArray.map(function(dataObject){dataObject.AMOUNT=kendo.parseFloat(dataObject.AMOUNT)/1000;// divide amount by 1000
+dataObject.DDATE=kendo.parseDate(dataObject.DDATE,"yyyy-MM-dd HH:mm:ss");return dataObject;// return the modified object
+});}},/**
+         * update the wallet transfer-in dashboard. Either using cached data or remote data
+         *
+         * @param periodType
+         */updateWalletOutgoingDashboard:function updateWalletOutgoingDashboard(periodType){// variable holds the object that contains the customisable settings for the chart created based on the 'periodType' parameter
+var chartCustomisableSettings=null;switch(periodType){// check the periodType parameter and format chartCutomisableSetting accordingly
+case"today":chartCustomisableSettings={chartTitle:"ALLY Wallet Transfers Out (Today)",labelFormat:'ha',intervalType:'Hours'};break;case"weekly":chartCustomisableSettings={chartTitle:"ALLY Wallet Transfers Out (Last 7 Days)",labelFormat:'dMMM',intervalType:'Days'};break;case"monthly":chartCustomisableSettings={chartTitle:"ALLY Wallet Transfers Out (Last 30 Days)",labelFormat:'dMMM',intervalType:'Days'};break;}// check if the walletOutgoing Chart has been created before, of so destroy it
+if(utopiasoftware.ally.controller.dashboardPageViewModel.walletOutgoingChart){// chart has previously been created
+// destroy the chart object
+utopiasoftware.ally.controller.dashboardPageViewModel.walletOutgoingChart.destroy();}// display chart loading indicator
+$('#dashboard-page #dashboard-wallet-outgoing-chart').html('<div class="title" style="font-size: 0.85em; padding: 0.5em;">\n                    ALLY Wallet Transfers Out\n                </div>\n                <div class="content" style="padding: 0.5em;">\n\n                    <ons-icon icon="md-settings" size="28px" style="color: #30a401;" spin>\n                    </ons-icon>\n                </div>');// check if there is internet connection or not
+if(navigator.connection.type===Connection.NONE){// there is no internet connection
+// inform the user that cached data will be displayed in the absence of internet
+window.plugins.toast.showWithOptions({message:"No Internet Connection. Previously cached data will be displayed",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#008000',textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
+window.plugins.toast.hide();}});// load the previously cached data
+utopiasoftware.ally.dashboardCharts.loadWalletTransferOutData().then(function(chartDataArray){// get the chart data array to be used by chart
+// format the chart data array so it can be properly used
+return chartDataMapping(chartDataArray);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.walletOutgoingChart=new ej.charts.Chart({// Width and height for chart in pixel
+width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#0FD0D0"],title:chartCustomisableSettings.chartTitle,titleStyle:{size:'1em'},tooltip:{enable:true,format:'Amount: ${point.y}'},// Legend for chart
+legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k'},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Outgoing Transfers',//Series type as line
+type:'Line'}]});// remove the loader content
+$('#dashboard-page #dashboard-wallet-outgoing-chart').html("");//append the newly created chart
+utopiasoftware.ally.controller.dashboardPageViewModel.walletOutgoingChart.appendTo('#dashboard-wallet-outgoing-chart');});return;// exit method
+}//THERE IS AN INTERNET CONNECTION
+// request for the user wallet transfer-in data for the provided time period
+Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/chart-transfer-out.php",//url: "in-wallet-chart-dummy.json",
+type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
+processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,duration:periodType}// data to submit to server
+})).then(function(serverResponse){// retrieve the server response
+serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// return the server response as an object
+return serverResponse;}).then(function(chartDataArray){// save the chart array data to cache
+return utopiasoftware.ally.dashboardCharts.saveWalletTransferOutData(chartDataArray);}).then(function(chartDataArray){// get the chart data array to be used by chart
+// format the chart data array so it can be properly used
+return chartDataMapping(chartDataArray);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.walletOutgoingChart=new ej.charts.Chart({// Width and height for chart in pixel
+width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#0FD0D0"],title:chartCustomisableSettings.chartTitle,titleStyle:{size:'1em'},tooltip:{enable:true,format:'Amount: ${point.y}'},// Legend for chart
+legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k'},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Outgoing Transfers',//Series type as line
+type:'Line'}]});// remove the loader content
+$('#dashboard-page #dashboard-wallet-outgoing-chart').html("");//append the newly created chart
+utopiasoftware.ally.controller.dashboardPageViewModel.walletOutgoingChart.appendTo('#dashboard-wallet-outgoing-chart');});/**
              * function is used to map the chart data into an appropriate forma that can be displayed inby the chart
              * @param chartDataArray {Array} array containing chart data objects to be mapped
              *
