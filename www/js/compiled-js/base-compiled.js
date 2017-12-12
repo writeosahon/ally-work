@@ -331,8 +331,143 @@ var utopiasoftware = {
                         resolve();
                     }); // ALWAYS resolve the promise
                 });
-            }
+            },
 
+            /**
+             * method is used to save/cache the data for the wallet payments-in chart
+             *
+             * @param chartDataArray {Array} the chart data to be saved
+             *
+             * @return {Promise} returns a promise that resolves to the data being saved
+             */
+            savePaymentInData: function savePaymentInData(chartDataArray) {
+
+                return new Promise(function (resolve, reject) {
+
+                    // check if a timestamp has been appended to the data being saved
+                    if (!chartDataArray._lastUpdatedDate) {
+                        // no timestamp, so attach one
+                        chartDataArray._lastUpdatedDate = Date.now(); // attach timestamp
+                    }
+
+                    // write the provided chart data to encrypted storage
+                    Promise.resolve(intel.security.secureData.createFromData({ "data": JSON.stringify(chartDataArray) })).then(function (instanceId) {
+
+                        return Promise.resolve(intel.security.secureStorage.write({ "id": "ally-chart-payment-in", "instanceID": instanceId }));
+                    }).then(function () {
+                        resolve(chartDataArray); // return the provided chartDataArray parameter back to the caller and resolve the Promise
+                    }).catch(function (err) {
+                        reject(err); // reject the Promise with the provided error
+                    });
+                });
+            },
+
+            /**
+             * method returns a Promise which contains the cached wallet payment-in data OR
+             * the Promise rejects with an error object
+             *
+             * @returns {Promise}
+             */
+            loadPaymentInData: function loadPaymentInData() {
+
+                return new Promise(function (resolve, reject) {
+
+                    // read the cached data from encrypted storage
+                    Promise.resolve(intel.security.secureStorage.read({ 'id': 'ally-chart-payment-in' })).then(function (instanceId) {
+
+                        return Promise.resolve(intel.security.secureData.getData(instanceId));
+                    }).then(function (chartDataArray) {
+                        resolve(JSON.parse(chartDataArray)); // return the cached app chart data and resolve the Promise
+                    }).catch(function (err) {
+                        reject(err); // reject the Promise with the provided error
+                    });
+                });
+            },
+
+            /**
+             * method returns a Promise which deletes the cached chart data from the device
+             *
+             * @returns {Promise}
+             */
+            deletePaymentInData: function deletePaymentInData() {
+
+                return new Promise(function (resolve, reject) {
+                    // delete the user app details from secure storage if it exists
+                    Promise.resolve(intel.security.secureStorage.delete({ 'id': 'ally-chart-payment-in' })).then(function () {
+                        resolve();
+                    }, function () {
+                        resolve();
+                    }); // ALWAYS resolve the promise
+                });
+            },
+
+            /**
+             * method is used to save/cache the data for the wallet payments-out chart
+             *
+             * @param chartDataArray {Array} the chart data to be saved
+             *
+             * @return {Promise} returns a promise that resolves to the data being saved
+             */
+            savePaymentOutData: function savePaymentOutData(chartDataArray) {
+
+                return new Promise(function (resolve, reject) {
+
+                    // check if a timestamp has been appended to the data being saved
+                    if (!chartDataArray._lastUpdatedDate) {
+                        // no timestamp, so attach one
+                        chartDataArray._lastUpdatedDate = Date.now(); // attach timestamp
+                    }
+
+                    // write the provided chart data to encrypted storage
+                    Promise.resolve(intel.security.secureData.createFromData({ "data": JSON.stringify(chartDataArray) })).then(function (instanceId) {
+
+                        return Promise.resolve(intel.security.secureStorage.write({ "id": "ally-chart-payment-out", "instanceID": instanceId }));
+                    }).then(function () {
+                        resolve(chartDataArray); // return the provided chartDataArray parameter back to the caller and resolve the Promise
+                    }).catch(function (err) {
+                        reject(err); // reject the Promise with the provided error
+                    });
+                });
+            },
+
+            /**
+             * method returns a Promise which contains the cached wallet payment-out data OR
+             * the Promise rejects with an error object
+             *
+             * @returns {Promise}
+             */
+            loadPaymentOutData: function loadPaymentOutData() {
+
+                return new Promise(function (resolve, reject) {
+
+                    // read the cached data from encrypted storage
+                    Promise.resolve(intel.security.secureStorage.read({ 'id': 'ally-chart-payment-out' })).then(function (instanceId) {
+
+                        return Promise.resolve(intel.security.secureData.getData(instanceId));
+                    }).then(function (chartDataArray) {
+                        resolve(JSON.parse(chartDataArray)); // return the cached app chart data and resolve the Promise
+                    }).catch(function (err) {
+                        reject(err); // reject the Promise with the provided error
+                    });
+                });
+            },
+
+            /**
+             * method returns a Promise which deletes the cached chart data from the device
+             *
+             * @returns {Promise}
+             */
+            deletePaymentOutData: function deletePaymentOutData() {
+
+                return new Promise(function (resolve, reject) {
+                    // delete the user app details from secure storage if it exists
+                    Promise.resolve(intel.security.secureStorage.delete({ 'id': 'ally-chart-payment-out' })).then(function () {
+                        resolve();
+                    }, function () {
+                        resolve();
+                    }); // ALWAYS resolve the promise
+                });
+            }
         }
     }
 };

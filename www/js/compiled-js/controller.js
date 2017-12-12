@@ -811,7 +811,9 @@ utopiasoftware.ally.controller = {
 
                 // add the promise object used to delete the cached chart data
                 promisesArray.push(utopiasoftware.ally.dashboardCharts.deleteWalletTransferInData(),
-                    utopiasoftware.ally.dashboardCharts.deleteWalletTransferOutData());
+                    utopiasoftware.ally.dashboardCharts.deleteWalletTransferOutData(),
+                utopiasoftware.ally.dashboardCharts.deletePaymentOutData(),
+                    utopiasoftware.ally.dashboardCharts.deletePaymentInData());
 
                 // return promise when all operations have completed
                 return Promise.all(promisesArray);
@@ -1222,7 +1224,9 @@ utopiasoftware.ally.controller = {
 
                 // add the promise object used to delete the cached chart data
                 promisesArray.push(utopiasoftware.ally.dashboardCharts.deleteWalletTransferInData(),
-                    utopiasoftware.ally.dashboardCharts.deleteWalletTransferOutData());
+                    utopiasoftware.ally.dashboardCharts.deleteWalletTransferOutData(),
+                    utopiasoftware.ally.dashboardCharts.deletePaymentOutData(),
+                    utopiasoftware.ally.dashboardCharts.deletePaymentInData());
 
                 // return promise when all operations have completed
                 return Promise.all(promisesArray);
@@ -1377,6 +1381,17 @@ utopiasoftware.ally.controller = {
 
 
         /**
+         * property is used to hold the "Payments Out" Chart
+         */
+        paymentsOutChart: null,
+
+        /**
+         * property is used to hold the "Payments In" Chart
+         */
+        paymentsInChart: null,
+
+
+        /**
          * event is triggered when page is initialised
          */
         pageInit: function(event){
@@ -1400,7 +1415,7 @@ utopiasoftware.ally.controller = {
                 $thisPage.get(0).onDeviceBackButton = utopiasoftware.ally.controller.dashboardPageViewModel.backButtonClicked;
 
                 // inject the the modules required to create various charts for the dashboard page
-                ej.charts.Chart.Inject(ej.charts.Legend, ej.charts.LineSeries, ej.charts.DateTime,
+                ej.charts.Chart.Inject(ej.charts.Legend, ej.charts.LineSeries, ej.charts.AreaSeries, ej.charts.DateTime,
                 ej.charts.Tooltip);
 
                 // initialise the DropDownList
@@ -1409,6 +1424,14 @@ utopiasoftware.ally.controller = {
                         placeholder: "Select Period",
                         floatLabelType: 'Auto'
                     });
+
+                // add listener for when the value of the period dropdown list is changed
+                utopiasoftware.ally.controller.dashboardPageViewModel.periodDropDownListObject.
+                    addEventListener("change", function(){
+                    // call the method used to ujpdate all charts on the dashboard.
+                    // Provide the currently selected value of the eriod dropdown list
+                    utopiasoftware.ally.controller.dashboardPageViewModel.refreshDashboardCharts(this.value);
+                });
 
                 // render initialized DropDownList
                 utopiasoftware.ally.controller.dashboardPageViewModel.periodDropDownListObject.
@@ -1424,6 +1447,14 @@ utopiasoftware.ally.controller = {
                 // update the wallet-outgoing chart using the value of the select Period dropdown list
                 utopiasoftware.ally.controller.dashboardPageViewModel.
                 updateWalletOutgoingDashboard(utopiasoftware.ally.controller.dashboardPageViewModel.periodDropDownListObject.value);
+
+                // update the payments-out chart using the value of the select Period dropdown list
+                utopiasoftware.ally.controller.dashboardPageViewModel.
+                updatePaymentOutDashboard(utopiasoftware.ally.controller.dashboardPageViewModel.periodDropDownListObject.value);
+
+                // update the payments-in chart using the value of the select Period dropdown list
+                utopiasoftware.ally.controller.dashboardPageViewModel.
+                updatePaymentInDashboard(utopiasoftware.ally.controller.dashboardPageViewModel.periodDropDownListObject.value);
 
                 // hide the loader
                 $('#loader-modal').get(0).hide();
@@ -1993,6 +2024,469 @@ utopiasoftware.ally.controller = {
                     return dataObject; // return the modified object
                 });
             }
+        },
+
+
+        /**
+         * update the wallet payment-out dashboard. Either using cached data or remote data
+         *
+         * @param periodType
+         */
+        updatePaymentOutDashboard: function(periodType){
+
+            // variable holds the object that contains the customisable settings for the chart created based on the 'periodType' parameter
+            var chartCustomisableSettings = null;
+
+            switch(periodType){ // check the periodType parameter and format chartCutomisableSetting accordingly
+
+                case "today":
+                    chartCustomisableSettings = {chartTitle: "ALLY Wallet Payments Out (Today)",
+                        labelFormat: 'ha',
+                        intervalType: 'Hours'};
+                    break;
+
+                case "weekly":
+                    chartCustomisableSettings = {chartTitle: "ALLY Wallet Payments Out (Last 7 Days)",
+                        labelFormat: 'dMMM',
+                        intervalType: 'Days'};
+                    break;
+
+                case "monthly":
+                    chartCustomisableSettings = {chartTitle: "ALLY Wallet Payments Out (Last 30 Days)",
+                        labelFormat: 'dMMM',
+                        intervalType: 'Days'};
+                    break;
+            }
+
+            // check if the walletIncoming Chart has been created before, of so destroy it
+            if(utopiasoftware.ally.controller.dashboardPageViewModel.paymentsOutChart){ // chart has previously been created
+                // destroy the chart object
+                utopiasoftware.ally.controller.dashboardPageViewModel.paymentsOutChart.destroy();
+            }
+
+            // display chart loading indicator
+            $('#dashboard-page #dashboard-wallet-payments-out-chart').
+            html(`<div class="title" style="font-size: 0.85em; padding: 0.5em;">
+                    ALLY Wallet Payments Out
+                </div>
+                <div class="content" style="padding: 0.5em;">
+
+                    <ons-icon icon="md-settings" size="28px" style="color: #30a401;" spin>
+                    </ons-icon>
+                </div>`);
+
+
+            // check if there is internet connection or not
+            if(navigator.connection.type === Connection.NONE){ // there is no internet connection
+                // inform the user that cached data will be displayed in the absence of internet
+                window.plugins.toast.showWithOptions({
+                    message: "No Internet Connection. Previously cached data will be displayed",
+                    duration: 4000,
+                    position: "top",
+                    styling: {
+                        opacity: 1,
+                        backgroundColor: '#008000',
+                        textColor: '#FFFFFF',
+                        textSize: 14
+                    }
+                }, function(toastEvent){
+                    if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                        window.plugins.toast.hide();
+                    }
+                });
+
+                // load the previously cached data
+                utopiasoftware.ally.dashboardCharts.loadPaymentOutData().
+                then(function(chartDataArray){ // get the chart data array to be used by chart
+                    // format the chart data array so it can be properly used
+                    return chartDataMapping(chartDataArray);
+                }).
+                then(function(chartDataArray){
+                    utopiasoftware.ally.controller.dashboardPageViewModel.paymentsOutChart =
+                        new ej.charts.Chart({
+                            // Width and height for chart in pixel
+                            width: '100%',
+                            height: '100%',
+                            margin: { left: 0, right: 15, top: 0, bottom: 0 },
+                            palettes: ["#30A401"],
+                            title: chartCustomisableSettings.chartTitle,
+                            titleStyle: {
+                                size: '1em'
+                            },
+                            tooltip: { enable: true,
+                                format: 'Amount: ${point.y}'
+                            },
+                            // Legend for chart
+                            legendSettings: {
+                                visible: true
+                            },
+                            primaryXAxis: {
+                                title: 'Time (GMT +1)',
+                                valueType: 'DateTime',
+                                labelFormat: chartCustomisableSettings.labelFormat,
+                                intervalType: chartCustomisableSettings.intervalType
+                            },
+                            primaryYAxis: {
+                                title: 'Amount in thousands (N)',
+                                valueType: 'Double',
+                                labelFormat: '{value}k'
+                            },
+                            series: [{
+                                dataSource: chartDataArray,
+                                width: 2,
+                                marker: {visible: true, width: 8, height:8},
+                                xName: 'DDATE', yName: 'AMOUNT',
+                                name: 'Outgoing Payments',
+                                //Series type as line
+                                type: 'Area'
+                            }]
+                        });
+
+                    // remove the loader content
+                    $('#dashboard-page #dashboard-wallet-payments-out-chart').html("");
+                    //append the newly created chart
+                    utopiasoftware.ally.controller.dashboardPageViewModel.paymentsOutChart.
+                    appendTo('#dashboard-wallet-payments-out-chart');
+                });
+
+                return; // exit method
+            }
+
+            //THERE IS AN INTERNET CONNECTION
+            // request for the user wallet payments-out data for the provided time period
+            Promise.resolve($.ajax(
+                {
+                    url: utopiasoftware.ally.model.ally_base_url + "/mobile/chart-payment-out.php",
+                    //url: "in-wallet-chart-dummy.json",
+                    type: "post",
+                    contentType: "application/x-www-form-urlencoded",
+                    beforeSend: function(jqxhr) {
+                        jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                    },
+                    dataType: "text",
+                    timeout: 240000, // wait for 4 minutes before timeout of request
+                    processData: true,
+                    data: {phone: utopiasoftware.ally.model.appUserDetails.phone, duration: periodType} // data to submit to server
+                }
+            )).
+            then(function(serverResponse){// retrieve the server response
+                serverResponse +=  "";
+                serverResponse = JSON.parse(serverResponse.trim()); // return the server response as an object
+                return serverResponse;
+            }).
+            then(function(chartDataArray){ // save the chart array data to cache
+                return utopiasoftware.ally.dashboardCharts.savePaymentOutData(chartDataArray);
+            }).
+            then(function(chartDataArray){ // get the chart data array to be used by chart
+                // format the chart data array so it can be properly used
+                return chartDataMapping(chartDataArray);
+            }).
+            then(function(chartDataArray){
+                utopiasoftware.ally.controller.dashboardPageViewModel.paymentsOutChart =
+                    new ej.charts.Chart({
+                        // Width and height for chart in pixel
+                        width: '100%',
+                        height: '100%',
+                        margin: { left: 0, right: 15, top: 0, bottom: 0 },
+                        palettes: ["#30A401"],
+                        title: chartCustomisableSettings.chartTitle,
+                        titleStyle: {
+                            size: '1em'
+                        },
+                        tooltip: { enable: true,
+                            format: 'Amount: ${point.y}'
+                        },
+                        // Legend for chart
+                        legendSettings: {
+                            visible: true
+                        },
+                        primaryXAxis: {
+                            title: 'Time (GMT +1)',
+                            valueType: 'DateTime',
+                            labelFormat: chartCustomisableSettings.labelFormat,
+                            intervalType: chartCustomisableSettings.intervalType
+                        },
+                        primaryYAxis: {
+                            title: 'Amount in thousands (N)',
+                            valueType: 'Double',
+                            labelFormat: '{value}k'
+                        },
+                        series: [{
+                            dataSource: chartDataArray,
+                            width: 2,
+                            marker: {visible: true, width: 8, height:8},
+                            xName: 'DDATE', yName: 'AMOUNT',
+                            name: 'Outgoing Payments',
+                            //Series type as line
+                            type: 'Area'
+                        }]
+                    });
+
+                // remove the loader content
+                $('#dashboard-page #dashboard-wallet-payments-out-chart').html("");
+                //append the newly created chart
+                utopiasoftware.ally.controller.dashboardPageViewModel.paymentsOutChart.
+                appendTo('#dashboard-wallet-payments-out-chart');
+            });
+
+
+            /**
+             * function is used to map the chart data into an appropriate forma that can be displayed inby the chart
+             * @param chartDataArray {Array} array containing chart data objects to be mapped
+             *
+             * @return {Array} an array containing properly formatted objects that can be used by the chart
+             */
+            function chartDataMapping(chartDataArray){
+                return chartDataArray.map(function(dataObject){
+                    dataObject.AMOUNT = (kendo.parseFloat(dataObject.AMOUNT)) / 1000; // divide amount by 1000
+                    dataObject.DDATE = kendo.parseDate(dataObject.DDATE, "yyyy-MM-dd HH:mm:ss");
+                    return dataObject; // return the modified object
+                });
+            }
+        },
+
+
+        /**
+         * update the wallet payment-in dashboard. Either using cached data or remote data
+         *
+         * @param periodType
+         */
+        updatePaymentInDashboard: function(periodType){
+
+            // variable holds the object that contains the customisable settings for the chart created based on the 'periodType' parameter
+            var chartCustomisableSettings = null;
+
+            switch(periodType){ // check the periodType parameter and format chartCutomisableSetting accordingly
+
+                case "today":
+                    chartCustomisableSettings = {chartTitle: "ALLY Wallet Payments In (Today)",
+                        labelFormat: 'ha',
+                        intervalType: 'Hours'};
+                    break;
+
+                case "weekly":
+                    chartCustomisableSettings = {chartTitle: "ALLY Wallet Payments In (Last 7 Days)",
+                        labelFormat: 'dMMM',
+                        intervalType: 'Days'};
+                    break;
+
+                case "monthly":
+                    chartCustomisableSettings = {chartTitle: "ALLY Wallet Payments In (Last 30 Days)",
+                        labelFormat: 'dMMM',
+                        intervalType: 'Days'};
+                    break;
+            }
+
+            // check if the walletIncoming Chart has been created before, of so destroy it
+            if(utopiasoftware.ally.controller.dashboardPageViewModel.paymentsInChart){ // chart has previously been created
+                // destroy the chart object
+                utopiasoftware.ally.controller.dashboardPageViewModel.paymentsInChart.destroy();
+            }
+
+            // display chart loading indicator
+            $('#dashboard-page #dashboard-wallet-payments-in-chart').
+            html(`<div class="title" style="font-size: 0.85em; padding: 0.5em;">
+                    ALLY Wallet Payments In
+                </div>
+                <div class="content" style="padding: 0.5em;">
+
+                    <ons-icon icon="md-settings" size="28px" style="color: #30a401;" spin>
+                    </ons-icon>
+                </div>`);
+
+
+            // check if there is internet connection or not
+            if(navigator.connection.type === Connection.NONE){ // there is no internet connection
+                // inform the user that cached data will be displayed in the absence of internet
+                window.plugins.toast.showWithOptions({
+                    message: "No Internet Connection. Previously cached data will be displayed",
+                    duration: 4000,
+                    position: "top",
+                    styling: {
+                        opacity: 1,
+                        backgroundColor: '#008000',
+                        textColor: '#FFFFFF',
+                        textSize: 14
+                    }
+                }, function(toastEvent){
+                    if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                        window.plugins.toast.hide();
+                    }
+                });
+
+                // load the previously cached data
+                utopiasoftware.ally.dashboardCharts.loadPaymentInData().
+                then(function(chartDataArray){ // get the chart data array to be used by chart
+                    // format the chart data array so it can be properly used
+                    return chartDataMapping(chartDataArray);
+                }).
+                then(function(chartDataArray){
+                    utopiasoftware.ally.controller.dashboardPageViewModel.paymentsInChart =
+                        new ej.charts.Chart({
+                            // Width and height for chart in pixel
+                            width: '100%',
+                            height: '100%',
+                            margin: { left: 0, right: 15, top: 0, bottom: 0 },
+                            palettes: ["#0FD0D0"],
+                            title: chartCustomisableSettings.chartTitle,
+                            titleStyle: {
+                                size: '1em'
+                            },
+                            tooltip: { enable: true,
+                                format: 'Amount: ${point.y}'
+                            },
+                            // Legend for chart
+                            legendSettings: {
+                                visible: true
+                            },
+                            primaryXAxis: {
+                                title: 'Time (GMT +1)',
+                                valueType: 'DateTime',
+                                labelFormat: chartCustomisableSettings.labelFormat,
+                                intervalType: chartCustomisableSettings.intervalType
+                            },
+                            primaryYAxis: {
+                                title: 'Amount in thousands (N)',
+                                valueType: 'Double',
+                                labelFormat: '{value}k'
+                            },
+                            series: [{
+                                dataSource: chartDataArray,
+                                width: 2,
+                                marker: {visible: true, width: 8, height:8},
+                                xName: 'DDATE', yName: 'AMOUNT',
+                                name: 'Incoming Payments',
+                                //Series type as line
+                                type: 'Area'
+                            }]
+                        });
+
+                    // remove the loader content
+                    $('#dashboard-page #dashboard-wallet-payments-in-chart').html("");
+                    //append the newly created chart
+                    utopiasoftware.ally.controller.dashboardPageViewModel.paymentsInChart.
+                    appendTo('#dashboard-wallet-payments-in-chart');
+                });
+
+                return; // exit method
+            }
+
+            //THERE IS AN INTERNET CONNECTION
+            // request for the user wallet payments-in data for the provided time period
+            Promise.resolve($.ajax(
+                {
+                    url: utopiasoftware.ally.model.ally_base_url + "/mobile/chart-payment-in.php",
+                    //url: "in-wallet-chart-dummy.json",
+                    type: "post",
+                    contentType: "application/x-www-form-urlencoded",
+                    beforeSend: function(jqxhr) {
+                        jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                    },
+                    dataType: "text",
+                    timeout: 240000, // wait for 4 minutes before timeout of request
+                    processData: true,
+                    data: {phone: utopiasoftware.ally.model.appUserDetails.phone, duration: periodType} // data to submit to server
+                }
+            )).
+            then(function(serverResponse){// retrieve the server response
+                serverResponse +=  "";
+                serverResponse = JSON.parse(serverResponse.trim()); // return the server response as an object
+                return serverResponse;
+            }).
+            then(function(chartDataArray){ // save the chart array data to cache
+                return utopiasoftware.ally.dashboardCharts.savePaymentInData(chartDataArray);
+            }).
+            then(function(chartDataArray){ // get the chart data array to be used by chart
+                // format the chart data array so it can be properly used
+                return chartDataMapping(chartDataArray);
+            }).
+            then(function(chartDataArray){
+                utopiasoftware.ally.controller.dashboardPageViewModel.paymentsInChart =
+                    new ej.charts.Chart({
+                        // Width and height for chart in pixel
+                        width: '100%',
+                        height: '100%',
+                        margin: { left: 0, right: 15, top: 0, bottom: 0 },
+                        palettes: ["#0FD0D0"],
+                        title: chartCustomisableSettings.chartTitle,
+                        titleStyle: {
+                            size: '1em'
+                        },
+                        tooltip: { enable: true,
+                            format: 'Amount: ${point.y}'
+                        },
+                        // Legend for chart
+                        legendSettings: {
+                            visible: true
+                        },
+                        primaryXAxis: {
+                            title: 'Time (GMT +1)',
+                            valueType: 'DateTime',
+                            labelFormat: chartCustomisableSettings.labelFormat,
+                            intervalType: chartCustomisableSettings.intervalType
+                        },
+                        primaryYAxis: {
+                            title: 'Amount in thousands (N)',
+                            valueType: 'Double',
+                            labelFormat: '{value}k'
+                        },
+                        series: [{
+                            dataSource: chartDataArray,
+                            width: 2,
+                            marker: {visible: true, width: 8, height:8},
+                            xName: 'DDATE', yName: 'AMOUNT',
+                            name: 'Incoming Payments',
+                            //Series type as line
+                            type: 'Area'
+                        }]
+                    });
+
+                // remove the loader content
+                $('#dashboard-page #dashboard-wallet-payments-in-chart').html("");
+                //append the newly created chart
+                utopiasoftware.ally.controller.dashboardPageViewModel.paymentsInChart.
+                appendTo('#dashboard-wallet-payments-in-chart');
+            });
+
+
+            /**
+             * function is used to map the chart data into an appropriate forma that can be displayed inby the chart
+             * @param chartDataArray {Array} array containing chart data objects to be mapped
+             *
+             * @return {Array} an array containing properly formatted objects that can be used by the chart
+             */
+            function chartDataMapping(chartDataArray){
+                return chartDataArray.map(function(dataObject){
+                    dataObject.AMOUNT = (kendo.parseFloat(dataObject.AMOUNT)) / 1000; // divide amount by 1000
+                    dataObject.DDATE = kendo.parseDate(dataObject.DDATE, "yyyy-MM-dd HH:mm:ss");
+                    return dataObject; // return the modified object
+                });
+            }
+        },
+
+
+        /**
+         * method is used to request a refresh of all chars on the dashboard page
+         *
+         * @param periodType {String} the time period for which the chars sghould be refreshed
+         */
+        refreshDashboardCharts: function(periodType){
+
+            // update the wallet-incoming chart using the value of the select Period dropdown list
+            utopiasoftware.ally.controller.dashboardPageViewModel.
+            updateWalletIncomingDashboard(periodType);
+
+            // update the wallet-outgoing chart using the value of the select Period dropdown list
+            utopiasoftware.ally.controller.dashboardPageViewModel.
+            updateWalletOutgoingDashboard(periodType);
+
+            // update the payments-out chart using the value of the select Period dropdown list
+            utopiasoftware.ally.controller.dashboardPageViewModel.
+            updatePaymentOutDashboard(periodType);
+
+            // update the payments-in chart using the value of the select Period dropdown list
+            utopiasoftware.ally.controller.dashboardPageViewModel.
+            updatePaymentInDashboard(periodType);
         }
 
     },
