@@ -1058,56 +1058,16 @@ utopiasoftware.ally.controller = {
                     $('#forgot-pin-page #forgot-pin-phone-number').val()
             };
 
-            // begin login process
-            Promise.resolve().
-            then(function(){
-                // display the loader message to indicate that account is being created;
-                $('#loader-modal-message').html("Completing User Login...");
-                return Promise.resolve($('#loader-modal').get(0).show()); // show loader
-            }).
-            then(function(){ // clear all data belonging to previous user
-                var promisesArray = []; // holds all the Promise objects for all data being deleted
+            // display the loader message to indicate that account is being created;
+            $('#loader-modal-message').html("Resetting User PIN...");
 
-                var promiseObject = new Promise(function(resolve, reject){
-                    // delete the user app details from secure storage if it exists
-                    Promise.resolve(intel.security.secureStorage.
-                    delete({'id':'ally-user-details'})).
-                    then(function(){resolve();},function(){resolve();}); // ALWAYS resolve the promise
-                });
-
-                // add the promise object to the promise array
-                promisesArray.push(promiseObject);
-
-                promiseObject = new Promise(function(resolve, reject){
-                    // delete the user secure pin from secure storage if it exists
-                    Promise.resolve(intel.security.secureStorage.
-                    delete({'id':'ally-user-secure-pin'})).
-                    then(function(){resolve();},function(){resolve();}); // ALWAYS resolve the promise
-                });
-
-                // add the promise object to the promise array
-                promisesArray.push(promiseObject);
-
-                // add the promise object used to delete the cached chart data
-                promisesArray.push(utopiasoftware.ally.dashboardCharts.deleteWalletTransferInData(),
-                    utopiasoftware.ally.dashboardCharts.deleteWalletTransferOutData(),
-                    utopiasoftware.ally.dashboardCharts.deletePaymentOutData(),
-                    utopiasoftware.ally.dashboardCharts.deletePaymentInData());
-
-                // return promise when all operations have completed
-                return Promise.all(promisesArray);
-            }).
-            then(function(){
-                // clear all data in the device local/session storage
-                window.localStorage.clear();
-                window.sessionStorage.clear();
-                return null;
-            }).
+            // begin pin reset process
+            Promise.resolve($('#loader-modal').get(0).show()). // show loader.
             then(function(){
                 // upload the user details to the server
                 return Promise.resolve($.ajax(
                     {
-                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/login.php",
+                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/reset-password.php",
                         type: "post",
                         contentType: "application/x-www-form-urlencoded",
                         beforeSend: function(jqxhr) {
@@ -1121,70 +1081,42 @@ utopiasoftware.ally.controller = {
                 ));
 
             }).
-            then(function(serverResponseText){
-                serverResponseText +=  "";
-                var newUser = JSON.parse(serverResponseText.trim()); // get the new user object
-                // add a timestamp for the last time user details was updated
-                newUser._lastUpdatedDate = Date.now();
+            then(function(serverResponse){
+                serverResponse +=  "";
+                serverResponse = JSON.parse(serverResponse.trim()); // get the new user object
 
                 // check if any error occurred
-                if(newUser.status == "error"){ // an error occured
-                    throw newUser.message; // throw the error message attached to this error
+                if(serverResponse.status == "error"){ // an error occurred
+                    throw serverResponse.message; // throw the error message attached to this error
                 }
 
-                // store user data
-                utopiasoftware.ally.model.appUserDetails = newUser; // store the user details
-
-                // store the user secure pin
-                utopiasoftware.ally.model.appSecurePin = formData.lock;
-
-                return newUser; // return user data
+                // pin reset was successful, hide loader
+                return Promise.all([serverResponse, Promise.resolve($('#loader-modal').get(0).hide())])
 
             }).
-            then(function(newUser){
-                // create a cypher data of the user details & secure pin
-                return Promise.all([Promise.resolve(intel.security.secureData.
-                createFromData({"data": JSON.stringify(newUser)})),
-                    Promise.resolve(intel.security.secureData.
-                    createFromData({"data": utopiasoftware.ally.model.appSecurePin}))]);
-            }).
-            then(function(instanceIdArray){
-                // store the cyphered user data & secure pin in secure persistent storage
-                return Promise.all([Promise.resolve(
-                    intel.security.secureStorage.write({"id": "ally-user-details", "instanceID": instanceIdArray[0]})),
-                    Promise.resolve(
-                        intel.security.secureStorage.write({"id": "ally-user-secure-pin", "instanceID": instanceIdArray[1]}))]);
-            }).
-            then(function(){
+            then(function(promiseArray){
 
-                // set app-status local storage (as user phone number)
-                window.localStorage.setItem("app-status", utopiasoftware.ally.model.appUserDetails.phone);
-
-                // update the first name being displayed in the side menu
-                //$('#side-menu-username').html(utopiasoftware.saveup.model.appUserDetails.firstName);
-
-                return $('#loader-modal').get(0).hide(); // hide loader
+                // go back to the login page
+                return Promise.all([promiseArray[0], $('#login-navigator').get(0).popPage({})]);
             }).
-            then(function(){ // navigate to the main menu page
-                return $('ons-splitter').get(0).content.load("app-main-template");
-            }).
-            then(function(){
-                ons.notification.toast("Login complete! Welcome", {timeout:3000});
+            then(function(promiseArray){ // display a message to the user that the secure pin has been reset
+                ons.notification.alert({title: '<ons-icon icon="md-check-circle" size="32px" ' +
+                'style="color: green;"></ons-icon> PIN Reset Successful',
+                    messageHTML: `<span>${promiseArray[0].message}</span>`,
+                    cancelable: false
+                });
             }).
             catch(function(err){
                 if(typeof err !== "string"){ // if err is NOT a String
-                    err = "Sorry. Login could not be completed"
+                    err = "Sorry. PIN reset failed. You can try again"
                 }
                 $('#loader-modal').get(0).hide(); // hide loader
                 ons.notification.alert({title: '<ons-icon icon="md-close-circle-o" size="32px" ' +
-                'style="color: red;"></ons-icon> Log In Failed',
+                'style="color: red;"></ons-icon> PIN Reset Failed',
                     messageHTML: '<span>' + err + '</span>',
                     cancelable: false
                 });
             });
-
-            $('#login-navigator').get(0).popPage({});
-
 
         }
 
