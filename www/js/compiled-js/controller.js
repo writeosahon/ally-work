@@ -1029,6 +1029,160 @@ utopiasoftware.ally.controller = {
          */
         forgotPinFormValidated: function(){
 
+            // check if Internet Connection is available before proceeding
+            if(navigator.connection.type === Connection.NONE){ // no Internet Connection
+                // inform the user that they cannot proceed without Internet
+                window.plugins.toast.showWithOptions({
+                    message: "ALLY user secure PIN cannot be reset without an Internet Connection",
+                    duration: 4000,
+                    position: "top",
+                    styling: {
+                        opacity: 1,
+                        backgroundColor: '#ff0000', //red
+                        textColor: '#FFFFFF',
+                        textSize: 14
+                    }
+                }, function(toastEvent){
+                    if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                        window.plugins.toast.hide();
+                    }
+                });
+
+                return; // exit method immediately
+            }
+
+            // prepare the form data to be submitted
+            var formData = {
+                phone: $('#forgot-pin-page #forgot-pin-phone-number').val().startsWith("0") ?
+                    $('#forgot-pin-page #forgot-pin-phone-number').val().replace("0", "+234"):
+                    $('#forgot-pin-page #forgot-pin-phone-number').val()
+            };
+
+            // begin login process
+            Promise.resolve().
+            then(function(){
+                // display the loader message to indicate that account is being created;
+                $('#loader-modal-message').html("Completing User Login...");
+                return Promise.resolve($('#loader-modal').get(0).show()); // show loader
+            }).
+            then(function(){ // clear all data belonging to previous user
+                var promisesArray = []; // holds all the Promise objects for all data being deleted
+
+                var promiseObject = new Promise(function(resolve, reject){
+                    // delete the user app details from secure storage if it exists
+                    Promise.resolve(intel.security.secureStorage.
+                    delete({'id':'ally-user-details'})).
+                    then(function(){resolve();},function(){resolve();}); // ALWAYS resolve the promise
+                });
+
+                // add the promise object to the promise array
+                promisesArray.push(promiseObject);
+
+                promiseObject = new Promise(function(resolve, reject){
+                    // delete the user secure pin from secure storage if it exists
+                    Promise.resolve(intel.security.secureStorage.
+                    delete({'id':'ally-user-secure-pin'})).
+                    then(function(){resolve();},function(){resolve();}); // ALWAYS resolve the promise
+                });
+
+                // add the promise object to the promise array
+                promisesArray.push(promiseObject);
+
+                // add the promise object used to delete the cached chart data
+                promisesArray.push(utopiasoftware.ally.dashboardCharts.deleteWalletTransferInData(),
+                    utopiasoftware.ally.dashboardCharts.deleteWalletTransferOutData(),
+                    utopiasoftware.ally.dashboardCharts.deletePaymentOutData(),
+                    utopiasoftware.ally.dashboardCharts.deletePaymentInData());
+
+                // return promise when all operations have completed
+                return Promise.all(promisesArray);
+            }).
+            then(function(){
+                // clear all data in the device local/session storage
+                window.localStorage.clear();
+                window.sessionStorage.clear();
+                return null;
+            }).
+            then(function(){
+                // upload the user details to the server
+                return Promise.resolve($.ajax(
+                    {
+                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/login.php",
+                        type: "post",
+                        contentType: "application/x-www-form-urlencoded",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                        },
+                        dataType: "text",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: true,
+                        data: formData
+                    }
+                ));
+
+            }).
+            then(function(serverResponseText){
+                serverResponseText +=  "";
+                var newUser = JSON.parse(serverResponseText.trim()); // get the new user object
+                // add a timestamp for the last time user details was updated
+                newUser._lastUpdatedDate = Date.now();
+
+                // check if any error occurred
+                if(newUser.status == "error"){ // an error occured
+                    throw newUser.message; // throw the error message attached to this error
+                }
+
+                // store user data
+                utopiasoftware.ally.model.appUserDetails = newUser; // store the user details
+
+                // store the user secure pin
+                utopiasoftware.ally.model.appSecurePin = formData.lock;
+
+                return newUser; // return user data
+
+            }).
+            then(function(newUser){
+                // create a cypher data of the user details & secure pin
+                return Promise.all([Promise.resolve(intel.security.secureData.
+                createFromData({"data": JSON.stringify(newUser)})),
+                    Promise.resolve(intel.security.secureData.
+                    createFromData({"data": utopiasoftware.ally.model.appSecurePin}))]);
+            }).
+            then(function(instanceIdArray){
+                // store the cyphered user data & secure pin in secure persistent storage
+                return Promise.all([Promise.resolve(
+                    intel.security.secureStorage.write({"id": "ally-user-details", "instanceID": instanceIdArray[0]})),
+                    Promise.resolve(
+                        intel.security.secureStorage.write({"id": "ally-user-secure-pin", "instanceID": instanceIdArray[1]}))]);
+            }).
+            then(function(){
+
+                // set app-status local storage (as user phone number)
+                window.localStorage.setItem("app-status", utopiasoftware.ally.model.appUserDetails.phone);
+
+                // update the first name being displayed in the side menu
+                //$('#side-menu-username').html(utopiasoftware.saveup.model.appUserDetails.firstName);
+
+                return $('#loader-modal').get(0).hide(); // hide loader
+            }).
+            then(function(){ // navigate to the main menu page
+                return $('ons-splitter').get(0).content.load("app-main-template");
+            }).
+            then(function(){
+                ons.notification.toast("Login complete! Welcome", {timeout:3000});
+            }).
+            catch(function(err){
+                if(typeof err !== "string"){ // if err is NOT a String
+                    err = "Sorry. Login could not be completed"
+                }
+                $('#loader-modal').get(0).hide(); // hide loader
+                ons.notification.alert({title: '<ons-icon icon="md-close-circle-o" size="32px" ' +
+                'style="color: red;"></ons-icon> Log In Failed',
+                    messageHTML: '<span>' + err + '</span>',
+                    cancelable: false
+                });
+            });
+
             $('#login-navigator').get(0).popPage({});
 
 
