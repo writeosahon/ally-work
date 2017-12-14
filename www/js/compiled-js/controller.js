@@ -1607,7 +1607,7 @@ utopiasoftware.ally.controller = {
              // show appropriate loader
             $('#dashboard-ally-wallet-loader').css("display", "inline-block");
             $('#dashboard-ally-wallet').css("display", "none");
-            $('#dashboard-ally-wallet').html("0");
+            $('#dashboard-ally-wallet').html("&#8358;" + "0");
             $('#dashboard-ally-wallet-last-updated').html("");
 
             // try to retrieve user updated wallet details
@@ -1661,10 +1661,10 @@ utopiasoftware.ally.controller = {
                         walletElement.css("display", "inline-block");
                     },
                     update: function() {
-                        walletElement.html(tempObj.balance);
+                        walletElement.html("&#8358;" + tempObj.balance);
                     },
                     complete: function(){
-                        walletElement.html(kendo.toString(kendo.parseFloat(tempObj.balance), "n2"));
+                        walletElement.html("&#8358;" + kendo.toString(kendo.parseFloat(tempObj.balance), "n2"));
                         $('#dashboard-ally-wallet-last-updated').
                         html(kendo.toString(new Date(userDetailsData._lastUpdatedDate), "MMM d yyyy, h:mmtt"));
                     }
@@ -1747,7 +1747,7 @@ utopiasoftware.ally.controller = {
                 utopiasoftware.ally.dashboardCharts.loadWalletTransferInData().
                 then(function(chartDataArray){ // get the chart data array to be used by chart
                     // format the chart data array so it can be properly used
-                    return chartDataMapping(chartDataArray);
+                    return chartDataMapping(chartDataArray[periodType]);
                 }).
                 then(function(chartDataArray){
                     utopiasoftware.ally.controller.dashboardPageViewModel.walletIncomingChart =
@@ -1772,12 +1772,20 @@ utopiasoftware.ally.controller = {
                                 title: 'Time (GMT +1)',
                                 valueType: 'DateTime',
                                 labelFormat: chartCustomisableSettings.labelFormat,
-                                intervalType: chartCustomisableSettings.intervalType
+                                intervalType: chartCustomisableSettings.intervalType,
+                                titleStyle: {
+                                    size: '1em',
+                                    textAlignment: 'center'
+                                }
                             },
                             primaryYAxis: {
                                 title: 'Amount in thousands (N)',
                                 valueType: 'Double',
-                                labelFormat: '{value}k'
+                                labelFormat: '{value}k',
+                                titleStyle: {
+                                    size: '1em',
+                                    textAlignment: 'center'
+                                }
                             },
                             series: [{
                                 dataSource: chartDataArray,
@@ -1820,14 +1828,16 @@ utopiasoftware.ally.controller = {
             then(function(serverResponse){// retrieve the server response
                 serverResponse +=  "";
                 serverResponse = JSON.parse(serverResponse.trim()); // return the server response as an object
-                return serverResponse;
+                return Promise.all([serverResponse, utopiasoftware.ally.dashboardCharts.loadWalletTransferInData()]);
             }).
             then(function(chartDataArray){ // save the chart array data to cache
-                return utopiasoftware.ally.dashboardCharts.saveWalletTransferInData(chartDataArray);
+                chartDataArray[1] = chartDataArray[1] || {};
+                chartDataArray[1][periodType] = chartDataArray[0];
+                return utopiasoftware.ally.dashboardCharts.saveWalletTransferInData(chartDataArray[1]);
             }).
             then(function(chartDataArray){ // get the chart data array to be used by chart
                 // format the chart data array so it can be properly used
-                return chartDataMapping(chartDataArray);
+                return chartDataMapping(chartDataArray[periodType]);
             }).
             then(function(chartDataArray){
                 utopiasoftware.ally.controller.dashboardPageViewModel.walletIncomingChart =
@@ -1852,12 +1862,20 @@ utopiasoftware.ally.controller = {
                             title: 'Time (GMT +1)',
                             valueType: 'DateTime',
                             labelFormat: chartCustomisableSettings.labelFormat,
-                            intervalType: chartCustomisableSettings.intervalType
+                            intervalType: chartCustomisableSettings.intervalType,
+                            titleStyle: {
+                                size: '1em',
+                                textAlignment: 'center'
+                            }
                         },
                         primaryYAxis: {
                             title: 'Amount in thousands (N)',
                             valueType: 'Double',
-                            labelFormat: '{value}k'
+                            labelFormat: '{value}k',
+                            titleStyle: {
+                                size: '1em',
+                                textAlignment: 'center'
+                            }
                         },
                         series: [{
                             dataSource: chartDataArray,
@@ -1966,7 +1984,7 @@ utopiasoftware.ally.controller = {
                 utopiasoftware.ally.dashboardCharts.loadWalletTransferOutData().
                 then(function(chartDataArray){ // get the chart data array to be used by chart
                     // format the chart data array so it can be properly used
-                    return chartDataMapping(chartDataArray);
+                    return chartDataMapping(chartDataArray[periodType]);
                 }).
                 then(function(chartDataArray){
                     utopiasoftware.ally.controller.dashboardPageViewModel.walletOutgoingChart =
@@ -1991,12 +2009,20 @@ utopiasoftware.ally.controller = {
                                 title: 'Time (GMT +1)',
                                 valueType: 'DateTime',
                                 labelFormat: chartCustomisableSettings.labelFormat,
-                                intervalType: chartCustomisableSettings.intervalType
+                                intervalType: chartCustomisableSettings.intervalType,
+                                titleStyle: {
+                                    size: '1em',
+                                    textAlignment: 'center'
+                                }
                             },
                             primaryYAxis: {
                                 title: 'Amount in thousands (N)',
                                 valueType: 'Double',
-                                labelFormat: '{value}k'
+                                labelFormat: '{value}k',
+                                titleStyle: {
+                                    size: '1em',
+                                    textAlignment: 'center'
+                                }
                             },
                             series: [{
                                 dataSource: chartDataArray,
@@ -2039,14 +2065,16 @@ utopiasoftware.ally.controller = {
             then(function(serverResponse){// retrieve the server response
                 serverResponse +=  "";
                 serverResponse = JSON.parse(serverResponse.trim()); // return the server response as an object
-                return serverResponse;
+                return Promise.all([serverResponse, utopiasoftware.ally.dashboardCharts.loadWalletTransferOutData()]);
             }).
             then(function(chartDataArray){ // save the chart array data to cache
-                return utopiasoftware.ally.dashboardCharts.saveWalletTransferOutData(chartDataArray);
+                chartDataArray[1] = chartDataArray[1] || {};
+                chartDataArray[1][periodType] = chartDataArray[0];
+                return utopiasoftware.ally.dashboardCharts.saveWalletTransferOutData(chartDataArray[1]);
             }).
             then(function(chartDataArray){ // get the chart data array to be used by chart
                 // format the chart data array so it can be properly used
-                return chartDataMapping(chartDataArray);
+                return chartDataMapping(chartDataArray[periodType]);
             }).
             then(function(chartDataArray){
                 utopiasoftware.ally.controller.dashboardPageViewModel.walletOutgoingChart =
@@ -2071,12 +2099,20 @@ utopiasoftware.ally.controller = {
                             title: 'Time (GMT +1)',
                             valueType: 'DateTime',
                             labelFormat: chartCustomisableSettings.labelFormat,
-                            intervalType: chartCustomisableSettings.intervalType
+                            intervalType: chartCustomisableSettings.intervalType,
+                            titleStyle: {
+                                size: '1em',
+                                textAlignment: 'center'
+                            }
                         },
                         primaryYAxis: {
                             title: 'Amount in thousands (N)',
                             valueType: 'Double',
-                            labelFormat: '{value}k'
+                            labelFormat: '{value}k',
+                            titleStyle: {
+                                size: '1em',
+                                textAlignment: 'center'
+                            }
                         },
                         series: [{
                             dataSource: chartDataArray,
@@ -2185,7 +2221,7 @@ utopiasoftware.ally.controller = {
                 utopiasoftware.ally.dashboardCharts.loadPaymentOutData().
                 then(function(chartDataArray){ // get the chart data array to be used by chart
                     // format the chart data array so it can be properly used
-                    return chartDataMapping(chartDataArray);
+                    return chartDataMapping(chartDataArray[periodType]);
                 }).
                 then(function(chartDataArray){
                     utopiasoftware.ally.controller.dashboardPageViewModel.paymentsOutChart =
@@ -2210,12 +2246,20 @@ utopiasoftware.ally.controller = {
                                 title: 'Time (GMT +1)',
                                 valueType: 'DateTime',
                                 labelFormat: chartCustomisableSettings.labelFormat,
-                                intervalType: chartCustomisableSettings.intervalType
+                                intervalType: chartCustomisableSettings.intervalType,
+                                titleStyle: {
+                                    size: '1em',
+                                    textAlignment: 'center'
+                                }
                             },
                             primaryYAxis: {
                                 title: 'Amount in thousands (N)',
                                 valueType: 'Double',
-                                labelFormat: '{value}k'
+                                labelFormat: '{value}k',
+                                titleStyle: {
+                                    size: '1em',
+                                    textAlignment: 'center'
+                                }
                             },
                             series: [{
                                 dataSource: chartDataArray,
@@ -2258,14 +2302,16 @@ utopiasoftware.ally.controller = {
             then(function(serverResponse){// retrieve the server response
                 serverResponse +=  "";
                 serverResponse = JSON.parse(serverResponse.trim()); // return the server response as an object
-                return serverResponse;
+                return Promise.all([serverResponse, utopiasoftware.ally.dashboardCharts.loadPaymentOutData()]);
             }).
             then(function(chartDataArray){ // save the chart array data to cache
-                return utopiasoftware.ally.dashboardCharts.savePaymentOutData(chartDataArray);
+                chartDataArray[1] = chartDataArray[1] || {};
+                chartDataArray[1][periodType] = chartDataArray[0];
+                return utopiasoftware.ally.dashboardCharts.savePaymentOutData(chartDataArray[1]);
             }).
             then(function(chartDataArray){ // get the chart data array to be used by chart
                 // format the chart data array so it can be properly used
-                return chartDataMapping(chartDataArray);
+                return chartDataMapping(chartDataArray[periodType]);
             }).
             then(function(chartDataArray){
                 utopiasoftware.ally.controller.dashboardPageViewModel.paymentsOutChart =
@@ -2290,12 +2336,20 @@ utopiasoftware.ally.controller = {
                             title: 'Time (GMT +1)',
                             valueType: 'DateTime',
                             labelFormat: chartCustomisableSettings.labelFormat,
-                            intervalType: chartCustomisableSettings.intervalType
+                            intervalType: chartCustomisableSettings.intervalType,
+                            titleStyle: {
+                                size: '1em',
+                                textAlignment: 'center'
+                            }
                         },
                         primaryYAxis: {
                             title: 'Amount in thousands (N)',
                             valueType: 'Double',
-                            labelFormat: '{value}k'
+                            labelFormat: '{value}k',
+                            titleStyle: {
+                                size: '1em',
+                                textAlignment: 'center'
+                            }
                         },
                         series: [{
                             dataSource: chartDataArray,
@@ -2404,7 +2458,7 @@ utopiasoftware.ally.controller = {
                 utopiasoftware.ally.dashboardCharts.loadPaymentInData().
                 then(function(chartDataArray){ // get the chart data array to be used by chart
                     // format the chart data array so it can be properly used
-                    return chartDataMapping(chartDataArray);
+                    return chartDataMapping(chartDataArray[periodType]);
                 }).
                 then(function(chartDataArray){
                     utopiasoftware.ally.controller.dashboardPageViewModel.paymentsInChart =
@@ -2429,12 +2483,20 @@ utopiasoftware.ally.controller = {
                                 title: 'Time (GMT +1)',
                                 valueType: 'DateTime',
                                 labelFormat: chartCustomisableSettings.labelFormat,
-                                intervalType: chartCustomisableSettings.intervalType
+                                intervalType: chartCustomisableSettings.intervalType,
+                                titleStyle: {
+                                    size: '1em',
+                                    textAlignment: 'center'
+                                }
                             },
                             primaryYAxis: {
                                 title: 'Amount in thousands (N)',
                                 valueType: 'Double',
-                                labelFormat: '{value}k'
+                                labelFormat: '{value}k',
+                                titleStyle: {
+                                    size: '1em',
+                                    textAlignment: 'center'
+                                }
                             },
                             series: [{
                                 dataSource: chartDataArray,
@@ -2477,14 +2539,16 @@ utopiasoftware.ally.controller = {
             then(function(serverResponse){// retrieve the server response
                 serverResponse +=  "";
                 serverResponse = JSON.parse(serverResponse.trim()); // return the server response as an object
-                return serverResponse;
+                return Promise.all([serverResponse, utopiasoftware.ally.dashboardCharts.loadPaymentInData()]);
             }).
             then(function(chartDataArray){ // save the chart array data to cache
-                return utopiasoftware.ally.dashboardCharts.savePaymentInData(chartDataArray);
+                chartDataArray[1] = chartDataArray[1] || {};
+                chartDataArray[1][periodType] = chartDataArray[0];
+                return utopiasoftware.ally.dashboardCharts.savePaymentInData(chartDataArray[1]);
             }).
             then(function(chartDataArray){ // get the chart data array to be used by chart
                 // format the chart data array so it can be properly used
-                return chartDataMapping(chartDataArray);
+                return chartDataMapping(chartDataArray[periodType]);
             }).
             then(function(chartDataArray){
                 utopiasoftware.ally.controller.dashboardPageViewModel.paymentsInChart =

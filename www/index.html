@@ -68,9 +68,44 @@
 
 <!-- splitter container housing the app -->
 <ons-splitter>
-    <ons-splitter-side id="side-menu" side="right" collapse>
+    <ons-splitter-side id="side-menu" side="right" collapse width="60%">
         <ons-page id="side-menu-page">
+            <div style="width: 100%; height: 56px;
+    background-image: linear-gradient(45deg, #30a401 0%, rgb(15, 208, 208) 100%);
+    background-repeat: no-repeat; background-size: cover; position: fixed; top: 0; z-index: 1;"><!-- div with color background -->
+                <div style="padding-top: 6px; width: 100%;">
+                    <div style="width: 70%; display: inline-block; font-size:0.85em; font-weight: bold; color: #ffffff;
+                             text-align: center; text-transform: uppercase; overflow: hidden;
+                             text-overflow: ellipsis; padding-right: 1em; padding-top: auto; padding-bottom: auto">
+                        DON BROWN
+                    </div>
+                        <img src="css/app-images/profile.png"
+                             style="height: 40px; width: 40px; vertical-align: middle; border-radius: 50%; border: double green 1px">
+                </div>
+            </div>
 
+            <ons-list id="account-list" style="position: fixed; top: 56px; width: 100%;
+    min-height: calc(100vh - 56px); max-height: calc(100vh - 56px); overflow-y: scroll; display: block;">
+
+                <ons-list-item tappable lock-on-drag="true" onclick="">
+                    <div class="left">
+                        <ons-icon icon="md-ally-icon-account-settings" size="28px" class="list-item__icon" fixed-width></ons-icon>
+                    </div>
+                    <div class="center" style="text-align: left">
+                        Account Settings
+                    </div>
+                </ons-list-item>
+
+                <ons-list-item tappable lock-on-drag="true" onclick="">
+                    <div class="left">
+                        <ons-icon icon="md-ally-icon-lock-reset" size="28px" class="list-item__icon" fixed-width></ons-icon>
+                    </div>
+                    <div class="center" style="text-align: left">
+                        Change Secure PIN
+                    </div>
+                </ons-list-item>
+
+            </ons-list>
         </ons-page>
     </ons-splitter-side>
     <ons-splitter-content id="splitter-content"></ons-splitter-content>

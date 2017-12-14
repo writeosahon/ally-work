@@ -493,7 +493,7 @@ navigator.app.exitApp();// Close the app
          * method is used to update the ALLY Wallet Balance on the dashboard
          */updateWalletDashboard:function updateWalletDashboard(){// create an object that contains the balance of the user wallet
 var tempObj={balance:0};// show appropriate loader
-$('#dashboard-ally-wallet-loader').css("display","inline-block");$('#dashboard-ally-wallet').css("display","none");$('#dashboard-ally-wallet').html("0");$('#dashboard-ally-wallet-last-updated').html("");// try to retrieve user updated wallet details
+$('#dashboard-ally-wallet-loader').css("display","inline-block");$('#dashboard-ally-wallet').css("display","none");$('#dashboard-ally-wallet').html("&#8358;"+"0");$('#dashboard-ally-wallet-last-updated').html("");// try to retrieve user updated wallet details
 Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/get-profile.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
 processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone}// data to submit to server
 })).then(function(serverResponseText){serverResponseText+="";var userDetailsData=JSON.parse(serverResponseText.trim());// get the new user object
@@ -503,7 +503,7 @@ if(userDetailsData.status=="error"){// an error occurred
 throw userDetailsData.message;// throw the error message attached to this error
 }return userDetailsData;},function(){return utopiasoftware.ally.loadUserCachedAppDetails();}).then(function(userDetailsData){// save the user details in the local app data and also cache it
 utopiasoftware.ally.model.appUserDetails=userDetailsData;return utopiasoftware.ally.saveUserAppDetails(userDetailsData);}).then(function(userDetailsData){var walletElement=$('#dashboard-ally-wallet');// holds the wallet element
-anime({targets:tempObj,balance:userDetailsData.balance,duration:1200,easing:'linear',begin:function begin(){$('#dashboard-ally-wallet-loader').css("display","none");walletElement.css("display","inline-block");},update:function update(){walletElement.html(tempObj.balance);},complete:function complete(){walletElement.html(kendo.toString(kendo.parseFloat(tempObj.balance),"n2"));$('#dashboard-ally-wallet-last-updated').html(kendo.toString(new Date(userDetailsData._lastUpdatedDate),"MMM d yyyy, h:mmtt"));}});});},/**
+anime({targets:tempObj,balance:userDetailsData.balance,duration:1200,easing:'linear',begin:function begin(){$('#dashboard-ally-wallet-loader').css("display","none");walletElement.css("display","inline-block");},update:function update(){walletElement.html("&#8358;"+tempObj.balance);},complete:function complete(){walletElement.html("&#8358;"+kendo.toString(kendo.parseFloat(tempObj.balance),"n2"));$('#dashboard-ally-wallet-last-updated').html(kendo.toString(new Date(userDetailsData._lastUpdatedDate),"MMM d yyyy, h:mmtt"));}});});},/**
          * update the wallet transfer-in dashboard. Either using cached data or remote data
          *
          * @param periodType
@@ -520,9 +520,9 @@ window.plugins.toast.showWithOptions({message:"No Internet Connection. Previousl
 window.plugins.toast.hide();}});// load the previously cached data
 utopiasoftware.ally.dashboardCharts.loadWalletTransferInData().then(function(chartDataArray){// get the chart data array to be used by chart
 // format the chart data array so it can be properly used
-return chartDataMapping(chartDataArray);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.walletIncomingChart=new ej.charts.Chart({// Width and height for chart in pixel
+return chartDataMapping(chartDataArray[periodType]);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.walletIncomingChart=new ej.charts.Chart({// Width and height for chart in pixel
 width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#30A401"],title:chartCustomisableSettings.chartTitle,titleStyle:{size:'1em'},tooltip:{enable:true,format:'Amount: ${point.y}'},// Legend for chart
-legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k'},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Incoming Transfers',//Series type as line
+legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType,titleStyle:{size:'1em',textAlignment:'center'}},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k',titleStyle:{size:'1em',textAlignment:'center'}},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Incoming Transfers',//Series type as line
 type:'Line'}]});// remove the loader content
 $('#dashboard-page #dashboard-wallet-incoming-chart').html("");//append the newly created chart
 utopiasoftware.ally.controller.dashboardPageViewModel.walletIncomingChart.appendTo('#dashboard-wallet-incoming-chart');});return;// exit method
@@ -533,12 +533,12 @@ type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function 
 processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,duration:periodType}// data to submit to server
 })).then(function(serverResponse){// retrieve the server response
 serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// return the server response as an object
-return serverResponse;}).then(function(chartDataArray){// save the chart array data to cache
-return utopiasoftware.ally.dashboardCharts.saveWalletTransferInData(chartDataArray);}).then(function(chartDataArray){// get the chart data array to be used by chart
+return Promise.all([serverResponse,utopiasoftware.ally.dashboardCharts.loadWalletTransferInData()]);}).then(function(chartDataArray){// save the chart array data to cache
+chartDataArray[1]=chartDataArray[1]||{};chartDataArray[1][periodType]=chartDataArray[0];return utopiasoftware.ally.dashboardCharts.saveWalletTransferInData(chartDataArray[1]);}).then(function(chartDataArray){// get the chart data array to be used by chart
 // format the chart data array so it can be properly used
-return chartDataMapping(chartDataArray);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.walletIncomingChart=new ej.charts.Chart({// Width and height for chart in pixel
+return chartDataMapping(chartDataArray[periodType]);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.walletIncomingChart=new ej.charts.Chart({// Width and height for chart in pixel
 width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#30A401"],title:chartCustomisableSettings.chartTitle,titleStyle:{size:'1em'},tooltip:{enable:true,format:'Amount: ${point.y}'},// Legend for chart
-legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k'},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Incoming Transfers',//Series type as line
+legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType,titleStyle:{size:'1em',textAlignment:'center'}},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k',titleStyle:{size:'1em',textAlignment:'center'}},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Incoming Transfers',//Series type as line
 type:'Line'}]});// remove the loader content
 $('#dashboard-page #dashboard-wallet-incoming-chart').html("");//append the newly created chart
 utopiasoftware.ally.controller.dashboardPageViewModel.walletIncomingChart.appendTo('#dashboard-wallet-incoming-chart');});/**
@@ -565,9 +565,9 @@ window.plugins.toast.showWithOptions({message:"No Internet Connection. Previousl
 window.plugins.toast.hide();}});// load the previously cached data
 utopiasoftware.ally.dashboardCharts.loadWalletTransferOutData().then(function(chartDataArray){// get the chart data array to be used by chart
 // format the chart data array so it can be properly used
-return chartDataMapping(chartDataArray);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.walletOutgoingChart=new ej.charts.Chart({// Width and height for chart in pixel
+return chartDataMapping(chartDataArray[periodType]);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.walletOutgoingChart=new ej.charts.Chart({// Width and height for chart in pixel
 width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#0FD0D0"],title:chartCustomisableSettings.chartTitle,titleStyle:{size:'1em'},tooltip:{enable:true,format:'Amount: ${point.y}'},// Legend for chart
-legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k'},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Outgoing Transfers',//Series type as line
+legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType,titleStyle:{size:'1em',textAlignment:'center'}},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k',titleStyle:{size:'1em',textAlignment:'center'}},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Outgoing Transfers',//Series type as line
 type:'Line'}]});// remove the loader content
 $('#dashboard-page #dashboard-wallet-outgoing-chart').html("");//append the newly created chart
 utopiasoftware.ally.controller.dashboardPageViewModel.walletOutgoingChart.appendTo('#dashboard-wallet-outgoing-chart');});return;// exit method
@@ -578,12 +578,12 @@ type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function 
 processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,duration:periodType}// data to submit to server
 })).then(function(serverResponse){// retrieve the server response
 serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// return the server response as an object
-return serverResponse;}).then(function(chartDataArray){// save the chart array data to cache
-return utopiasoftware.ally.dashboardCharts.saveWalletTransferOutData(chartDataArray);}).then(function(chartDataArray){// get the chart data array to be used by chart
+return Promise.all([serverResponse,utopiasoftware.ally.dashboardCharts.loadWalletTransferOutData()]);}).then(function(chartDataArray){// save the chart array data to cache
+chartDataArray[1]=chartDataArray[1]||{};chartDataArray[1][periodType]=chartDataArray[0];return utopiasoftware.ally.dashboardCharts.saveWalletTransferOutData(chartDataArray[1]);}).then(function(chartDataArray){// get the chart data array to be used by chart
 // format the chart data array so it can be properly used
-return chartDataMapping(chartDataArray);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.walletOutgoingChart=new ej.charts.Chart({// Width and height for chart in pixel
+return chartDataMapping(chartDataArray[periodType]);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.walletOutgoingChart=new ej.charts.Chart({// Width and height for chart in pixel
 width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#0FD0D0"],title:chartCustomisableSettings.chartTitle,titleStyle:{size:'1em'},tooltip:{enable:true,format:'Amount: ${point.y}'},// Legend for chart
-legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k'},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Outgoing Transfers',//Series type as line
+legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType,titleStyle:{size:'1em',textAlignment:'center'}},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k',titleStyle:{size:'1em',textAlignment:'center'}},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Outgoing Transfers',//Series type as line
 type:'Line'}]});// remove the loader content
 $('#dashboard-page #dashboard-wallet-outgoing-chart').html("");//append the newly created chart
 utopiasoftware.ally.controller.dashboardPageViewModel.walletOutgoingChart.appendTo('#dashboard-wallet-outgoing-chart');});/**
@@ -610,9 +610,9 @@ window.plugins.toast.showWithOptions({message:"No Internet Connection. Previousl
 window.plugins.toast.hide();}});// load the previously cached data
 utopiasoftware.ally.dashboardCharts.loadPaymentOutData().then(function(chartDataArray){// get the chart data array to be used by chart
 // format the chart data array so it can be properly used
-return chartDataMapping(chartDataArray);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.paymentsOutChart=new ej.charts.Chart({// Width and height for chart in pixel
+return chartDataMapping(chartDataArray[periodType]);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.paymentsOutChart=new ej.charts.Chart({// Width and height for chart in pixel
 width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#30A401"],title:chartCustomisableSettings.chartTitle,titleStyle:{size:'1em'},tooltip:{enable:true,format:'Amount: ${point.y}'},// Legend for chart
-legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k'},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Outgoing Payments',//Series type as line
+legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType,titleStyle:{size:'1em',textAlignment:'center'}},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k',titleStyle:{size:'1em',textAlignment:'center'}},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Outgoing Payments',//Series type as line
 type:'Area'}]});// remove the loader content
 $('#dashboard-page #dashboard-wallet-payments-out-chart').html("");//append the newly created chart
 utopiasoftware.ally.controller.dashboardPageViewModel.paymentsOutChart.appendTo('#dashboard-wallet-payments-out-chart');});return;// exit method
@@ -623,12 +623,12 @@ type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function 
 processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,duration:periodType}// data to submit to server
 })).then(function(serverResponse){// retrieve the server response
 serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// return the server response as an object
-return serverResponse;}).then(function(chartDataArray){// save the chart array data to cache
-return utopiasoftware.ally.dashboardCharts.savePaymentOutData(chartDataArray);}).then(function(chartDataArray){// get the chart data array to be used by chart
+return Promise.all([serverResponse,utopiasoftware.ally.dashboardCharts.loadPaymentOutData()]);}).then(function(chartDataArray){// save the chart array data to cache
+chartDataArray[1]=chartDataArray[1]||{};chartDataArray[1][periodType]=chartDataArray[0];return utopiasoftware.ally.dashboardCharts.savePaymentOutData(chartDataArray[1]);}).then(function(chartDataArray){// get the chart data array to be used by chart
 // format the chart data array so it can be properly used
-return chartDataMapping(chartDataArray);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.paymentsOutChart=new ej.charts.Chart({// Width and height for chart in pixel
+return chartDataMapping(chartDataArray[periodType]);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.paymentsOutChart=new ej.charts.Chart({// Width and height for chart in pixel
 width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#30A401"],title:chartCustomisableSettings.chartTitle,titleStyle:{size:'1em'},tooltip:{enable:true,format:'Amount: ${point.y}'},// Legend for chart
-legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k'},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Outgoing Payments',//Series type as line
+legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType,titleStyle:{size:'1em',textAlignment:'center'}},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k',titleStyle:{size:'1em',textAlignment:'center'}},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Outgoing Payments',//Series type as line
 type:'Area'}]});// remove the loader content
 $('#dashboard-page #dashboard-wallet-payments-out-chart').html("");//append the newly created chart
 utopiasoftware.ally.controller.dashboardPageViewModel.paymentsOutChart.appendTo('#dashboard-wallet-payments-out-chart');});/**
@@ -655,9 +655,9 @@ window.plugins.toast.showWithOptions({message:"No Internet Connection. Previousl
 window.plugins.toast.hide();}});// load the previously cached data
 utopiasoftware.ally.dashboardCharts.loadPaymentInData().then(function(chartDataArray){// get the chart data array to be used by chart
 // format the chart data array so it can be properly used
-return chartDataMapping(chartDataArray);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.paymentsInChart=new ej.charts.Chart({// Width and height for chart in pixel
+return chartDataMapping(chartDataArray[periodType]);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.paymentsInChart=new ej.charts.Chart({// Width and height for chart in pixel
 width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#0FD0D0"],title:chartCustomisableSettings.chartTitle,titleStyle:{size:'1em'},tooltip:{enable:true,format:'Amount: ${point.y}'},// Legend for chart
-legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k'},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Incoming Payments',//Series type as line
+legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType,titleStyle:{size:'1em',textAlignment:'center'}},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k',titleStyle:{size:'1em',textAlignment:'center'}},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Incoming Payments',//Series type as line
 type:'Area'}]});// remove the loader content
 $('#dashboard-page #dashboard-wallet-payments-in-chart').html("");//append the newly created chart
 utopiasoftware.ally.controller.dashboardPageViewModel.paymentsInChart.appendTo('#dashboard-wallet-payments-in-chart');});return;// exit method
@@ -668,10 +668,10 @@ type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function 
 processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,duration:periodType}// data to submit to server
 })).then(function(serverResponse){// retrieve the server response
 serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// return the server response as an object
-return serverResponse;}).then(function(chartDataArray){// save the chart array data to cache
-return utopiasoftware.ally.dashboardCharts.savePaymentInData(chartDataArray);}).then(function(chartDataArray){// get the chart data array to be used by chart
+return Promise.all([serverResponse,utopiasoftware.ally.dashboardCharts.loadPaymentInData()]);}).then(function(chartDataArray){// save the chart array data to cache
+chartDataArray[1]=chartDataArray[1]||{};chartDataArray[1][periodType]=chartDataArray[0];return utopiasoftware.ally.dashboardCharts.savePaymentInData(chartDataArray[1]);}).then(function(chartDataArray){// get the chart data array to be used by chart
 // format the chart data array so it can be properly used
-return chartDataMapping(chartDataArray);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.paymentsInChart=new ej.charts.Chart({// Width and height for chart in pixel
+return chartDataMapping(chartDataArray[periodType]);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.paymentsInChart=new ej.charts.Chart({// Width and height for chart in pixel
 width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#0FD0D0"],title:chartCustomisableSettings.chartTitle,titleStyle:{size:'1em'},tooltip:{enable:true,format:'Amount: ${point.y}'},// Legend for chart
 legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k'},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Incoming Payments',//Series type as line
 type:'Area'}]});// remove the loader content

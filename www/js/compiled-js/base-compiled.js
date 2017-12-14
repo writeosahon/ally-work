@@ -243,7 +243,7 @@ var utopiasoftware = {
                     }).then(function (chartDataArray) {
                         resolve(JSON.parse(chartDataArray)); // return the cached app chart data and resolve the Promise
                     }).catch(function (err) {
-                        reject(err); // reject the Promise with the provided error
+                        resolve({}); // resolve the Promise with an empty object
                     });
                 });
             },
@@ -311,7 +311,7 @@ var utopiasoftware = {
                     }).then(function (chartDataArray) {
                         resolve(JSON.parse(chartDataArray)); // return the cached app chart data and resolve the Promise
                     }).catch(function (err) {
-                        reject(err); // reject the Promise with the provided error
+                        resolve({}); //resolve the Promise with an empty object
                     });
                 });
             },
@@ -379,7 +379,7 @@ var utopiasoftware = {
                     }).then(function (chartDataArray) {
                         resolve(JSON.parse(chartDataArray)); // return the cached app chart data and resolve the Promise
                     }).catch(function (err) {
-                        reject(err); // reject the Promise with the provided error
+                        resolve({}); // resolve the Promise with an empty object
                     });
                 });
             },
@@ -447,7 +447,7 @@ var utopiasoftware = {
                     }).then(function (chartDataArray) {
                         resolve(JSON.parse(chartDataArray)); // return the cached app chart data and resolve the Promise
                     }).catch(function (err) {
-                        reject(err); // reject the Promise with the provided error
+                        resolve({}); // resolve the Promise with an empty object
                     });
                 });
             },
