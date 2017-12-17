@@ -1,5 +1,16 @@
 <!-- payments ally-scan page -->
 <ons-page id="payments-ally-scan-page">
+    <ons-card id="payments-ally-scan-payments-out-chart"
+              style="height: 16em; padding: 0 !important; background-color: #ffffff">
+        <div class="title" style="font-size: 0.85em; padding: 0.5em;">
+            ALLY Wallet Payments Out
+        </div>
+        <div class="content" style="padding: 0.5em;">
+
+            <ons-icon icon="md-settings" size="28px" style="color: #30a401;" spin>
+            </ons-icon>
+        </div>
+    </ons-card>
     <!-- page layout -->
     <ons-row vertical-align="top" style="margin-top: 2em;">
         <ons-col width="75%" style="height: 100%;">
@@ -44,6 +55,7 @@
     </ons-row>
 
     <!-- this section displays the QR Code icon -->
+    <!--
     <ons-row vertical-align="top">
         <ons-col width="calc((100% - 180px) / 2 )" style="height: 180px"></ons-col>
         <ons-col width="180px" style="height: 180px">
@@ -51,6 +63,7 @@
         </ons-col>
         <ons-col width="calc((100% - 180px) / 2 )" style="height: 180px"></ons-col>
     </ons-row>
+    -->
 
     <ons-bottom-toolbar modifier="transparent" style="height: 56px; !important;">
         <div style="width: 60%; margin-left: 20%; margin-right: 20%; padding-top: 6px; padding-bottom: 6px">

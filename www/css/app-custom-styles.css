@@ -407,6 +407,9 @@
     background-color: transparent;
     opacity: 0;
 }
+#payments-ally-scan-page.transparent #payments-ally-scan-payments-out-chart {
+    opacity: 0;
+}
 #payments-ally-scan-page.transparent ons-bottom-toolbar {
     opacity: 0;
 }
