@@ -518,3 +518,13 @@
     color: #ffffff;
     line-height: 20px;
 }
+/** STYLE FOR THE LOCK-SCREEN MODAL ENDS **/
+
+/** STYLE FOR THE CHANGE PIN PAGE BEGINS **/
+#change-pin-page ons-list, #change-pin-page ons-list-item {
+    background-color: transparent;
+}
+#change-pin-page input {
+    -webkit-text-security: disc;
+}
+/** STYLE FOR THE CHANGE PIN PAGE ENDS **/

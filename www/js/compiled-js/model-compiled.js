@@ -226,4 +226,16 @@ $(document).on("hide", "#payments-ally-direct-page", utopiasoftware.ally.control
 // listen for when the Payments-Ally-Direct page is destroyed
 $(document).on("destroy", "#payments-ally-direct-page", utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.pageDestroy);
 
+// listen for the initialisation of the Change-Pin page
+$(document).on("init", "#change-pin-page", utopiasoftware.ally.controller.changePinPageViewModel.pageInit);
+
+// listen for when the Change-Pin page is shown
+$(document).on("show", "#change-pin-page", utopiasoftware.ally.controller.changePinPageViewModel.pageShow);
+
+// listen for when the Change-Pin page is hidden
+$(document).on("hide", "#change-pin-page", utopiasoftware.ally.controller.changePinPageViewModel.pageHide);
+
+// listen for when the Change-Pin page is destroyed
+$(document).on("destroy", "#change-pin-page", utopiasoftware.ally.controller.changePinPageViewModel.pageDestroy);
+
 //# sourceMappingURL=model-compiled.js.map

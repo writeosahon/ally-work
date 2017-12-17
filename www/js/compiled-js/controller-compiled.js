@@ -66,9 +66,9 @@ position:"bottom",styling:{opacity:1,backgroundColor:'#000000',textColor:'#FFFFF
          * items in the side menu is clicked
          *
          * @param label {String} label represents clicked list item in the side-menu
-         */sideMenuListClicked:function sideMenuListClicked(label){if(label=="events schedule"){// 'events schedule' button was clicked
+         */sideMenuListClicked:function sideMenuListClicked(label){if(label=="change pin"){// 'change pin' list item was clicked
 // close the side menu
-$('ons-splitter').get(0).left.close().then(function(){$('#app-main-navigator').get(0).bringPageTop("events-schedule-page.html",{});// navigate to the specified page
+$('ons-splitter').get(0).right.close().then(function(){$('#app-main-navigator').get(0).bringPageTop("change-pin-page.html",{});// navigate to the specified page
 }).catch(function(){});return;}if(label=="hotels"){// 'hotels' button was clicked
 // close the side menu
 $('ons-splitter').get(0).left.close().then(function(){$('#app-main-navigator').get(0).bringPageTop("hotels-page.html",{});// navigate to the specified page
@@ -534,7 +534,7 @@ processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,dura
 })).then(function(serverResponse){// retrieve the server response
 serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// return the server response as an object
 return Promise.all([serverResponse,utopiasoftware.ally.dashboardCharts.loadWalletTransferInData()]);}).then(function(chartDataArray){// save the chart array data to cache
-chartDataArray[1]=chartDataArray[1]||{};chartDataArray[1][periodType]=chartDataArray[0];return utopiasoftware.ally.dashboardCharts.saveWalletTransferInData(chartDataArray[1]);}).then(function(chartDataArray){// get the chart data array to be used by chart
+chartDataArray[1]=chartDataArray[1];chartDataArray[1][periodType]=chartDataArray[0];return utopiasoftware.ally.dashboardCharts.saveWalletTransferInData(chartDataArray[1]);}).then(function(chartDataArray){// get the chart data array to be used by chart
 // format the chart data array so it can be properly used
 return chartDataMapping(chartDataArray[periodType]);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.walletIncomingChart=new ej.charts.Chart({// Width and height for chart in pixel
 width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#30A401"],title:chartCustomisableSettings.chartTitle,titleStyle:{size:'1em'},tooltip:{enable:true,format:'Amount: ${point.y}'},// Legend for chart
@@ -579,7 +579,7 @@ processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,dura
 })).then(function(serverResponse){// retrieve the server response
 serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// return the server response as an object
 return Promise.all([serverResponse,utopiasoftware.ally.dashboardCharts.loadWalletTransferOutData()]);}).then(function(chartDataArray){// save the chart array data to cache
-chartDataArray[1]=chartDataArray[1]||{};chartDataArray[1][periodType]=chartDataArray[0];return utopiasoftware.ally.dashboardCharts.saveWalletTransferOutData(chartDataArray[1]);}).then(function(chartDataArray){// get the chart data array to be used by chart
+chartDataArray[1]=chartDataArray[1];chartDataArray[1][periodType]=chartDataArray[0];return utopiasoftware.ally.dashboardCharts.saveWalletTransferOutData(chartDataArray[1]);}).then(function(chartDataArray){// get the chart data array to be used by chart
 // format the chart data array so it can be properly used
 return chartDataMapping(chartDataArray[periodType]);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.walletOutgoingChart=new ej.charts.Chart({// Width and height for chart in pixel
 width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#0FD0D0"],title:chartCustomisableSettings.chartTitle,titleStyle:{size:'1em'},tooltip:{enable:true,format:'Amount: ${point.y}'},// Legend for chart
@@ -624,7 +624,7 @@ processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,dura
 })).then(function(serverResponse){// retrieve the server response
 serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// return the server response as an object
 return Promise.all([serverResponse,utopiasoftware.ally.dashboardCharts.loadPaymentOutData()]);}).then(function(chartDataArray){// save the chart array data to cache
-chartDataArray[1]=chartDataArray[1]||{};chartDataArray[1][periodType]=chartDataArray[0];return utopiasoftware.ally.dashboardCharts.savePaymentOutData(chartDataArray[1]);}).then(function(chartDataArray){// get the chart data array to be used by chart
+chartDataArray[1]=chartDataArray[1];chartDataArray[1][periodType]=chartDataArray[0];return utopiasoftware.ally.dashboardCharts.savePaymentOutData(chartDataArray[1]);}).then(function(chartDataArray){// get the chart data array to be used by chart
 // format the chart data array so it can be properly used
 return chartDataMapping(chartDataArray[periodType]);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.paymentsOutChart=new ej.charts.Chart({// Width and height for chart in pixel
 width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#30A401"],title:chartCustomisableSettings.chartTitle,titleStyle:{size:'1em'},tooltip:{enable:true,format:'Amount: ${point.y}'},// Legend for chart
@@ -669,7 +669,7 @@ processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,dura
 })).then(function(serverResponse){// retrieve the server response
 serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// return the server response as an object
 return Promise.all([serverResponse,utopiasoftware.ally.dashboardCharts.loadPaymentInData()]);}).then(function(chartDataArray){// save the chart array data to cache
-chartDataArray[1]=chartDataArray[1]||{};chartDataArray[1][periodType]=chartDataArray[0];return utopiasoftware.ally.dashboardCharts.savePaymentInData(chartDataArray[1]);}).then(function(chartDataArray){// get the chart data array to be used by chart
+chartDataArray[1]=chartDataArray[1];chartDataArray[1][periodType]=chartDataArray[0];return utopiasoftware.ally.dashboardCharts.savePaymentInData(chartDataArray[1]);}).then(function(chartDataArray){// get the chart data array to be used by chart
 // format the chart data array so it can be properly used
 return chartDataMapping(chartDataArray[periodType]);}).then(function(chartDataArray){utopiasoftware.ally.controller.dashboardPageViewModel.paymentsInChart=new ej.charts.Chart({// Width and height for chart in pixel
 width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#0FD0D0"],title:chartCustomisableSettings.chartTitle,titleStyle:{size:'1em'},tooltip:{enable:true,format:'Amount: ${point.y}'},// Legend for chart
@@ -1609,6 +1609,85 @@ $('#payments-ally-direct-page #payments-ally-direct-form').get(0).reset();// res
 $('#payments-ally-direct-page .page__content').scrollTop(0);// forward details of the wallet-transfer and the user details
 return Promise.all([$('#hour-glass-loader-modal').get(0).hide(),$('#payments-page #payments-tabbar').get(0).setActiveTab(0),ons.notification.toast("Merchant Payment Successful!",{timeout:4000})]);}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
 err='Sorry, merchant payment could not be made.<br> '+'You can try again OR scan the QR Code to pay merchant';}$('#hour-glass-loader-modal').get(0).hide();// hide loader
-ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> ALLY Payment Error',messageHTML:'<span>'+err+'</span>',cancelable:false});});}}};
+ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> ALLY Payment Error',messageHTML:'<span>'+err+'</span>',cancelable:false});});}},/**
+     * object is view-model for change-pin page
+     */changePinPageViewModel:{/**
+         * used to hold the parsley form validation object for the page
+         */formValidator:null,/**
+         * event is triggered when page is initialised
+         */pageInit:function pageInit(event){var $thisPage=$(event.target);// get the current page shown
+// call the function used to initialise the app page if the app is fully loaded
+loadPageOnAppReady();//function is used to initialise the page if the app is fully ready for execution
+function loadPageOnAppReady(){// check to see if onsen is ready and if all app loading has been completed
+if(!ons.isReady()||utopiasoftware.ally.model.isAppReady===false){setTimeout(loadPageOnAppReady,500);// call this function again after half a second
+return;}// listen for the back button event
+$('#app-main-navigator').get(0).topPage.onDeviceBackButton=utopiasoftware.ally.controller.changePinPageViewModel.backButtonClicked;// initialise the create-account form validation
+utopiasoftware.ally.controller.changePinPageViewModel.formValidator=$('#change-pin-form').parsley();// attach listener for the change pin button on the page
+$('#change-pin-change-button').get(0).onclick=function(){// run the validation method for the form
+utopiasoftware.ally.controller.changePinPageViewModel.formValidator.whenValidate();};// listen for form field validation failure event
+utopiasoftware.ally.controller.changePinPageViewModel.formValidator.on('field:error',function(fieldInstance){// get the element that triggered the field validation error and use it to display tooltip
+// display tooltip
+$(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$(fieldInstance.$element).attr("data-hint",fieldInstance.getErrorsMessages()[0]);});// listen for the form field validation success event
+utopiasoftware.ally.controller.changePinPageViewModel.formValidator.on('field:success',function(fieldInstance){// remove tooltip from element
+$(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$(fieldInstance.$element).removeAttr("data-hint");});// listen for the form validation success
+utopiasoftware.ally.controller.changePinPageViewModel.formValidator.on('form:success',utopiasoftware.ally.controller.changePinPageViewModel.formValidated);// hide the loader
+$('#loader-modal').get(0).hide();}},/**
+         * method is triggered when page is shown
+         *
+         * @param event
+         */pageShow:function pageShow(event){},/**
+         * method is triggered when the page is hidden
+         * @param event
+         */pageHide:function pageHide(event){try{// remove any tooltip being displayed on all forms on the page
+$('#change-pin-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#change-pin-page [data-hint]').removeAttr("data-hint");// reset the form validator object on the page
+utopiasoftware.ally.controller.changePinPageViewModel.formValidator.reset();}catch(err){}},/**
+         * method is triggered when the page is destroyed
+         * @param event
+         */pageDestroy:function pageDestroy(event){try{// remove any tooltip being displayed on all forms on the page
+$('#change-pin-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#change-pin-page [data-hint]').removeAttr("data-hint");// destroy the form validator objects on the page
+utopiasoftware.ally.controller.changePinPageViewModel.formValidator.destroy();}catch(err){}},/**
+         * method is triggered when sign-up form is successfully validated
+         */formValidated:function formValidated(){// check if Internet Connection is available before proceeding
+if(navigator.connection.type===Connection.NONE){// no Internet Connection
+// inform the user that they cannot proceed without Internet
+window.plugins.toast.showWithOptions({message:"ALLY secure PIN cannot be changed without an Internet Connection",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#ff0000',//red
+textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
+window.plugins.toast.hide();}});return;// exit method immediately
+}// create the form data to be submitted
+var formData={lock:$('#change-pin-page #change-pin-old').val(),newlock:$('#change-pin-page #change-pin-new').val(),phone:utopiasoftware.ally.model.appUserDetails.phone};// inform the user that their current pin is being changed
+$('#hour-glass-loader-modal .modal-message').html("Changing Secure PIN...");Promise.resolve($('#hour-glass-loader-modal').get(0).show()).then(function(){// submit the form data
+return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/change-pin.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
+processData:true,data:formData}));}).then(function(serverResponse){serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// get the response object
+// check if any error occurred
+if(serverResponse.status=="error"){// an error occurred
+throw serverResponse.message;// throw the error message attached to this error
+}// store the updated secure pin
+utopiasoftware.ally.model.appSecurePin=formData.newlock;}).then(function(){// create a cypher data of the user secure pin
+return Promise.all([Promise.resolve(intel.security.secureData.createFromData({"data":formData.newlock}))]);}).then(function(instanceIdArray){// store the cyphered data & secure pin in secure persistent storage
+return Promise.all([Promise.resolve(intel.security.secureStorage.write({"id":"ally-user-secure-pin","instanceID":instanceIdArray[0]}))]);}).then(function(){// reset the form
+$('#change-pin-page #change-pin-form').get(0).reset();utopiasoftware.ally.controller.changePinPageViewModel.formValidator.reset();return $('#hour-glass-loader-modal').get(0).hide();// hide loader
+}).then(function(){ons.notification.toast("PIN changed successfully",{timeout:3000});}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
+err="Sorry, your Secure PIN could not be changed";}$('#hour-glass-loader-modal').get(0).hide();// hide loader
+ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> PIN Change Failed',messageHTML:'<span>'+err+'</span>',cancelable:false});});},/**
+         * method is triggered when the PIN visibility button is clicked.
+         * It toggles pin visibility
+         *
+         * @param buttonElement
+         * @param inputFieldId
+         */pinVisibilityButtonClicked:function pinVisibilityButtonClicked(buttonElement,inputFieldId){if($(buttonElement).attr("data-ally-visible")==="no"){// pin is not visible, make it visible
+$('#'+inputFieldId+' input').css("-webkit-text-security","none");// change the text-security for the input field
+$(buttonElement).find('ons-icon').attr("icon","md-eye-off");// change the icon associated with the input
+$(buttonElement).attr("data-ally-visible","yes");// flag the pin is now visible
+}else{// make the pin not visible
+$('#'+inputFieldId+' input').css("-webkit-text-security","disc");// change the text-security for the input field
+$(buttonElement).find('ons-icon').attr("icon","md-eye");// change the icon associated with the input
+$(buttonElement).attr("data-ally-visible","no");// flag the pin is now invisible
+}},/**
+         * method is triggered when back button or device back button is clicked
+         */backButtonClicked:function backButtonClicked(){// check if the side menu is open
+if($('ons-splitter').get(0).right.isOpen){// side menu open, so close it
+$('ons-splitter').get(0).right.close();return;// exit the method
+}// go back to previous page in the main-navigator stack
+$('#app-main-navigator').get(0).popPage({});}}};
 
 //# sourceMappingURL=controller-compiled.js.map

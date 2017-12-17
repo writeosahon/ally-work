@@ -1,0 +1,75 @@
+<!-- change pin page -->
+<ons-page id="change-pin-page">
+    <ons-toolbar>
+        <div class="left">
+            <ons-toolbar-button onclick="utopiasoftware.ally.controller.changePinPageViewModel.backButtonClicked()">
+                <ons-icon icon="md-long-arrow-left"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+        <div class="center">Change PIN</div>
+    </ons-toolbar>
+
+    <!-- form -->
+    <form id="change-pin-form" autocomplete="off" data-parsley-inputs="ons-input,textarea,ons-select,ons-checkbox"
+          data-parsley-excluded="ons-input[type=button], ons-input[type=submit],
+                              ons-input[type=reset], ons-input[type=hidden], [disabled], :hidden, readonly"
+          style="display: block;">
+
+        <ons-list>
+            <ons-list-item modifier="nodivider" style="margin-top: 3.5em;">
+                <div class="left">
+                    <ons-icon icon="ion-locked" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <ons-input id="change-pin-old" type="number" required float placeholder="Current PIN"
+                               data-parsley-type="digits"
+                               data-parsley-minlength="4"
+                               data-parsley-maxlength="8"
+                               data-parsley-required-message="enter secure PIN"
+                               data-parsley-type-message="your PIN must contain only numbers"
+                               data-parsley-minlength-message="your PIN must be at least 4 numbers"
+                               data-parsley-maxlength-message="your PIN cannot be more than 8 numbers"
+                               style="width: 65%" class="hint--top"></ons-input>
+
+                    <ons-button modifier="quiet" data-ally-visible="no"
+                                style="color: #30a401; margin-left: 1.5em;"
+                                onclick="utopiasoftware.ally.controller.changePinPageViewModel.pinVisibilityButtonClicked(this, 'change-pin-old')">
+                        <ons-icon icon="md-eye" size="21px"></ons-icon>
+                    </ons-button>
+                </div>
+            </ons-list-item>
+
+            <ons-list-item modifier="nodivider" style="margin-bottom: 3.5em;">
+                <div class="left">
+                    <ons-icon icon="md-ally-icon-padlock-confirm" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <ons-input id="change-pin-new" type="number" required float placeholder="New PIN"
+                               data-parsley-type="digits"
+                               data-parsley-minlength="4"
+                               data-parsley-maxlength="8"
+                               data-parsley-required-message="enter new PIN"
+                               data-parsley-type-message="your PIN must contain only numbers"
+                               data-parsley-minlength-message="your PIN must be at least 4 numbers"
+                               data-parsley-maxlength-message="your PIN cannot be more than 8 numbers"
+                               style="width: 65%" class="hint--bottom"></ons-input>
+
+                    <ons-button modifier="quiet" data-ally-visible="no"
+                                style="color: #30a401; margin-left: 1.5em;"
+                                onclick="utopiasoftware.ally.controller.changePinPageViewModel.pinVisibilityButtonClicked(this, 'change-pin-new')">
+                        <ons-icon icon="md-eye" size="21px"></ons-icon>
+                    </ons-button>
+                </div>
+            </ons-list-item>
+
+        </ons-list>
+    </form>
+
+    <ons-bottom-toolbar modifier="transparent" style="height: 56px; !important;">
+        <div style="width: 60%; margin-left: 20%; margin-right: 20%; padding-top: 6px; padding-bottom: 6px">
+            <ons-button id="change-pin-change-button" disable-auto-styling modifier="large"
+                        style="background-color: #30a401; color: #ffffff; border-radius: 21px;">Change PIN</ons-button>
+        </div>
+    </ons-bottom-toolbar>
+
+</ons-page>
