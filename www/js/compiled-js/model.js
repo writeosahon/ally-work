@@ -238,3 +238,15 @@ $(document).on("hide", "#change-pin-page", utopiasoftware.ally.controller.change
 
 // listen for when the Change-Pin page is destroyed
 $(document).on("destroy", "#change-pin-page", utopiasoftware.ally.controller.changePinPageViewModel.pageDestroy);
+
+// listen for the initialisation of the Transaction History page
+$(document).on("init", "#transaction-history-page", utopiasoftware.ally.controller.transactionHistoryPageViewModel.pageInit);
+
+// listen for when the Transaction History page is shown
+$(document).on("show", "#transaction-history-page", utopiasoftware.ally.controller.transactionHistoryPageViewModel.pageShow);
+
+// listen for when the Transaction History page is hidden
+$(document).on("hide", "#transaction-history-page", utopiasoftware.ally.controller.transactionHistoryPageViewModel.pageHide);
+
+// listen for when the Transaction History page is destroyed
+$(document).on("destroy", "#transaction-history-page", utopiasoftware.ally.controller.transactionHistoryPageViewModel.pageDestroy);

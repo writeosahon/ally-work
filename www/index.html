@@ -71,7 +71,7 @@
     <ons-splitter-side id="side-menu" side="right" collapse width="60%">
         <ons-page id="side-menu-page">
             <div style="width: 100%; height: 56px;
-    background-image: linear-gradient(45deg, #30a401 0%, rgb(15, 208, 208) 100%);
+    background-image: linear-gradient(45deg, #30a401 0%, #30a401 100%);
     background-repeat: no-repeat; background-size: cover; position: fixed; top: 0; z-index: 1;"><!-- div with color background -->
                 <div style="padding-top: 6px; width: 100%;">
                     <div style="width: 70%; display: inline-block; font-size:0.85em; font-weight: bold; color: #ffffff;
@@ -103,6 +103,16 @@
                     </div>
                     <div class="center" style="text-align: left">
                         Change PIN
+                    </div>
+                </ons-list-item>
+
+                <ons-list-item tappable lock-on-drag="true"
+                               onclick="utopiasoftware.ally.controller.sideMenuViewModel.sideMenuListClicked('transaction history')">
+                    <div class="left">
+                        <ons-icon icon="md-time" size="28px" class="list-item__icon" fixed-width></ons-icon>
+                    </div>
+                    <div class="center" style="text-align: left">
+                        Transaction History
                     </div>
                 </ons-list-item>
 

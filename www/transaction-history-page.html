@@ -1,0 +1,20 @@
+<!-- transaction history page -->
+<ons-page id="transaction-history-page">
+    <ons-toolbar>
+        <div class="left">
+            <ons-toolbar-button onclick="utopiasoftware.ally.controller.transactionHistoryPageViewModel.backButtonClicked()">
+                <ons-icon icon="md-long-arrow-left"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+        <div class="center">Transaction History</div>
+        <div class="right">
+            <ons-toolbar-button onclick="$('#side-menu').get(0).toggle()">
+                <ons-icon icon="md-menu"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+    </ons-toolbar>
+
+    <div id="transaction-history-transaction-grid" style="min-height: calc(100vh - 56px) !important;"></div>
+
+
+</ons-page>

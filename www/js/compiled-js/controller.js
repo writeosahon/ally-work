@@ -211,12 +211,12 @@ utopiasoftware.ally.controller = {
                 return;
             }
 
-            if(label == "hotels"){ // 'hotels' button was clicked
+            if(label == "transaction history"){ // 'transaction history' list item was clicked
 
                 // close the side menu
-                $('ons-splitter').get(0).left.close().
+                $('ons-splitter').get(0).right.close().
                 then(function(){
-                    $('#app-main-navigator').get(0).bringPageTop("hotels-page.html", {}); // navigate to the specified page
+                    $('#app-main-navigator').get(0).bringPageTop("transaction-history-page.html", {}); // navigate to the specified page
                 }).catch(function(){});
 
                 return;
@@ -808,20 +808,26 @@ utopiasoftware.ally.controller = {
 
                 // add the promise object to the promise array
                 promisesArray.push(promiseObject);
-
-                // add the promise object used to delete the cached chart data
-                promisesArray.push(utopiasoftware.ally.dashboardCharts.deleteWalletTransferInData(),
-                    utopiasoftware.ally.dashboardCharts.deleteWalletTransferOutData(),
-                utopiasoftware.ally.dashboardCharts.deletePaymentOutData(),
-                    utopiasoftware.ally.dashboardCharts.deletePaymentInData());
+                // if the previously logged in user is NOT the same user trying to log in
+                if(window.localStorage.getItem("app-status") != formData.phone){ // a different user from the stored user is loggin in
+                    // add the promise object used to delete the cached chart data
+                    promisesArray.push(utopiasoftware.ally.dashboardCharts.deleteWalletTransferInData(),
+                        utopiasoftware.ally.dashboardCharts.deleteWalletTransferOutData(),
+                        utopiasoftware.ally.dashboardCharts.deletePaymentOutData(),
+                        utopiasoftware.ally.dashboardCharts.deletePaymentInData(),
+                        utopiasoftware.ally.transactionHistoryCharts.deleteTransactionHistoryData());
+                }
 
                 // return promise when all operations have completed
                 return Promise.all(promisesArray);
             }).
             then(function(){
-                // clear all data in the device local/session storage
-                window.localStorage.clear();
-                window.sessionStorage.clear();
+                // if the previously logged in user is NOT the same user trying to log in
+                if(window.localStorage.getItem("app-status") != formData.phone){ // a different user from the stored user is loggin in
+                    // clear all data in the device local/session storage
+                    window.localStorage.clear();
+                    window.sessionStorage.clear();
+                }
                 return null;
             }).
             then(function(){
@@ -1312,7 +1318,8 @@ utopiasoftware.ally.controller = {
                 promisesArray.push(utopiasoftware.ally.dashboardCharts.deleteWalletTransferInData(),
                     utopiasoftware.ally.dashboardCharts.deleteWalletTransferOutData(),
                     utopiasoftware.ally.dashboardCharts.deletePaymentOutData(),
-                    utopiasoftware.ally.dashboardCharts.deletePaymentInData());
+                    utopiasoftware.ally.dashboardCharts.deletePaymentInData(),
+                    utopiasoftware.ally.transactionHistoryCharts.deleteTransactionHistoryData());
 
                 // return promise when all operations have completed
                 return Promise.all(promisesArray);
@@ -6602,5 +6609,306 @@ utopiasoftware.ally.controller = {
             // go back to previous page in the main-navigator stack
             $('#app-main-navigator').get(0).popPage({});
         }
+    },
+
+
+    /**
+     * object is view-model for transaction history page
+     */
+    transactionHistoryPageViewModel: {
+
+        /**
+         * property is used to hold the "Transaction History" Grid
+         */
+        transactionHistoryGrid: null,
+
+
+        /**
+         * event is triggered when page is initialised
+         */
+        pageInit: function(event){
+
+            var $thisPage = $(event.target); // get the current page shown
+            // disable the swipeable feature for the app splitter
+            $('ons-splitter-side').removeAttr("swipeable");
+
+            // call the function used to initialise the app page if the app is fully loaded
+            loadPageOnAppReady();
+
+            //function is used to initialise the page if the app is fully ready for execution
+            function loadPageOnAppReady(){
+                // check to see if onsen is ready and if all app loading has been completed
+                if(!ons.isReady() || utopiasoftware.ally.model.isAppReady === false){
+                    setTimeout(loadPageOnAppReady, 500); // call this function again after half a second
+                    return;
+                }
+
+                // listen for the back button event
+                $('#app-main-navigator').get(0).topPage.onDeviceBackButton =
+                    utopiasoftware.ally.controller.transactionHistoryPageViewModel.backButtonClicked;
+
+                // inject the the modules required to create the transaction history grid
+                ej.grids.Grid.Inject(ej.grids.Selection, ej.grids.Scroll, ej.grids.Search, ej.grids.Toolbar);
+
+                // update the Transaction History Grid
+                utopiasoftware.ally.controller.transactionHistoryPageViewModel.updateTransactionHistoryGrid();
+
+                // hide the loader
+                $('#loader-modal').get(0).hide();
+
+            }
+
+        },
+
+        /**
+         * method is triggered when page is shown
+         */
+        pageShow: function(){
+            // disable the swipeable feature for the app splitter
+            $('ons-splitter-side').removeAttr("swipeable");
+        },
+
+
+        /**
+         * method is triggered when page is hidden
+         */
+        pageHide: function(){
+
+        },
+
+
+        /**
+         * method is triggered when page is destroyed
+         */
+        pageDestroy: function(){
+            // destroy the transaction history grid
+            utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.destroy();
+        },
+
+
+        /**
+         * method is triggered when back button or device back button is clicked
+         */
+        backButtonClicked: function(){
+
+            // check if the side menu is open
+            if($('ons-splitter').get(0).right.isOpen){ // side menu open, so close it
+                $('ons-splitter').get(0).right.close();
+                return; // exit the method
+            }
+
+            // go back to previous page in the main-navigator stack
+            $('#app-main-navigator').get(0).popPage({});
+        },
+
+
+
+        /**
+         * update the transaction history grid. Either using cached data or remote data
+         *
+         */
+        updateTransactionHistoryGrid: function(){
+
+            var pdfExportBlob = null; // holds the blob for the pdf content being exported
+
+            // check if the Transaction History Grid has been created before, of so destroy it
+            if(utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid){ // grid has previously been created
+                // destroy the grid object
+                utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.destroy();
+            }
+
+            // display grid loading indicator
+            $('#transaction-history-page #transaction-history-transaction-grid').
+            html(`<div class="title" style="font-size: 0.85em; padding: 0.5em;">
+                    ALLY Transaction History
+                </div>
+                <div class="content" style="padding: 0.5em;">
+
+                    <ons-icon icon="md-settings" size="28px" style="color: #30a401;" spin>
+                    </ons-icon>
+                </div>`);
+
+
+            // check if there is internet connection or not
+            if(navigator.connection.type === Connection.NONE){ // there is no internet connection
+                // inform the user that cached data will be displayed in the absence of internet
+                window.plugins.toast.showWithOptions({
+                    message: "No Internet Connection. Previously cached data will be displayed",
+                    duration: 4000,
+                    position: "top",
+                    styling: {
+                        opacity: 1,
+                        backgroundColor: '#008000',
+                        textColor: '#FFFFFF',
+                        textSize: 14
+                    }
+                }, function(toastEvent){
+                    if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                        window.plugins.toast.hide();
+                    }
+                });
+
+                // load the previously cached data
+                utopiasoftware.ally.transactionHistoryCharts.loadTransactionHistoryData().
+                then(function(dataArray){ // get the data array to be used by grid
+                    // format the data array so it can be properly used
+                    return gridDataMapping(dataArray);
+                }).
+                then(function(dataArray){
+                    utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid =
+                        new ej.grids.Grid({
+                            // Width for grid
+                            width: '100%',
+                            allowTextWrap: true,
+                            showColumnChooser: true,
+                            allowPdfExport: true,
+                            toolbar: ['search', 'columnchooser', 'pdfexport'],
+                            columns: [
+                                { field: 'SENDER', headerText: 'Sender', width: "25%", clipMode: 'ellipsiswithtooltip' },
+                                { field: 'RECEIVER', headerText: 'Recipient', width: "25%", clipMode: 'ellipsiswithtooltip' },
+                                { field: 'AMOUNT', headerText: 'Amount', width: "25%", textAlign: 'right',
+                                    clipMode: 'ellipsiswithtooltip'},
+                                { field: 'DDATE', headerText: 'Date', width: "25%",
+                                    clipMode: 'ellipsiswithtooltip'},
+                                { field: 'TRANSFERTYPE', headerText: 'Type', width: "25%",
+                                    clipMode: 'ellipsiswithtooltip', visible: false},
+                                { field: 'TRANSACTIONREF', headerText: 'Ref', width: "25%", clipMode: 'ellipsiswithtooltip',
+                                    visible: false}
+                            ],
+                            dataSource: dataArray
+                        });
+
+                    // remove the loader content
+                    $('#transaction-history-page #transaction-history-transaction-grid').html("");
+                    //append the newly created grid
+                    utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.
+                    appendTo('#transaction-history-transaction-grid');
+                });
+
+                return; // exit method
+            }
+
+            //THERE IS AN INTERNET CONNECTION
+            // request for the user wallet transfer-in data for the provided time period
+            Promise.resolve($.ajax(
+                {
+                    url: utopiasoftware.ally.model.ally_base_url + "/mobile/transaction-report.php",
+                    type: "post",
+                    contentType: "application/x-www-form-urlencoded",
+                    beforeSend: function(jqxhr) {
+                        jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                    },
+                    dataType: "text",
+                    timeout: 240000, // wait for 4 minutes before timeout of request
+                    processData: true,
+                    data: {phone: utopiasoftware.ally.model.appUserDetails.phone} // data to submit to server
+                }
+            )).
+            then(function(serverResponse){// retrieve the server response
+                serverResponse +=  "";
+                serverResponse = JSON.parse(serverResponse.trim()); // return the server response as an object
+                return Promise.all([serverResponse, utopiasoftware.ally.transactionHistoryCharts.loadTransactionHistoryData()]);
+            }).
+            then(function(dataArray){ // save the grid array data to cache
+                dataArray[1] = dataArray[1];
+                dataArray[1] = dataArray[0];
+                return utopiasoftware.ally.transactionHistoryCharts.saveTransactionHistoryData(dataArray[1]);
+            }).
+            then(function(dataArray){ // get the data array to be used by grid
+                // format the chart data array so it can be properly used
+                return gridDataMapping(dataArray);
+            }).
+            then(function(dataArray){
+                console.log(dataArray);
+                utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid =
+                    new ej.grids.Grid({
+                        // Width for grid
+                        width: '100%',
+                        allowTextWrap: true,
+                        showColumnChooser: true,
+                        allowTextWrap: true,
+                        showColumnChooser: true,
+                        allowPdfExport: true,
+                        toolbar: ['search', 'columnchooser', 'pdfexport'],
+                        columns: [
+                            { field: 'SENDER', headerText: 'Sender', width: "25%", clipMode: 'ellipsiswithtooltip' },
+                            { field: 'RECEIVER', headerText: 'Recipient', width: "25%", clipMode: 'ellipsiswithtooltip'},
+                            { field: 'AMOUNT', headerText: 'Amount', width: "25%", textAlign: 'right',
+                                clipMode: 'ellipsiswithtooltip'},
+                            { field: 'DDATE', headerText: 'Date', width: "25%",
+                                clipMode: 'ellipsiswithtooltip'},
+                            { field: 'TRANSFERTYPE', headerText: 'Type', width: "25%",
+                                clipMode: 'ellipsiswithtooltip', visible: false},
+                            { field: 'TRANSACTIONREF', headerText: 'Ref', width: "25%", clipMode: 'ellipsiswithtooltip',
+                                visible: false}
+                        ],
+                        dataSource: dataArray
+                    });
+
+                // remove the loader content
+                $('#transaction-history-page #transaction-history-transaction-grid').html("");
+                //append the newly created grid
+                utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.
+                appendTo('#transaction-history-transaction-grid');
+
+                // append the listener for the toolbar 'Export PDF' button click
+                utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.
+                    toolbarClick = function (args) {
+                    console.log("ID ", args.item.id);
+                    if (args.item.id === 'transaction-history-transaction-grid_pdfexport') { // the toolbar button being clicked is the 'PDF Export'
+                        utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.
+                        pdfExport().
+                        then(function(pdfData){ // get the pdf structure if the content being exported
+                            pdfExportBlob = pdfData.streamWriter.bufferBlob; // get the blob for the exported pdf
+                            console.log("EXPORTED", pdfData);
+
+                            return new Promise(function(resolve, reject){ // return the directory where to store the document/image
+                                window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory, resolve, reject);
+                            });
+                        }).then(function(directory){
+                            return new Promise(function(resolve, reject){ // return the created file which holds the pdf document
+                                directory.getFile('ALLY-Transactions-' + Date.now() + '.pdf', {create:true, exclusive: false},
+                                    resolve, reject);
+                            });
+                        }).
+                        then(function(file){ // get the file object
+                            fileObj = file; // assign the file object to the function variable
+
+                            return new Promise(function(resolve, reject){ // return the FileWriter object used to write content to the created file
+                                file.createWriter(resolve, reject);
+                            });
+                        }).
+                        then(function(fileWriter){ // get the FileWriter object
+                            return new Promise(function(resolve, reject){
+                                fileWriter.onwriteend = resolve;
+                                fileWriter.onerror = reject;
+
+                                fileWriter.write(pdfExportBlob); // write the content of the blob to the file
+                            });
+                        }).
+                        catch(function(err){console.log("EXPORT FAILED", err)});
+                    }
+                };
+
+
+            });
+
+
+            /**
+             * function is used to map the grid data into an appropriate form that can be displayed by the chart
+             * @param gridDataArray {Array} array containing grid data objects to be mapped
+             *
+             * @return {Array} an array containing properly formatted objects that can be used by the grid
+             */
+            function gridDataMapping(gridDataArray){
+                return gridDataArray.map(function(dataObject){
+                    dataObject.AMOUNT = kendo.toString(kendo.parseFloat(dataObject.AMOUNT), "n2"); // convert to currency format
+                    dataObject.DDATE = kendo.toString(kendo.parseDate(dataObject.DDATE, "yyyy-MM-dd HH:mm:ss"),
+                    "yyyy-MM-dd; h:mmtt"); // convert to date object
+                    return dataObject; // return the modified object
+                });
+            }
+        }
+
     }
 };
