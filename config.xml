@@ -49,7 +49,7 @@
 
 <preference name="AndroidPersistentFileLocation" value="Internal" />
 
-<config-file platform="android" target="AndroidManifest.xml" parent="/*">
+<config-file platform="android" target="AndroidManifest.xml" parent="/*" mode="add">
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 </config-file>
