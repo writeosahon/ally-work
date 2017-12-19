@@ -87,6 +87,14 @@
 <splash platform="android" src="package-assets/xhdpi_landscape.png" width="960" height="720" orientation="landscape" qualifier="land-xhdpi"/>
 -->
 
+    <config-file platform="android" parent="/*">
+        <uses-permission android:name="android.permission.INTERNET" />
+        <!-- And if you need more things about the internet
+           <uses-permission android:name="android.permissions.NETWORK_ACCESS" />
+           <uses-permission android:name="android.permissions.ACCESS_NETWORK_STATE" />
+        -->
+    </config-file>
+
 <config-file platform="android" parent="/manifest/application" mode="merge"> 
     <activity android:launchMode="singleTop" />
 </config-file>
