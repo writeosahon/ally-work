@@ -38,11 +38,21 @@
 <plugin name="cordova-plugin-contact-number-picker" spec="0.1.1"/>
 <plugin name="cordova-plugin-qrscanner" spec="2.5.0"/>
 <plugin name="ionic-plugin-keyboard" spec="2.2.1"/>
-<!--<plugin name="cordova-plugin-file" spec="4.3.0"/>-->
+<plugin name="cordova-plugin-file" spec="4.3.0"/>
 <plugin name="com.lampa.startapp" spec="0.1.4"/>
 
 <plugin name="cordova-plugin-whitelist" spec="1.2.2"/>
 
+<config-file platform="android" parent="/*">
+    <uses-permission android:name="android.permission.INTERNET" />
+</config-file>
+
+<preference name="AndroidPersistentFileLocation" value="Internal" />
+
+<config-file platform="android" target="AndroidManifest.xml" parent="/*">
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+</config-file>
 
 <preference  name="AutoHideSplashScreen" value="true"/>
 <preference  name="SplashShowOnlyFirstTime" value="false"/>
@@ -86,14 +96,6 @@
 <splash platform="android" src="package-assets/hdpi_landscape.png" width="640" height="480" orientation="landscape" qualifier="land-hdpi"/>
 <splash platform="android" src="package-assets/xhdpi_landscape.png" width="960" height="720" orientation="landscape" qualifier="land-xhdpi"/>
 -->
-
-    <config-file platform="android" parent="/*">
-        <uses-permission android:name="android.permission.INTERNET" />
-        <!-- And if you need more things about the internet
-           <uses-permission android:name="android.permissions.NETWORK_ACCESS" />
-           <uses-permission android:name="android.permissions.ACCESS_NETWORK_STATE" />
-        -->
-    </config-file>
 
 <config-file platform="android" parent="/manifest/application" mode="merge"> 
     <activity android:launchMode="singleTop" />
