@@ -284,7 +284,7 @@ window.localStorage.setItem("app-status",utopiasoftware.ally.model.appUserDetail
 //$('#side-menu-username').html(utopiasoftware.saveup.model.appUserDetails.firstName);
 return $('#loader-modal').get(0).hide();// hide loader
 }).then(function(){// navigate to the main menu page
-return $('ons-splitter').get(0).content.load("app-main-template");}).then(function(){ons.notification.toast("Login complete! Welcome",{timeout:3000});}).catch(function(err){console.log(err);if(typeof err!=="string"){// if err is NOT a String
+return $('ons-splitter').get(0).content.load("app-main-template");}).then(function(){ons.notification.toast("Login complete! Welcome",{timeout:3000});}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
 err="Sorry. Login could not be completed";}$('#loader-modal').get(0).hide();// hide loader
 ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> Log In Failed',messageHTML:'<span>'+err+'</span>',cancelable:false});});}},/**
      * object is view-model for forgot-pin page

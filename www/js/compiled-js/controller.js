@@ -899,7 +899,6 @@ utopiasoftware.ally.controller = {
                 ons.notification.toast("Login complete! Welcome", {timeout:3000});
             }).
             catch(function(err){
-                console.log(err);
                 if(typeof err !== "string"){ // if err is NOT a String
                     err = "Sorry. Login could not be completed"
                 }

@@ -51,11 +51,11 @@
                 <div class="center">
                     <ons-input id="fund-wallet-amount" required placeholder="Amount (NGN)"
                            data-parsley-type="number" type="tel"
-                           data-parsley-min="500"
+                           data-parsley-min="100"
                            data-parsley-max="50000"
                            data-parsley-required-message="enter amount"
                            data-parsley-type-message="provide a valid cash amount"
-                           data-parsley-min-message="minimum amount allowed is 500"
+                           data-parsley-min-message="minimum amount allowed is 100"
                            data-parsley-max-message="maximum amount allowed is 50,000"
                            onchange="$(this).val(kendo.toString(kendo.parseFloat($(this).val()), 'n2'));"
                                class="hint--bottom"></ons-input>
