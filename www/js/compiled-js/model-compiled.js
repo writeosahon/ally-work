@@ -13,38 +13,54 @@
  * also used interchangeably
  */
 
-// define the model namespace
-utopiasoftware.ally.model = {
+// define the _model namespace
+utopiasoftware.ally._model = {
 
-  /**
-   * property acts as a flag that indicates that all hybrid plugins and DOM content
-   * have been successfully loaded. It relies on the special device ready event triggered by the
-   * intel xdk (i.e. app.Ready) to set the flag.
-   *
-   * @type {boolean} flag for if the hybrid plugins and DOM content are ready for execution
-   */
-  isAppReady: false,
+    /**
+     * property acts as a flag that indicates that all hybrid plugins and DOM content
+     * have been successfully loaded. It relies on the special device ready event triggered by the
+     * intel xdk (i.e. app.Ready) to set the flag.
+     *
+     * @type {boolean} flag for if the hybrid plugins and DOM content are ready for execution
+     */
+    isAppReady: false,
 
-  /**
-   * property is used to hold the base url for communicating with ALLY app server
-   */
-  ally_base_url: "https://myallyapp.com",
+    /**
+     * property is used to hold the base url for communicating with ALLY app server
+     */
+    ally_base_url: "https://myallyapp.com",
 
-  /**
-   * property holds the google app share/dynamic link for this app
-   */
-  ally_app_share_link: "",
+    /**
+     * property holds the google app share/dynamic link for this app
+     */
+    ally_app_share_link: "",
 
-  /**
-   * holds details about the currently logged in user
-   */
-  appUserDetails: null,
+    /**
+     * holds details about the currently logged in user
+     */
+    appUserDetails: null,
 
-  /**
-   * holds the cached app secure pin for the logged in user
-   */
-  appSecurePin: null
+    /**
+     * holds the cached app secure pin for the logged in user
+     */
+    appSecurePin: null
 };
+
+// define the proxy object for the _model namespace object
+utopiasoftware.ally.model = new Proxy(utopiasoftware.ally._model, {
+    set: function set(target, prop, value) {
+        target[prop] = value; // update the target object property with the specified value
+        if (prop == 'appUserDetails') {
+            // use this block to update the name of the logged in user on the side menu
+            // update the app side menu 'name' segment with the provided value
+            $('#side-menu #side-menu-username').html(value.firstname + " " + value.lastname);
+            // update the 'name' display on the wallet balance page
+            $('#wallet-page #wallet-owner-name').html(value.firstname + " " + value.lastname);
+        }
+
+        return true; // return true to signal that proxy updating was successful
+    }
+});
 
 // register the event listener for when all Hybrid plugins and document DOM are ready
 document.addEventListener("app.Ready", utopiasoftware.ally.controller.appReady, false);

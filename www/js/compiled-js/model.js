@@ -11,8 +11,8 @@
  * also used interchangeably
  */
 
-// define the model namespace
-utopiasoftware.ally.model = {
+// define the _model namespace
+utopiasoftware.ally._model = {
 
     /**
      * property acts as a flag that indicates that all hybrid plugins and DOM content
@@ -45,6 +45,22 @@ utopiasoftware.ally.model = {
      */
     appSecurePin: null
 };
+
+
+// define the proxy object for the _model namespace object
+utopiasoftware.ally.model = new Proxy(utopiasoftware.ally._model, {
+    set: function(target, prop, value){
+        target[prop] = value; // update the target object property with the specified value
+        if(prop == 'appUserDetails'){ // use this block to update the name of the logged in user on the side menu
+            // update the app side menu 'name' segment with the provided value
+            $('#side-menu #side-menu-username').html(`${value.firstname} ${value.lastname}`);
+            // update the 'name' display on the wallet balance page
+            $('#wallet-page #wallet-owner-name').html(`${value.firstname} ${value.lastname}`);
+        }
+
+        return true; // return true to signal that proxy updating was successful
+    }
+});
 
 
 // register the event listener for when all Hybrid plugins and document DOM are ready
