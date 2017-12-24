@@ -151,8 +151,16 @@ utopiasoftware.ally.controller = {
 
             utopiasoftware.ally.model.appUserDetails = JSON.parse(secureDataArray[0]); // transfer the collected user details to the app
             utopiasoftware.ally.model.appSecurePin = secureDataArray[1];
-            // update the first name being displayed in the side menu
-            //$('#side-menu-username').html(utopiasoftware.saveup.model.appUserDetails.firstName);
+
+            return null;
+        }).then(function(){ // setup push notification for the app
+
+            window.plugins.OneSignal
+                .startInit("d5d2bdba-eec0-46b1-836e-c5b8e318e928")
+                .inFocusDisplaying(window.plugins.OneSignal.OSInFocusDisplayOption.None)
+                .handleNotificationReceived(function(){})
+                .handleNotificationOpened(function(){})
+                .endInit();
             return null;
         }).
         then(function(){
@@ -224,6 +232,12 @@ utopiasoftware.ally.controller = {
 
         }
     },
+
+
+    /**
+     * object is the view-model for the app push notification
+     */
+    pushNotificationModel: {},
 
     /**
      * object is the view-model for the app lock-screen-modal

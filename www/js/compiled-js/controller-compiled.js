@@ -51,9 +51,8 @@ if(!window.localStorage.getItem("app-status")||window.localStorage.getItem("app-
 return null;}return Promise.all([Promise.resolve(intel.security.secureStorage.read({"id":"ally-user-details"})),Promise.resolve(intel.security.secureStorage.read({"id":"ally-user-secure-pin"}))]);}).then(function(instanceIdArray){if(instanceIdArray==null||instanceIdArray[0]==null||instanceIdArray[1]==null){// user is not logged in
 return null;}return Promise.all([Promise.resolve(intel.security.secureData.getData(instanceIdArray[0])),Promise.resolve(intel.security.secureData.getData(instanceIdArray[1]))]);}).then(function(secureDataArray){if(secureDataArray==null||secureDataArray[0]==null||secureDataArray[1]==null){// user is not logged in
 return null;}utopiasoftware.ally.model.appUserDetails=JSON.parse(secureDataArray[0]);// transfer the collected user details to the app
-utopiasoftware.ally.model.appSecurePin=secureDataArray[1];// update the first name being displayed in the side menu
-//$('#side-menu-username').html(utopiasoftware.saveup.model.appUserDetails.firstName);
-return null;}).then(function(){// notify the app that the app has been successfully initialised and is ready for further execution (set app ready flag to true)
+utopiasoftware.ally.model.appSecurePin=secureDataArray[1];return null;}).then(function(){// setup push notification for the app
+window.plugins.OneSignal.startInit("d5d2bdba-eec0-46b1-836e-c5b8e318e928").inFocusDisplaying(window.plugins.OneSignal.OSInFocusDisplayOption.None).handleNotificationReceived(function(){}).handleNotificationOpened(function(){}).endInit();return null;}).then(function(){// notify the app that the app has been successfully initialised and is ready for further execution (set app ready flag to true)
 utopiasoftware.ally.model.isAppReady=true;// hide the splash screen
 navigator.splashscreen.hide();}).catch(function(err){// notify the app that the app has been successfully initialised and is ready for further execution (set app ready flag to true)
 utopiasoftware.ally.model.isAppReady=true;// hide the splash screen
@@ -73,6 +72,8 @@ $('ons-splitter').get(0).right.close().then(function(){$('#app-main-navigator').
 // close the side menu
 $('ons-splitter').get(0).right.close().then(function(){$('#app-main-navigator').get(0).bringPageTop("transaction-history-page.html",{});// navigate to the specified page
 }).catch(function(){});return;}}},/**
+     * object is the view-model for the app push notification
+     */pushNotificationModel:{},/**
      * object is the view-model for the app lock-screen-modal
      */lockScreenModalViewModel:{/**
          * property holds the input field jquery object used in the
