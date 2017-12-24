@@ -158,8 +158,8 @@ utopiasoftware.ally.controller = {
             window.plugins.OneSignal
                 .startInit("d5d2bdba-eec0-46b1-836e-c5b8e318e928")
                 .inFocusDisplaying(window.plugins.OneSignal.OSInFocusDisplayOption.None)
-                .handleNotificationReceived(function(){})
-                .handleNotificationOpened(function(){})
+                .handleNotificationReceived(utopiasoftware.ally.controller.pushNotificationModel.notificationOpened)
+                .handleNotificationOpened(utopiasoftware.ally.controller.pushNotificationModel.notificationOpened)
                 .endInit();
             return null;
         }).
@@ -237,7 +237,27 @@ utopiasoftware.ally.controller = {
     /**
      * object is the view-model for the app push notification
      */
-    pushNotificationModel: {},
+    pushNotificationModel: {
+
+        /**
+         * method is used to handle both when notification are opened from the notification tray AND when a
+         * notification is received when the app is open
+         * @param notificationObj
+         */
+        notificationOpened(notificationObj){
+
+            // check if the notification data is stored in another object(for when the notification is opened from 'tray')
+            if(notificationObj.notification){ // notification was opened from tray
+                notificationObj = notificationObj.notification; // assign the 'real' notification object to the passed param
+            }
+
+            // set the title for the notification message
+            $('#push-notification-modal #push-notification-heading').html('');
+            // set the content for the push notification message
+            $('#push-notification-modal #push-notification-message').html('');
+            $('#push-notification-modal').get(0).show(); // show the push-notification modal
+        }
+    },
 
     /**
      * object is the view-model for the app lock-screen-modal
