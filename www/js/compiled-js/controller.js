@@ -252,9 +252,9 @@ utopiasoftware.ally.controller = {
             }
 
             // set the title for the notification message
-            $('#push-notification-modal #push-notification-heading').html('');
+            $('#push-notification-modal #push-notification-heading').html(notificationObj.payload.title);
             // set the content for the push notification message
-            $('#push-notification-modal #push-notification-message').html('');
+            $('#push-notification-modal #push-notification-message').html(notificationObj.payload.body);
             $('#push-notification-modal').get(0).show(); // show the push-notification modal
         }
     },

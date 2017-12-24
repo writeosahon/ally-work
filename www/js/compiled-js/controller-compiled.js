@@ -81,8 +81,8 @@ $('ons-splitter').get(0).right.close().then(function(){$('#app-main-navigator').
 if(notificationObj.notification){// notification was opened from tray
 notificationObj=notificationObj.notification;// assign the 'real' notification object to the passed param
 }// set the title for the notification message
-$('#push-notification-modal #push-notification-heading').html('');// set the content for the push notification message
-$('#push-notification-modal #push-notification-message').html('');$('#push-notification-modal').get(0).show();// show the push-notification modal
+$('#push-notification-modal #push-notification-heading').html(notificationObj.payload.title);// set the content for the push notification message
+$('#push-notification-modal #push-notification-message').html(notificationObj.payload.body);$('#push-notification-modal').get(0).show();// show the push-notification modal
 }},/**
      * object is the view-model for the app lock-screen-modal
      */lockScreenModalViewModel:{/**
