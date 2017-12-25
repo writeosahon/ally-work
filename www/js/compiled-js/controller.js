@@ -4772,6 +4772,34 @@ utopiasoftware.ally.controller = {
                     // reset the form validator object on the page
                     utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.reset();
 
+                    // send push notification to the recipient of the transfer
+                    let pushNotification = { // create the push notification object
+                        "app_id": "d5d2bdba-eec0-46b1-836e-c5b8e318e928",
+                        "filters": [{"field": "tag", "key": "phone", "relation": "=", "value":
+                        formData.phone_receiver}],
+                        "contents": {"en": "You received funds into your ALLY WALLET from " +
+                        utopiasoftware.ally.model.appUserDetails.firstname + " " + utopiasoftware.ally.model.appUserDetails.lastname},
+                        "headings": {"en": "Funds Received"},
+                        "android_channel_id": "66dfeddf-12d7-4194-b3d9-38325042d258",
+                        "android_visibility": 0,
+                        "priority": 5
+                    };
+
+                    Promise.resolve($.ajax(
+                        {
+                            url: "https://onesignal.com/api/v1/notifications",
+                            type: "post",
+                            contentType: "application/json",
+                            beforeSend: function(jqxhr) {
+                                jqxhr.setRequestHeader("Authorization", "Basic MmQ3ODcwZGUtYmIyYS00NzY5LWIwZWQtMTk5ZGRjNzU2M2Q3");
+                            },
+                            dataType: "json",
+                            timeout: 240000, // wait for 4 minutes before timeout of request
+                            processData: false,
+                            data: JSON.stringify(pushNotification)
+                        }
+                    ));
+
                     return Promise.all([ons.notification.toast("Wallet Transfer Successful!", {timeout:4000})]); // conclude wallet transfer process
                 }
 
