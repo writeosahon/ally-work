@@ -60,6 +60,11 @@ utopiasoftware.ally.model = new Proxy(utopiasoftware.ally._model, {
             $('#side-menu #side-menu-username').html(value.firstname + " " + value.lastname);
             // update the 'name' display on the wallet balance page
             $('#wallet-page #wallet-owner-name').html(value.firstname + " " + value.lastname);
+
+            // update the wallet balance on every page it is being displayed
+            $('#dashboard-page #dashboard-ally-wallet').html("&#8358;" + kendo.toString(kendo.parseFloat(value.balance), "n2"));
+            $('#wallet-page #wallet-balance').html(kendo.toString(kendo.parseFloat(value.balance), "n2"));
+            $('#account-page #account-wallet-balance').html(kendo.toString(kendo.parseFloat(value.balance), "n2"));
         }
 
         return true; // return true to signal that proxy updating was successful
