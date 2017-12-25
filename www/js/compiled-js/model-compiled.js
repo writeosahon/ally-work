@@ -50,8 +50,12 @@ utopiasoftware.ally._model = {
 utopiasoftware.ally.model = new Proxy(utopiasoftware.ally._model, {
     set: function set(target, prop, value) {
         target[prop] = value; // update the target object property with the specified value
+
         if (prop == 'appUserDetails') {
             // use this block to update the name of the logged in user on the side menu
+
+            window.plugins.OneSignal.sendTags(value); // set the tags for the push notification service
+
             // update the app side menu 'name' segment with the provided value
             $('#side-menu #side-menu-username').html(value.firstname + " " + value.lastname);
             // update the 'name' display on the wallet balance page
