@@ -6404,6 +6404,34 @@ utopiasoftware.ally.controller = {
                 // populate the payments-out chart
                 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.updatePaymentOutChart('today');
 
+                // send push notification to the recipient of the transfer
+                let pushNotification = { // create the push notification object
+                    "app_id": "d5d2bdba-eec0-46b1-836e-c5b8e318e928",
+                    "filters": [{"field": "tag", "key": "phone", "relation": "=", "value":
+                    formData.phone_receiver}],
+                    "contents": {"en": "You received payment into your ALLY WALLET from " +
+                    utopiasoftware.ally.model.appUserDetails.firstname + " " + utopiasoftware.ally.model.appUserDetails.lastname},
+                    "headings": {"en": "Payment Received"},
+                    "android_channel_id": "81baf9bc-d068-4f4c-9bae-1a3dc8488491",
+                    "android_visibility": 0,
+                    "priority": 5
+                };
+
+                Promise.resolve($.ajax(
+                    {
+                        url: "https://onesignal.com/api/v1/notifications",
+                        type: "post",
+                        contentType: "application/json",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("Authorization", "Basic MmQ3ODcwZGUtYmIyYS00NzY5LWIwZWQtMTk5ZGRjNzU2M2Q3");
+                        },
+                        dataType: "json",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: false,
+                        data: JSON.stringify(pushNotification)
+                    }
+                ));
+
                 // forward details of the wallet-transfer and the user details
                 return Promise.all([$('#hour-glass-loader-modal').get(0).hide(),
                     $('#payments-page #payments-tabbar').get(0).setActiveTab(0),
