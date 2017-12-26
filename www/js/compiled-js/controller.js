@@ -3061,6 +3061,37 @@ utopiasoftware.ally.controller = {
                 return $('#hour-glass-loader-modal').get(0).hide(); // hide loader
             }).
             then(function(){
+                // populate the payments-out chart
+                utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.updatePaymentOutChart('today');
+
+                // send push notification that account was updated
+                let pushNotification = { // create the push notification object
+                    "app_id": "d5d2bdba-eec0-46b1-836e-c5b8e318e928",
+                    "filters": [{"field": "tag", "key": "phone", "relation": "=", "value":
+                    utopiasoftware.ally.model.appUserDetails.phone}],
+                    "contents": {"en": "Your ALLY account details were just updated"},
+                    "headings": {"en": "Account Updated"},
+                    "android_channel_id": "81baf9bc-d068-4f4c-9bae-1a3dc8488491",
+                    "android_visibility": 0,
+                    "priority": 5
+                };
+
+                Promise.resolve($.ajax(
+                    {
+                        url: "https://onesignal.com/api/v1/notifications",
+                        type: "post",
+                        contentType: "application/json",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("Authorization", "Basic MmQ3ODcwZGUtYmIyYS00NzY5LWIwZWQtMTk5ZGRjNzU2M2Q3");
+                        },
+                        dataType: "json",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: false,
+                        data: JSON.stringify(pushNotification)
+                    }
+                ));
+
+                // display toast to user that account was updated
                 ons.notification.toast("Account Details Updated!", {timeout:3000});
             }).
             catch(function(err){

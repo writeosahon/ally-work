@@ -817,7 +817,12 @@ utopiasoftware.ally.model.appUserDetails=userAcctDetails;return userAcctDetails;
 $('#account-page #account-list').css("display","block");$('#account-page #account-reload-fab').css("display","inline-block");$('#account-page #account-edit-fab').css("display","inline-block");// hide necessary page components
 $('#account-page #account-save').css("display","none");$('#account-page #account-page-error').css("display","none");// hide page preloader
 $('#account-page #account-preloading-fab').css("display","none");return $('#hour-glass-loader-modal').get(0).hide();// hide loader
-}).then(function(){ons.notification.toast("Account Details Updated!",{timeout:3000});}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
+}).then(function(){// populate the payments-out chart
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.updatePaymentOutChart('today');// send push notification that account was updated
+var pushNotification={// create the push notification object
+"app_id":"d5d2bdba-eec0-46b1-836e-c5b8e318e928","filters":[{"field":"tag","key":"phone","relation":"=","value":utopiasoftware.ally.model.appUserDetails.phone}],"contents":{"en":"Your ALLY account details were just updated"},"headings":{"en":"Account Updated"},"android_channel_id":"81baf9bc-d068-4f4c-9bae-1a3dc8488491","android_visibility":0,"priority":5};Promise.resolve($.ajax({url:"https://onesignal.com/api/v1/notifications",type:"post",contentType:"application/json",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("Authorization","Basic MmQ3ODcwZGUtYmIyYS00NzY5LWIwZWQtMTk5ZGRjNzU2M2Q3");},dataType:"json",timeout:240000,// wait for 4 minutes before timeout of request
+processData:false,data:JSON.stringify(pushNotification)}));// display toast to user that account was updated
+ons.notification.toast("Account Details Updated!",{timeout:3000});}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
 err="Sorry. Your account details could not be updated. Please retry";}// remove the readonly attributes, so the form  elements can be editable
 $('#account-page [data-ally-readonly-field]').removeAttr('readonly',true);// hide the edit account button
 $('#account-page #account-edit-fab').css("display","none");// show the save account button
