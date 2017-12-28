@@ -1833,7 +1833,7 @@ function loadPageOnAppReady(){// check to see if onsen is ready and if all app l
 if(!ons.isReady()||utopiasoftware.ally.model.isAppReady===false){setTimeout(loadPageOnAppReady,500);// call this function again after half a second
 return;}// listen for the back button event
 $('#app-main-navigator').get(0).topPage.onDeviceBackButton=utopiasoftware.ally.controller.transactionHistoryPageViewModel.backButtonClicked;// inject the the modules required to create the transaction history grid
-ej.grids.Grid.Inject(ej.grids.Selection,ej.grids.Scroll,ej.grids.Search,ej.grids.Toolbar);// update the Transaction History Grid
+ej.grids.Grid.Inject(ej.grids.Selection,ej.grids.Scroll,ej.grids.Search,ej.grids.Toolbar,ej.grids.PdfExport);// update the Transaction History Grid
 utopiasoftware.ally.controller.transactionHistoryPageViewModel.updateTransactionHistoryGrid();// hide the loader
 $('#loader-modal').get(0).hide();}},/**
          * method is triggered when page is shown

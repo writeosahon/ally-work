@@ -6803,7 +6803,7 @@ utopiasoftware.ally.controller = {
                     utopiasoftware.ally.controller.transactionHistoryPageViewModel.backButtonClicked;
 
                 // inject the the modules required to create the transaction history grid
-                ej.grids.Grid.Inject(ej.grids.Selection, ej.grids.Scroll, ej.grids.Search, ej.grids.Toolbar);
+                ej.grids.Grid.Inject(ej.grids.Selection, ej.grids.Scroll, ej.grids.Search, ej.grids.Toolbar, ej.grids.PdfExport);
 
                 // update the Transaction History Grid
                 utopiasoftware.ally.controller.transactionHistoryPageViewModel.updateTransactionHistoryGrid();
