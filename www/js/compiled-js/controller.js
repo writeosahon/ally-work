@@ -163,6 +163,11 @@ utopiasoftware.ally.controller = {
                 .endInit();
             return null;
         }).
+        then(function(){ // start analytics tracking todo
+            hockeyapp.start(function(){
+                hockeyapp.trackEvent(function(){}, function(){}, "USER SESSION STARTED"); // track start app session
+            }, function(){}, "eeb9deb1b58d44948be72f178c159fbc");
+        }).
         then(function(){
             // notify the app that the app has been successfully initialised and is ready for further execution (set app ready flag to true)
             utopiasoftware.ally.model.isAppReady = true;
