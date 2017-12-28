@@ -6911,8 +6911,7 @@ utopiasoftware.ally.controller = {
                             width: '100%',
                             allowTextWrap: true,
                             showColumnChooser: true,
-                            allowPdfExport: true,
-                            toolbar: ['search', 'columnchooser', 'pdfexport'],
+                            toolbar: ['search', 'columnchooser'],
                             columns: [
                                 { field: 'SENDER', headerText: 'Sender', width: "25%", clipMode: 'ellipsiswithtooltip' },
                                 { field: 'RECEIVER', headerText: 'Recipient', width: "25%", clipMode: 'ellipsiswithtooltip' },
@@ -6969,20 +6968,16 @@ utopiasoftware.ally.controller = {
                 return gridDataMapping(dataArray);
             }).
             then(function(dataArray){
-                console.log(dataArray);
                 utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid =
                     new ej.grids.Grid({
                         // Width for grid
                         width: '100%',
                         allowTextWrap: true,
                         showColumnChooser: true,
-                        allowTextWrap: true,
-                        showColumnChooser: true,
-                        allowPdfExport: true,
-                        toolbar: ['search', 'columnchooser', 'pdfexport'],
+                        toolbar: ['search', 'columnchooser'],
                         columns: [
                             { field: 'SENDER', headerText: 'Sender', width: "25%", clipMode: 'ellipsiswithtooltip' },
-                            { field: 'RECEIVER', headerText: 'Recipient', width: "25%", clipMode: 'ellipsiswithtooltip'},
+                            { field: 'RECEIVER', headerText: 'Recipient', width: "25%", clipMode: 'ellipsiswithtooltip' },
                             { field: 'AMOUNT', headerText: 'Amount', width: "25%", textAlign: 'right',
                                 clipMode: 'ellipsiswithtooltip'},
                             { field: 'DDATE', headerText: 'Date', width: "25%",
@@ -7000,46 +6995,6 @@ utopiasoftware.ally.controller = {
                 //append the newly created grid
                 utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.
                 appendTo('#transaction-history-transaction-grid');
-
-                // append the listener for the toolbar 'Export PDF' button click
-                utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.
-                    toolbarClick = function (args) {
-                    console.log("ID ", args.item.id);
-                    if (args.item.id === 'transaction-history-transaction-grid_pdfexport') { // the toolbar button being clicked is the 'PDF Export'
-                        utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.
-                        pdfExport().
-                        then(function(pdfData){ // get the pdf structure if the content being exported
-                            pdfExportBlob = pdfData.streamWriter.bufferBlob; // get the blob for the exported pdf
-                            console.log("EXPORTED", pdfData);
-
-                            return new Promise(function(resolve, reject){ // return the directory where to store the document/image
-                                window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory, resolve, reject);
-                            });
-                        }).then(function(directory){
-                            return new Promise(function(resolve, reject){ // return the created file which holds the pdf document
-                                directory.getFile('ALLY-Transactions-' + Date.now() + '.pdf', {create:true, exclusive: false},
-                                    resolve, reject);
-                            });
-                        }).
-                        then(function(file){ // get the file object
-                            fileObj = file; // assign the file object to the function variable
-
-                            return new Promise(function(resolve, reject){ // return the FileWriter object used to write content to the created file
-                                file.createWriter(resolve, reject);
-                            });
-                        }).
-                        then(function(fileWriter){ // get the FileWriter object
-                            return new Promise(function(resolve, reject){
-                                fileWriter.onwriteend = resolve;
-                                fileWriter.onerror = reject;
-
-                                fileWriter.write(pdfExportBlob); // write the content of the blob to the file
-                            });
-                        }).
-                        catch(function(err){console.log("EXPORT FAILED", err)});
-                    }
-                };
-
 
             });
 
