@@ -235,6 +235,40 @@ utopiasoftware.ally.controller = {
                 return;
             }
 
+            if(label == "sign out"){ // 'sign out' list item was clicked
+
+                // display the loader message to indicate that user is signing out;
+                $('#loader-modal-message').html("Completing User Sign Out...");
+
+                // close the side menu
+                Promise.all([$('ons-splitter').get(0).right.close(), $('#loader-modal').get(0).show()]).
+                then(function(){
+                    // clear all data in the device local/session storage
+                    window.localStorage.clear();
+                    window.sessionStorage.clear();
+                    // clear the user data used in-app
+                    utopiasoftware.ally.model.appSecurePin = null;
+                    utopiasoftware.ally.model.appUserDetails = {};
+
+                    return new Promise(function(resolve, reject){
+                        // delete the user app details from secure storage if it exists
+                        Promise.resolve(intel.security.secureStorage.
+                        delete({'id':'ally-user-details'})).
+                        then(function(){resolve();},function(){resolve();}); // ALWAYS resolve the promise
+                    });
+
+                }).
+                then(function(){ // hide the loader
+                    return $('#loader-modal').get(0).hide();
+                }).
+                then(function(){ // load the login page
+                    $('ons-splitter').get(0).content.load('login-template'); // navigate to the login page
+                }).
+                catch(function(){});
+                Promise.all([$('#loader-modal').get(0).hide(), $('ons-splitter').get(0).content.load('login-template')]);
+                return;
+            }
+
         }
     },
 
