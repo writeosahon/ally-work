@@ -40,7 +40,7 @@
 <plugin name="ionic-plugin-keyboard" spec="2.2.1"/>
 <plugin name="cordova-plugin-file" spec="4.3.0"/>
 <plugin name="onesignal-cordova-plugin" spec="2.2.5"/>
-<plugin name="com-intel-security-cordova-plugin" spec="https://github.com/writeosahon/ally-work-images.git#1.0.0"/>
+<plugin name="ally-images-sounds" spec="https://github.com/writeosahon/ally-work-images.git#1.0.0"/>
 <plugin name="cordova-plugin-hockeyapp" spec="5.1.1"/>
 <plugin name="com.lampa.startapp" spec="0.1.4"/>
 

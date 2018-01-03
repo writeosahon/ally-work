@@ -1352,7 +1352,9 @@ if(!ons.isReady()||utopiasoftware.ally.model.isAppReady===false){setTimeout(load
 return;}// listen for the back button event
 $('#app-main-navigator').get(0).topPage.onDeviceBackButton=utopiasoftware.ally.controller.disburseWalletPageViewModel.backButtonClicked;// display the page preloader
 $('.page-preloader',$thisPage).css('display',"block");// hide the form
-$('#disburse-wallet-form',$thisPage).css('display',"none");// create the form data to be sent
+$('#disburse-wallet-form',$thisPage).css('display',"none");// initialise the account number combo box widget
+utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox=new ej.dropdowns.ComboBox({//set the data to dataSource property
+dataSource:[],fields:{text:'displayText',value:'ACCOUNTNUMBER'},placeholder:"Account Name or Number (NUBAN)",floatLabelType:"Auto",popupHeight:"300px",allowCustom:true});utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.appendTo('#disburse-wallet-account-number');// create the form data to be sent
 var formData={phone:utopiasoftware.ally.model.appUserDetails.phone};// get the collection of stored bank accounts and bank names
 Promise.resolve(formData).then(function(){// submit the form data
 return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/get-my-bank-accounts.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
@@ -1363,9 +1365,18 @@ serverResponse.forEach(function(acctObject){// add an additional property to eac
 acctObject.displayText=acctObject.RECIPIENTNAME+" - "+acctObject.ACCOUNTNUMBER;});return Promise.all([serverResponse,utopiasoftware.ally.banksData()]);// forward the server response i.e. collection of bank accounts (and the list of banks)
 }).then(function(promiseArray){// this array contains the list of user bank accounts AND the list of banks in nigeria
 // initialise the account number combo box widget
-utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox=new ej.dropdowns.ComboBox({//set the data to dataSource property
-dataSource:promiseArray[0],fields:{text:'displayText',value:'ACCOUNTNUMBER'},placeholder:"Account Name or Number (NUBAN)",floatLabelType:"Auto",popupHeight:"300px",allowCustom:true});// render initialized card ComboBox
-utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.appendTo('#disburse-wallet-account-number');// initialise the bank DropDown widget
+/*utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox =
+                        new ej.dropdowns.ComboBox({
+                        //set the data to dataSource property
+                        dataSource: promiseArray[0],
+                        fields: {text: 'displayText', value: 'ACCOUNTNUMBER'},
+                        placeholder: "Account Name or Number (NUBAN)",
+                        floatLabelType: "Auto",
+                        popupHeight: "300px",
+                        allowCustom: true
+                    });*/utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.dataSource=promiseArray[0];utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.bindData();// render initialized card ComboBox
+/*utopiasoftware.ally.controller.disburseWalletPageViewModel.
+                    accountNumberComboBox.appendTo('#disburse-wallet-account-number');*/// initialise the bank DropDown widget
 utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList=new ej.dropdowns.DropDownList({//set the data to dataSource property
 dataSource:promiseArray[1],fields:{text:'name',value:'code'},sortOrder:"Ascending",enabled:true,placeholder:"Select Bank",floatLabelType:"Auto",popupHeight:"300px"});// render initialised bank dropdown list
 utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.appendTo('#disburse-wallet-bank');// initialise form tooltips

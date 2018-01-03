@@ -5043,6 +5043,21 @@ utopiasoftware.ally.controller = {
                 // hide the form
                 $('#disburse-wallet-form', $thisPage).css('display', "none");
 
+                // initialise the account number combo box widget
+                utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox =
+                 new ej.dropdowns.ComboBox({
+                 //set the data to dataSource property
+                 dataSource: [],
+                 fields: {text: 'displayText', value: 'ACCOUNTNUMBER'},
+                 placeholder: "Account Name or Number (NUBAN)",
+                 floatLabelType: "Auto",
+                 popupHeight: "300px",
+                 allowCustom: true
+                 });
+
+                utopiasoftware.ally.controller.disburseWalletPageViewModel.
+                accountNumberComboBox.appendTo('#disburse-wallet-account-number');
+
                 // create the form data to be sent
                 var formData = {phone: utopiasoftware.ally.model.appUserDetails.phone};
 
@@ -5079,7 +5094,7 @@ utopiasoftware.ally.controller = {
                 then(function(promiseArray){ // this array contains the list of user bank accounts AND the list of banks in nigeria
 
                     // initialise the account number combo box widget
-                    utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox =
+                    /*utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox =
                         new ej.dropdowns.ComboBox({
                         //set the data to dataSource property
                         dataSource: promiseArray[0],
@@ -5088,11 +5103,14 @@ utopiasoftware.ally.controller = {
                         floatLabelType: "Auto",
                         popupHeight: "300px",
                         allowCustom: true
-                    });
+                    });*/
+                    utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.dataSource =
+                        promiseArray[0];
+                    utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.bindData();
 
                     // render initialized card ComboBox
-                    utopiasoftware.ally.controller.disburseWalletPageViewModel.
-                    accountNumberComboBox.appendTo('#disburse-wallet-account-number');
+                    /*utopiasoftware.ally.controller.disburseWalletPageViewModel.
+                    accountNumberComboBox.appendTo('#disburse-wallet-account-number');*/
 
                     // initialise the bank DropDown widget
                     utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList =  new ej.dropdowns.DropDownList({
