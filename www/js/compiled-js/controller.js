@@ -5043,6 +5043,22 @@ utopiasoftware.ally.controller = {
                 // hide the form
                 $('#disburse-wallet-form', $thisPage).css('display', "none");
 
+                // initialise the bank DropDown widget
+                utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList =  new ej.dropdowns.DropDownList({
+                    //set the data to dataSource property
+                    dataSource: [],
+                    fields: {text: 'name', value: 'code'},
+                    sortOrder: "Ascending",
+                    enabled: true,
+                    placeholder: "Select Bank",
+                    floatLabelType: "Auto",
+                    popupHeight: "300px"
+                });
+
+                // render initialised bank dropdown list
+                utopiasoftware.ally.controller.disburseWalletPageViewModel.
+                banksDropDownList.appendTo('#disburse-wallet-bank');
+
                 // initialise the account number combo box widget
                 utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox =
                  new ej.dropdowns.ComboBox({
@@ -5084,21 +5100,7 @@ utopiasoftware.ally.controller = {
                     utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataBind();
                 });
 
-                // initialise the bank DropDown widget
-                utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList =  new ej.dropdowns.DropDownList({
-                    //set the data to dataSource property
-                    dataSource: [],
-                    fields: {text: 'name', value: 'code'},
-                    sortOrder: "Ascending",
-                    enabled: true,
-                    placeholder: "Select Bank",
-                    floatLabelType: "Auto",
-                    popupHeight: "300px"
-                });
 
-                // render initialised bank dropdown list
-                utopiasoftware.ally.controller.disburseWalletPageViewModel.
-                banksDropDownList.appendTo('#disburse-wallet-bank');
 
                 // initialise form tooltips
                 utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip = new ej.popups.Tooltip({
@@ -5188,13 +5190,13 @@ utopiasoftware.ally.controller = {
                 }).
                 then(function(promiseArray){ // this array contains the list of user bank accounts AND the list of banks in nigeria
 
-                    utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.dataSource =
-                        promiseArray[0];
-                    utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.dataBind();
-
                     utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataSource =
                         promiseArray[1];
                     utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataBind();
+
+                    utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.dataSource =
+                        promiseArray[0];
+                    utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.dataBind();
 
                     // hide the page preloader
                     $('.page-preloader', $thisPage).css('display', "none");
