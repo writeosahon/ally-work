@@ -3561,6 +3561,71 @@ utopiasoftware.ally.controller = {
                 // hide the form
                 $('#fund-wallet-form', $thisPage).css('display', "none");
 
+                // initialise the card DropDown widget
+                utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList =  new ej.dropdowns.DropDownList({
+                    //set the data to dataSource property
+                    dataSource: [],
+                    fields: {text: 'CARDNUMBER2', value: 'CARDNUMBER2'},
+                    placeholder: "Select Card",
+                    floatLabelType: "Auto",
+                    popupHeight: "300px"
+                });
+
+                // render initialized card DropDownList
+                utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList.appendTo('#fund-wallet-card-number');
+
+                // initialise form tooltips
+                utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip = new ej.popups.Tooltip({
+                    target: '.ally-input-tooltip',
+                    position: 'top center',
+                    cssClass: 'ally-input-tooltip',
+                    opensOn: 'focus'
+                });
+
+                // render the initialized form tooltip
+                utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip.appendTo('#fund-wallet-form');
+
+                // initialise the amount field
+                utopiasoftware.ally.controller.fundWalletPageViewModel.amountFieldValidator =
+                    $('#fund-wallet-amount').parsley({
+                        value: function(parsley) {
+                            // convert the amount back to a plain text without the thousand separator
+                            let parsedNumber = kendo.parseFloat($('#fund-wallet-amount', $thisPage).val());
+                            return (parsedNumber ? parsedNumber : $('#fund-wallet-amount', $thisPage).val());
+                        }
+                    });
+
+                // initialise the form validation
+                utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator = $('#fund-wallet-form').parsley();
+
+                // attach listener for the fund wallet button on the page
+                $('#fund-wallet-fund-button').get(0).onclick = function(){
+                    // run the validation method for the form
+                    utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.whenValidate();
+                };
+
+                // listen for the form field validation failure event
+                utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('field:error', function(fieldInstance) {
+                    // get the element that triggered the field validation error and use it to display tooltip
+                    // display tooltip
+                    $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                    $(fieldInstance.$element).attr("data-hint", fieldInstance.getErrorsMessages()[0]);
+                    $(fieldInstance.$element).attr("title", fieldInstance.getErrorsMessages()[0]);
+                });
+
+                // listen for the form field validation success event
+                utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('field:success', function(fieldInstance) {
+                    // remove tooltip from element
+                    $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                    $(fieldInstance.$element).removeAttr("data-hint");
+                    $(fieldInstance.$element).removeAttr("title");
+                });
+
+                // listen for the form validation success
+                utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('form:success',
+                    utopiasoftware.ally.controller.fundWalletPageViewModel.formValidated);
+
+
                 // create the form data to be sent
                 var formData = {phone: utopiasoftware.ally.model.appUserDetails.phone};
 
@@ -3591,69 +3656,10 @@ utopiasoftware.ally.controller = {
                 then(function(cardCollectionArray){
 
                     // initialise the card DropDown widget
-                    utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList =  new ej.dropdowns.DropDownList({
-                        //set the data to dataSource property
-                        dataSource: cardCollectionArray,
-                        fields: {text: 'CARDNUMBER2', value: 'CARDNUMBER2'},
-                        placeholder: "Select Card",
-                        floatLabelType: "Auto",
-                        popupHeight: "300px"
-                    });
+                    utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList.dataSource = cardCollectionArray;
 
-                    // render initialized card DropDownList
-                    utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList.appendTo('#fund-wallet-card-number');
-
-
-                    // initialise form tooltips
-                    utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip = new ej.popups.Tooltip({
-                        target: '.ally-input-tooltip',
-                        position: 'top center',
-                        cssClass: 'ally-input-tooltip',
-                        opensOn: 'focus'
-                    });
-
-                    // render the initialized form tooltip
-                    utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip.appendTo('#fund-wallet-form');
-
-                    // initialise the amount field
-                    utopiasoftware.ally.controller.fundWalletPageViewModel.amountFieldValidator =
-                        $('#fund-wallet-amount').parsley({
-                            value: function(parsley) {
-                                // convert the amount back to a plain text without the thousand separator
-                                let parsedNumber = kendo.parseFloat($('#fund-wallet-amount', $thisPage).val());
-                                return (parsedNumber ? parsedNumber : $('#fund-wallet-amount', $thisPage).val());
-                            }
-                        });
-
-                    // initialise the form validation
-                    utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator = $('#fund-wallet-form').parsley();
-
-                    // attach listener for the fund wallet button on the page
-                    $('#fund-wallet-fund-button').get(0).onclick = function(){
-                        // run the validation method for the form
-                        utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.whenValidate();
-                    };
-
-                    // listen for the form field validation failure event
-                    utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('field:error', function(fieldInstance) {
-                        // get the element that triggered the field validation error and use it to display tooltip
-                        // display tooltip
-                        $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
-                        $(fieldInstance.$element).attr("data-hint", fieldInstance.getErrorsMessages()[0]);
-                        $(fieldInstance.$element).attr("title", fieldInstance.getErrorsMessages()[0]);
-                    });
-
-                    // listen for the form field validation success event
-                    utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('field:success', function(fieldInstance) {
-                        // remove tooltip from element
-                        $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
-                        $(fieldInstance.$element).removeAttr("data-hint");
-                        $(fieldInstance.$element).removeAttr("title");
-                    });
-
-                    // listen for the form validation success
-                    utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('form:success',
-                        utopiasoftware.ally.controller.fundWalletPageViewModel.formValidated);
+                    // bind the new update to the dropdown list
+                    utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList.dataBind();
 
                     // hide the page preloader
                     $('.page-preloader', $thisPage).css('display', "none");
@@ -3823,6 +3829,7 @@ utopiasoftware.ally.controller = {
                 })]);
             }).
             then(function(){
+                hockeyapp.trackEvent(function(){}, function(){}, "WALLET FUNDED"); // track wallet funding
                 return Promise.all([ons.notification.toast("Wallet Funded Successfully!", {timeout:4000}),
                     $('#app-main-navigator').get(0).popPage({data: {refresh: true}})]);
 
@@ -5747,6 +5754,7 @@ utopiasoftware.ally.controller = {
                 $('#payments-ally-scan-page #payments-ally-scan-form').get(0).reset();
                 // reset the form validator object on the page
                 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();
+                $('#payments-ally-scan-page #payments-ally-scan-find-button').css("transform", "scale(1)");
 
                 // reset the page scroll position to the top
                 $('#payments-ally-scan-page .page__content').scrollTop(0);
@@ -6513,6 +6521,8 @@ utopiasoftware.ally.controller = {
                         data: JSON.stringify(pushNotification)
                     }
                 ));
+
+                hockeyapp.trackEvent(function(){}, function(){}, "MERCHANT PAYMENT"); // track merchant payments
 
                 // forward details of the wallet-transfer and the user details
                 return Promise.all([$('#hour-glass-loader-modal').get(0).hide(),

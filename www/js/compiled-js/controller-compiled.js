@@ -965,16 +965,9 @@ if(!ons.isReady()||utopiasoftware.ally.model.isAppReady===false){setTimeout(load
 return;}// listen for the back button event
 $('#app-main-navigator').get(0).topPage.onDeviceBackButton=utopiasoftware.ally.controller.fundWalletPageViewModel.backButtonClicked;// display the page preloader
 $('.page-preloader',$thisPage).css('display',"block");// hide the form
-$('#fund-wallet-form',$thisPage).css('display',"none");// create the form data to be sent
-var formData={phone:utopiasoftware.ally.model.appUserDetails.phone};// get the collection of stored/tokenised cards
-Promise.resolve(formData).then(function(){// submit the form data
-return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/get-my-cards.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
-processData:true,data:formData// data to submit to server
-}));}).then(function(serverResponse){serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// get the response object
-return serverResponse;// forward the server response i.e. collection of tokenised cards
-}).then(function(cardCollectionArray){// initialise the card DropDown widget
+$('#fund-wallet-form',$thisPage).css('display',"none");// initialise the card DropDown widget
 utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList=new ej.dropdowns.DropDownList({//set the data to dataSource property
-dataSource:cardCollectionArray,fields:{text:'CARDNUMBER2',value:'CARDNUMBER2'},placeholder:"Select Card",floatLabelType:"Auto",popupHeight:"300px"});// render initialized card DropDownList
+dataSource:[],fields:{text:'CARDNUMBER2',value:'CARDNUMBER2'},placeholder:"Select Card",floatLabelType:"Auto",popupHeight:"300px"});// render initialized card DropDownList
 utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList.appendTo('#fund-wallet-card-number');// initialise form tooltips
 utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip=new ej.popups.Tooltip({target:'.ally-input-tooltip',position:'top center',cssClass:'ally-input-tooltip',opensOn:'focus'});// render the initialized form tooltip
 utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip.appendTo('#fund-wallet-form');// initialise the amount field
@@ -988,7 +981,16 @@ utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('field:e
 $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$(fieldInstance.$element).attr("data-hint",fieldInstance.getErrorsMessages()[0]);$(fieldInstance.$element).attr("title",fieldInstance.getErrorsMessages()[0]);});// listen for the form field validation success event
 utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('field:success',function(fieldInstance){// remove tooltip from element
 $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$(fieldInstance.$element).removeAttr("data-hint");$(fieldInstance.$element).removeAttr("title");});// listen for the form validation success
-utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('form:success',utopiasoftware.ally.controller.fundWalletPageViewModel.formValidated);// hide the page preloader
+utopiasoftware.ally.controller.fundWalletPageViewModel.formValidator.on('form:success',utopiasoftware.ally.controller.fundWalletPageViewModel.formValidated);// create the form data to be sent
+var formData={phone:utopiasoftware.ally.model.appUserDetails.phone};// get the collection of stored/tokenised cards
+Promise.resolve(formData).then(function(){// submit the form data
+return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/get-my-cards.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
+processData:true,data:formData// data to submit to server
+}));}).then(function(serverResponse){serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// get the response object
+return serverResponse;// forward the server response i.e. collection of tokenised cards
+}).then(function(cardCollectionArray){// initialise the card DropDown widget
+utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList.dataSource=cardCollectionArray;// bind the new update to the dropdown list
+utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList.dataBind();// hide the page preloader
 $('.page-preloader',$thisPage).css('display',"none");// display the form
 $('#fund-wallet-form',$thisPage).css('display',"block");// hide the loader
 $('#loader-modal').get(0).hide();}).catch(function(){// hide the page preloader
@@ -1032,7 +1034,8 @@ throw serverResponse.message||serverResponse.data.message;// throw the error mes
 }return serverResponse;// forward the server response
 }).then(function(serverResponse){// hide the loader
 return Promise.all([serverResponse,$('#hour-glass-loader-modal').get(0).hide()]);}).then(function(responseArray){// ask user for transaction otp
-return Promise.all([responseArray[0],ons.notification.alert({title:'<ons-icon icon="md-check-circle" size="32px" '+'style="color: green;"></ons-icon> Wallet Funded',messageHTML:'<span>FUNDING FEE: '+kendo.toString(kendo.parseFloat(responseArray[0].data.appfee),'n2')+'<br>\n                    AMOUNT CHARGED: '+kendo.toString(kendo.parseFloat(responseArray[0].data.charged_amount),'n2')+'</span>',cancelable:false})]);}).then(function(){return Promise.all([ons.notification.toast("Wallet Funded Successfully!",{timeout:4000}),$('#app-main-navigator').get(0).popPage({data:{refresh:true}})]);}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
+return Promise.all([responseArray[0],ons.notification.alert({title:'<ons-icon icon="md-check-circle" size="32px" '+'style="color: green;"></ons-icon> Wallet Funded',messageHTML:'<span>FUNDING FEE: '+kendo.toString(kendo.parseFloat(responseArray[0].data.appfee),'n2')+'<br>\n                    AMOUNT CHARGED: '+kendo.toString(kendo.parseFloat(responseArray[0].data.charged_amount),'n2')+'</span>',cancelable:false})]);}).then(function(){hockeyapp.trackEvent(function(){},function(){},"WALLET FUNDED");// track wallet funding
+return Promise.all([ons.notification.toast("Wallet Funded Successfully!",{timeout:4000}),$('#app-main-navigator').get(0).popPage({data:{refresh:true}})]);}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
 err="Sorry. Your ALLY wallet could not be funded. Please retry";}$('#hour-glass-loader-modal').get(0).hide();// hide loader
 ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> Wallet Funding Failed',messageHTML:'<span>'+err+'</span>',cancelable:false});});},/**
          * method is triggered when back button or device back button is clicked
@@ -1556,7 +1559,7 @@ utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=false
 $('html, body').removeClass('ally-transparent');$('#payments-page').removeClass('transparent');$('#payments-ally-scan-page').removeClass('transparent');// remove any tooltip being displayed on all forms on the page
 $('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-scan-page [title]').removeAttr("title");$('#payments-ally-scan-page [data-hint]').removeAttr("data-hint");// reset the form
 $('#payments-ally-scan-page #payments-ally-scan-form').get(0).reset();// reset the form validator object on the page
-utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();// reset the page scroll position to the top
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();$('#payments-ally-scan-page #payments-ally-scan-find-button').css("transform","scale(1)");// reset the page scroll position to the top
 $('#payments-ally-scan-page .page__content').scrollTop(0);// disable the webview transparency
 QRScanner.hide(function(status){QRScanner.resumePreview(function(){});});}catch(err){}},/**
          * method is triggered when the page is destroyed
@@ -1744,7 +1747,8 @@ $('#payments-ally-direct-page .page__content').scrollTop(0);// populate the paym
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.updatePaymentOutChart('today');// send push notification to the recipient of the transfer
 var pushNotification={// create the push notification object
 "app_id":"d5d2bdba-eec0-46b1-836e-c5b8e318e928","filters":[{"field":"tag","key":"phone","relation":"=","value":formData.phone_receiver}],"contents":{"en":"You received payment into your ALLY WALLET from "+utopiasoftware.ally.model.appUserDetails.firstname+" "+utopiasoftware.ally.model.appUserDetails.lastname},"headings":{"en":"Payment Received"},"android_channel_id":"81baf9bc-d068-4f4c-9bae-1a3dc8488491","android_visibility":0,"priority":5};Promise.resolve($.ajax({url:"https://onesignal.com/api/v1/notifications",type:"post",contentType:"application/json",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("Authorization","Basic MmQ3ODcwZGUtYmIyYS00NzY5LWIwZWQtMTk5ZGRjNzU2M2Q3");},dataType:"json",timeout:240000,// wait for 4 minutes before timeout of request
-processData:false,data:JSON.stringify(pushNotification)}));// forward details of the wallet-transfer and the user details
+processData:false,data:JSON.stringify(pushNotification)}));hockeyapp.trackEvent(function(){},function(){},"MERCHANT PAYMENT");// track merchant payments
+// forward details of the wallet-transfer and the user details
 return Promise.all([$('#hour-glass-loader-modal').get(0).hide(),$('#payments-page #payments-tabbar').get(0).setActiveTab(0),ons.notification.toast("Merchant Payment Successful!",{timeout:4000})]);}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
 err='Sorry, merchant payment could not be made.<br> '+'You can try again OR scan the QR Code to pay merchant';}$('#hour-glass-loader-modal').get(0).hide();// hide loader
 ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> ALLY Payment Error',messageHTML:'<span>'+err+'</span>',cancelable:false});});}},/**
