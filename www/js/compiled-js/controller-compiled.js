@@ -1357,14 +1357,7 @@ utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList=new
 dataSource:[],fields:{text:'name',value:'code'},sortOrder:"Ascending",enabled:true,placeholder:"Select Bank",floatLabelType:"Auto",popupHeight:"300px"});// render initialised bank dropdown list
 utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.appendTo('#disburse-wallet-bank');// initialise the account number combo box widget
 utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox=new ej.dropdowns.ComboBox({//set the data to dataSource property
-dataSource:[],fields:{text:'displayText',value:'ACCOUNTNUMBER'},placeholder:"Account Name or Number (NUBAN)",floatLabelType:"Auto",popupHeight:"300px",allowCustom:true});utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.appendTo('#disburse-wallet-account-number');// add the change event listener to listen for changes in the bank account number combo box
-utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.addEventListener("change",function(){var accountObj=this.getDataByValue(this.value);// get the object that matches the selected value
-if(accountObj){// update the bank selection dropdown
-utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.value=accountObj["BANKCODE"];utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.enabled=false;// update the account nickname input
-$('#disburse-wallet-page #disburse-wallet-account-name').val(accountObj.RECIPIENTNAME);$('#disburse-wallet-page #disburse-wallet-account-name').attr("readonly",true);}else{// update the bank selection dropdown
-utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.enabled=true;utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.value=null;utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.text=null;// update the account nickname input
-$('#disburse-wallet-page #disburse-wallet-account-name').val("");$('#disburse-wallet-page #disburse-wallet-account-name').removeAttr("readonly");}// update the bank selection dropdown
-utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataBind();});// initialise form tooltips
+dataSource:[],fields:{text:'displayText',value:'ACCOUNTNUMBER'},placeholder:"Account Name or Number (NUBAN)",floatLabelType:"Auto",popupHeight:"300px",allowCustom:true});utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.appendTo('#disburse-wallet-account-number');// initialise form tooltips
 utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip=new ej.popups.Tooltip({target:'.ally-input-tooltip',position:'top center',cssClass:'ally-input-tooltip',opensOn:'focus'});// render the initialized form tooltip
 utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip.appendTo('#disburse-wallet-form');// initialise the amount field
 utopiasoftware.ally.controller.disburseWalletPageViewModel.amountFieldValidator=$('#disburse-wallet-amount').parsley({value:function value(parsley){// convert the amount back to a plain text without the thousand separator
@@ -1387,7 +1380,16 @@ serverResponse.forEach(function(acctObject){// add an additional property to eac
 // this property is displayed to the user
 acctObject.displayText=acctObject.RECIPIENTNAME+" - "+acctObject.ACCOUNTNUMBER;});return Promise.all([serverResponse,utopiasoftware.ally.banksData()]);// forward the server response i.e. collection of bank accounts (and the list of banks)
 }).then(function(promiseArray){// this array contains the list of user bank accounts AND the list of banks in nigeria
-utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataSource=promiseArray[1];utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataBind();utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.dataSource=promiseArray[0];utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.dataBind();// hide the page preloader
+//populate data fir the bank dropdown list
+utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataSource=promiseArray[1];utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataBind();// populate data for the account combo box
+utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.dataSource=promiseArray[0];utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.dataBind();// add the change event listener to listen for changes in the bank account number combo box
+utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.addEventListener("change",function(){var accountObj=this.getDataByValue(this.value);// get the object that matches the selected value
+if(accountObj){// update the bank selection dropdown
+utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.value=accountObj["BANKCODE"];utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.enabled=false;// update the account nickname input
+$('#disburse-wallet-page #disburse-wallet-account-name').val(accountObj.RECIPIENTNAME);$('#disburse-wallet-page #disburse-wallet-account-name').attr("readonly",true);}else{// update the bank selection dropdown
+utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.enabled=true;utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.value=null;utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.text=null;// update the account nickname input
+$('#disburse-wallet-page #disburse-wallet-account-name').val("");$('#disburse-wallet-page #disburse-wallet-account-name').removeAttr("readonly");}// update the bank selection dropdown
+utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataBind();});// hide the page preloader
 $('.page-preloader',$thisPage).css('display',"none");// display the form
 $('#disburse-wallet-form',$thisPage).css('display',"block");// hide the loader
 $('#loader-modal').get(0).hide();}).catch(function(err){console.log(err);// hide the page preloader

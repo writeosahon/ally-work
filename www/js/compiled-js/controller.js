@@ -5074,34 +5074,6 @@ utopiasoftware.ally.controller = {
                 utopiasoftware.ally.controller.disburseWalletPageViewModel.
                 accountNumberComboBox.appendTo('#disburse-wallet-account-number');
 
-                // add the change event listener to listen for changes in the bank account number combo box
-                utopiasoftware.ally.controller.disburseWalletPageViewModel.
-                accountNumberComboBox.addEventListener("change", function(){
-                    var accountObj = this.getDataByValue(this.value); // get the object that matches the selected value
-                    if(accountObj){
-                        // update the bank selection dropdown
-                        utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.value =
-                            accountObj["BANKCODE"];
-                        utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.enabled = false;
-                        // update the account nickname input
-                        $('#disburse-wallet-page #disburse-wallet-account-name').val(accountObj.RECIPIENTNAME);
-                        $('#disburse-wallet-page #disburse-wallet-account-name').attr("readonly", true);
-                    }
-                    else{
-                        // update the bank selection dropdown
-                        utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.enabled = true;
-                        utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.value = null;
-                        utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.text = null;
-                        // update the account nickname input
-                        $('#disburse-wallet-page #disburse-wallet-account-name').val("");
-                        $('#disburse-wallet-page #disburse-wallet-account-name').removeAttr("readonly");
-                    }
-                    // update the bank selection dropdown
-                    utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataBind();
-                });
-
-
-
                 // initialise form tooltips
                 utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip = new ej.popups.Tooltip({
                     target: '.ally-input-tooltip',
@@ -5190,13 +5162,41 @@ utopiasoftware.ally.controller = {
                 }).
                 then(function(promiseArray){ // this array contains the list of user bank accounts AND the list of banks in nigeria
 
+                    //populate data fir the bank dropdown list
                     utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataSource =
                         promiseArray[1];
                     utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataBind();
 
+                    // populate data for the account combo box
                     utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.dataSource =
                         promiseArray[0];
                     utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.dataBind();
+
+                    // add the change event listener to listen for changes in the bank account number combo box
+                    utopiasoftware.ally.controller.disburseWalletPageViewModel.
+                    accountNumberComboBox.addEventListener("change", function(){
+                        var accountObj = this.getDataByValue(this.value); // get the object that matches the selected value
+                        if(accountObj){
+                            // update the bank selection dropdown
+                            utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.value =
+                                accountObj["BANKCODE"];
+                            utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.enabled = false;
+                            // update the account nickname input
+                            $('#disburse-wallet-page #disburse-wallet-account-name').val(accountObj.RECIPIENTNAME);
+                            $('#disburse-wallet-page #disburse-wallet-account-name').attr("readonly", true);
+                        }
+                        else{
+                            // update the bank selection dropdown
+                            utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.enabled = true;
+                            utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.value = null;
+                            utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.text = null;
+                            // update the account nickname input
+                            $('#disburse-wallet-page #disburse-wallet-account-name').val("");
+                            $('#disburse-wallet-page #disburse-wallet-account-name').removeAttr("readonly");
+                        }
+                        // update the bank selection dropdown
+                        utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataBind();
+                    });
 
                     // hide the page preloader
                     $('.page-preloader', $thisPage).css('display', "none");
