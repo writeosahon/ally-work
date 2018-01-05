@@ -5058,6 +5058,101 @@ utopiasoftware.ally.controller = {
                 utopiasoftware.ally.controller.disburseWalletPageViewModel.
                 accountNumberComboBox.appendTo('#disburse-wallet-account-number');
 
+                // add the change event listener to listen for changes in the bank account number combo box
+                utopiasoftware.ally.controller.disburseWalletPageViewModel.
+                accountNumberComboBox.addEventListener("change", function(){
+                    var accountObj = this.getDataByValue(this.value); // get the object that matches the selected value
+                    if(accountObj){
+                        // update the bank selection dropdown
+                        utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.value =
+                            accountObj["BANKCODE"];
+                        utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.enabled = false;
+                        // update the account nickname input
+                        $('#disburse-wallet-page #disburse-wallet-account-name').val(accountObj.RECIPIENTNAME);
+                        $('#disburse-wallet-page #disburse-wallet-account-name').attr("readonly", true);
+                    }
+                    else{
+                        // update the bank selection dropdown
+                        utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.enabled = true;
+                        utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.value = null;
+                        utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.text = null;
+                        // update the account nickname input
+                        $('#disburse-wallet-page #disburse-wallet-account-name').val("");
+                        $('#disburse-wallet-page #disburse-wallet-account-name').removeAttr("readonly");
+                    }
+                    // update the bank selection dropdown
+                    utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataBind();
+                });
+
+                // initialise the bank DropDown widget
+                utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList =  new ej.dropdowns.DropDownList({
+                    //set the data to dataSource property
+                    dataSource: [],
+                    fields: {text: 'name', value: 'code'},
+                    sortOrder: "Ascending",
+                    enabled: true,
+                    placeholder: "Select Bank",
+                    floatLabelType: "Auto",
+                    popupHeight: "300px"
+                });
+
+                // render initialised bank dropdown list
+                utopiasoftware.ally.controller.disburseWalletPageViewModel.
+                banksDropDownList.appendTo('#disburse-wallet-bank');
+
+                // initialise form tooltips
+                utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip = new ej.popups.Tooltip({
+                    target: '.ally-input-tooltip',
+                    position: 'top center',
+                    cssClass: 'ally-input-tooltip',
+                    opensOn: 'focus'
+                });
+
+                // render the initialized form tooltip
+                utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip.appendTo('#disburse-wallet-form');
+
+
+                // initialise the amount field
+                utopiasoftware.ally.controller.disburseWalletPageViewModel.amountFieldValidator =
+                    $('#disburse-wallet-amount').parsley({
+                        value: function(parsley) {
+                            // convert the amount back to a plain text without the thousand separator
+                            let parsedNumber = kendo.parseFloat($('#disburse-wallet-amount', $thisPage).val());
+                            return (parsedNumber ? parsedNumber : $('#disburse-wallet-amount', $thisPage).val());
+                        }
+                    });
+
+                // initialise the form validation
+                utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator = $('#disburse-wallet-form').parsley();
+
+                // attach listener for the disburse wallet button on the page
+                $('#disburse-wallet-disburse-button').get(0).onclick = function(){
+                    // run the validation method for the form
+                    utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.whenValidate();
+                };
+
+                // listen for the form field validation failure event
+                utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.on('field:error', function(fieldInstance) {
+                    // get the element that triggered the field validation error and use it to display tooltip
+                    // display tooltip
+                    $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                    $(fieldInstance.$element).attr("data-hint", fieldInstance.getErrorsMessages()[0]);
+                    $(fieldInstance.$element).attr("title", fieldInstance.getErrorsMessages()[0]);
+                });
+
+                // listen for the form field validation success event
+                utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.on('field:success', function(fieldInstance) {
+                    // remove tooltip from element
+                    $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                    $(fieldInstance.$element).removeAttr("data-hint");
+                    $(fieldInstance.$element).removeAttr("title");
+                });
+
+                // listen for the form validation success
+                utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.on('form:success',
+                    utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidated);
+
+
                 // create the form data to be sent
                 var formData = {phone: utopiasoftware.ally.model.appUserDetails.phone};
 
@@ -5093,117 +5188,13 @@ utopiasoftware.ally.controller = {
                 }).
                 then(function(promiseArray){ // this array contains the list of user bank accounts AND the list of banks in nigeria
 
-                    // initialise the account number combo box widget
-                    /*utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox =
-                        new ej.dropdowns.ComboBox({
-                        //set the data to dataSource property
-                        dataSource: promiseArray[0],
-                        fields: {text: 'displayText', value: 'ACCOUNTNUMBER'},
-                        placeholder: "Account Name or Number (NUBAN)",
-                        floatLabelType: "Auto",
-                        popupHeight: "300px",
-                        allowCustom: true
-                    });*/
                     utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.dataSource =
                         promiseArray[0];
-                    utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.bindData();
+                    utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.dataBind();
 
-                    // render initialized card ComboBox
-                    /*utopiasoftware.ally.controller.disburseWalletPageViewModel.
-                    accountNumberComboBox.appendTo('#disburse-wallet-account-number');*/
-
-                    // initialise the bank DropDown widget
-                    utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList =  new ej.dropdowns.DropDownList({
-                        //set the data to dataSource property
-                        dataSource: promiseArray[1],
-                        fields: {text: 'name', value: 'code'},
-                        sortOrder: "Ascending",
-                        enabled: true,
-                        placeholder: "Select Bank",
-                        floatLabelType: "Auto",
-                        popupHeight: "300px"
-                    });
-
-                    // render initialised bank dropdown list
-                    utopiasoftware.ally.controller.disburseWalletPageViewModel.
-                    banksDropDownList.appendTo('#disburse-wallet-bank');
-
-                    // initialise form tooltips
-                    utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip = new ej.popups.Tooltip({
-                        target: '.ally-input-tooltip',
-                        position: 'top center',
-                        cssClass: 'ally-input-tooltip',
-                        opensOn: 'focus'
-                    });
-
-                    // render the initialized form tooltip
-                    utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip.appendTo('#disburse-wallet-form');
-
-                    // add the change event listener to listen for changes in the bank account number combo box
-                    utopiasoftware.ally.controller.disburseWalletPageViewModel.
-                    accountNumberComboBox.addEventListener("change", function(){
-                        var accountObj = this.getDataByValue(this.value); // get the object that matches the selected value
-                        if(accountObj){
-                            // update the bank selection dropdown
-                            utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.value =
-                                accountObj["BANKCODE"];
-                            utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.enabled = false;
-                            // update the account nickname input
-                            $('#disburse-wallet-page #disburse-wallet-account-name').val(accountObj.RECIPIENTNAME);
-                            $('#disburse-wallet-page #disburse-wallet-account-name').attr("readonly", true);
-                        }
-                        else{
-                            // update the bank selection dropdown
-                            utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.enabled = true;
-                            utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.value = null;
-                            utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.text = null;
-                            // update the account nickname input
-                            $('#disburse-wallet-page #disburse-wallet-account-name').val("");
-                            $('#disburse-wallet-page #disburse-wallet-account-name').removeAttr("readonly");
-                        }
-                        // update the bank selection dropdown
-                        utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataBind();
-                    });
-
-                    // initialise the amount field
-                    utopiasoftware.ally.controller.disburseWalletPageViewModel.amountFieldValidator =
-                        $('#disburse-wallet-amount').parsley({
-                            value: function(parsley) {
-                                // convert the amount back to a plain text without the thousand separator
-                                let parsedNumber = kendo.parseFloat($('#disburse-wallet-amount', $thisPage).val());
-                                return (parsedNumber ? parsedNumber : $('#disburse-wallet-amount', $thisPage).val());
-                            }
-                        });
-
-                    // initialise the form validation
-                    utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator = $('#disburse-wallet-form').parsley();
-
-                    // attach listener for the disburse wallet button on the page
-                    $('#disburse-wallet-disburse-button').get(0).onclick = function(){
-                        // run the validation method for the form
-                        utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.whenValidate();
-                    };
-
-                    // listen for the form field validation failure event
-                    utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.on('field:error', function(fieldInstance) {
-                        // get the element that triggered the field validation error and use it to display tooltip
-                        // display tooltip
-                        $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
-                        $(fieldInstance.$element).attr("data-hint", fieldInstance.getErrorsMessages()[0]);
-                        $(fieldInstance.$element).attr("title", fieldInstance.getErrorsMessages()[0]);
-                    });
-
-                    // listen for the form field validation success event
-                    utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.on('field:success', function(fieldInstance) {
-                        // remove tooltip from element
-                        $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
-                        $(fieldInstance.$element).removeAttr("data-hint");
-                        $(fieldInstance.$element).removeAttr("title");
-                    });
-
-                    // listen for the form validation success
-                    utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.on('form:success',
-                        utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidated);
+                    utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataSource =
+                        promiseArray[1];
+                    utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataBind();
 
                     // hide the page preloader
                     $('.page-preloader', $thisPage).css('display', "none");
@@ -5215,7 +5206,8 @@ utopiasoftware.ally.controller = {
                     $('#loader-modal').get(0).hide();
 
                 }).
-                catch(function(){
+                catch(function(err){
+                    console.log(err);
                     // hide the page preloader
                     $('.page-preloader', $thisPage).css('display', "none");
 

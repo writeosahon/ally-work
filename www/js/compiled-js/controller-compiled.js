@@ -1354,41 +1354,19 @@ $('#app-main-navigator').get(0).topPage.onDeviceBackButton=utopiasoftware.ally.c
 $('.page-preloader',$thisPage).css('display',"block");// hide the form
 $('#disburse-wallet-form',$thisPage).css('display',"none");// initialise the account number combo box widget
 utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox=new ej.dropdowns.ComboBox({//set the data to dataSource property
-dataSource:[],fields:{text:'displayText',value:'ACCOUNTNUMBER'},placeholder:"Account Name or Number (NUBAN)",floatLabelType:"Auto",popupHeight:"300px",allowCustom:true});utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.appendTo('#disburse-wallet-account-number');// create the form data to be sent
-var formData={phone:utopiasoftware.ally.model.appUserDetails.phone};// get the collection of stored bank accounts and bank names
-Promise.resolve(formData).then(function(){// submit the form data
-return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/get-my-bank-accounts.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
-processData:true,data:formData// data to submit to server
-}));}).then(function(serverResponse){serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// get the response object (i.e. array of bank account objects)
-serverResponse.forEach(function(acctObject){// add an additional property to each object
-// this property is displayed to the user
-acctObject.displayText=acctObject.RECIPIENTNAME+" - "+acctObject.ACCOUNTNUMBER;});return Promise.all([serverResponse,utopiasoftware.ally.banksData()]);// forward the server response i.e. collection of bank accounts (and the list of banks)
-}).then(function(promiseArray){// this array contains the list of user bank accounts AND the list of banks in nigeria
-// initialise the account number combo box widget
-/*utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox =
-                        new ej.dropdowns.ComboBox({
-                        //set the data to dataSource property
-                        dataSource: promiseArray[0],
-                        fields: {text: 'displayText', value: 'ACCOUNTNUMBER'},
-                        placeholder: "Account Name or Number (NUBAN)",
-                        floatLabelType: "Auto",
-                        popupHeight: "300px",
-                        allowCustom: true
-                    });*/utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.dataSource=promiseArray[0];utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.bindData();// render initialized card ComboBox
-/*utopiasoftware.ally.controller.disburseWalletPageViewModel.
-                    accountNumberComboBox.appendTo('#disburse-wallet-account-number');*/// initialise the bank DropDown widget
-utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList=new ej.dropdowns.DropDownList({//set the data to dataSource property
-dataSource:promiseArray[1],fields:{text:'name',value:'code'},sortOrder:"Ascending",enabled:true,placeholder:"Select Bank",floatLabelType:"Auto",popupHeight:"300px"});// render initialised bank dropdown list
-utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.appendTo('#disburse-wallet-bank');// initialise form tooltips
-utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip=new ej.popups.Tooltip({target:'.ally-input-tooltip',position:'top center',cssClass:'ally-input-tooltip',opensOn:'focus'});// render the initialized form tooltip
-utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip.appendTo('#disburse-wallet-form');// add the change event listener to listen for changes in the bank account number combo box
+dataSource:[],fields:{text:'displayText',value:'ACCOUNTNUMBER'},placeholder:"Account Name or Number (NUBAN)",floatLabelType:"Auto",popupHeight:"300px",allowCustom:true});utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.appendTo('#disburse-wallet-account-number');// add the change event listener to listen for changes in the bank account number combo box
 utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.addEventListener("change",function(){var accountObj=this.getDataByValue(this.value);// get the object that matches the selected value
 if(accountObj){// update the bank selection dropdown
 utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.value=accountObj["BANKCODE"];utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.enabled=false;// update the account nickname input
 $('#disburse-wallet-page #disburse-wallet-account-name').val(accountObj.RECIPIENTNAME);$('#disburse-wallet-page #disburse-wallet-account-name').attr("readonly",true);}else{// update the bank selection dropdown
 utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.enabled=true;utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.value=null;utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.text=null;// update the account nickname input
 $('#disburse-wallet-page #disburse-wallet-account-name').val("");$('#disburse-wallet-page #disburse-wallet-account-name').removeAttr("readonly");}// update the bank selection dropdown
-utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataBind();});// initialise the amount field
+utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataBind();});// initialise the bank DropDown widget
+utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList=new ej.dropdowns.DropDownList({//set the data to dataSource property
+dataSource:[],fields:{text:'name',value:'code'},sortOrder:"Ascending",enabled:true,placeholder:"Select Bank",floatLabelType:"Auto",popupHeight:"300px"});// render initialised bank dropdown list
+utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.appendTo('#disburse-wallet-bank');// initialise form tooltips
+utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip=new ej.popups.Tooltip({target:'.ally-input-tooltip',position:'top center',cssClass:'ally-input-tooltip',opensOn:'focus'});// render the initialized form tooltip
+utopiasoftware.ally.controller.disburseWalletPageViewModel.formTooltip.appendTo('#disburse-wallet-form');// initialise the amount field
 utopiasoftware.ally.controller.disburseWalletPageViewModel.amountFieldValidator=$('#disburse-wallet-amount').parsley({value:function value(parsley){// convert the amount back to a plain text without the thousand separator
 var parsedNumber=kendo.parseFloat($('#disburse-wallet-amount',$thisPage).val());return parsedNumber?parsedNumber:$('#disburse-wallet-amount',$thisPage).val();}});// initialise the form validation
 utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator=$('#disburse-wallet-form').parsley();// attach listener for the disburse wallet button on the page
@@ -1399,10 +1377,20 @@ utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.on('fie
 $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$(fieldInstance.$element).attr("data-hint",fieldInstance.getErrorsMessages()[0]);$(fieldInstance.$element).attr("title",fieldInstance.getErrorsMessages()[0]);});// listen for the form field validation success event
 utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.on('field:success',function(fieldInstance){// remove tooltip from element
 $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$(fieldInstance.$element).removeAttr("data-hint");$(fieldInstance.$element).removeAttr("title");});// listen for the form validation success
-utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.on('form:success',utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidated);// hide the page preloader
+utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidator.on('form:success',utopiasoftware.ally.controller.disburseWalletPageViewModel.formValidated);// create the form data to be sent
+var formData={phone:utopiasoftware.ally.model.appUserDetails.phone};// get the collection of stored bank accounts and bank names
+Promise.resolve(formData).then(function(){// submit the form data
+return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/get-my-bank-accounts.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
+processData:true,data:formData// data to submit to server
+}));}).then(function(serverResponse){serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// get the response object (i.e. array of bank account objects)
+serverResponse.forEach(function(acctObject){// add an additional property to each object
+// this property is displayed to the user
+acctObject.displayText=acctObject.RECIPIENTNAME+" - "+acctObject.ACCOUNTNUMBER;});return Promise.all([serverResponse,utopiasoftware.ally.banksData()]);// forward the server response i.e. collection of bank accounts (and the list of banks)
+}).then(function(promiseArray){// this array contains the list of user bank accounts AND the list of banks in nigeria
+utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.dataSource=promiseArray[0];utopiasoftware.ally.controller.disburseWalletPageViewModel.accountNumberComboBox.dataBind();utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataSource=promiseArray[1];utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataBind();// hide the page preloader
 $('.page-preloader',$thisPage).css('display',"none");// display the form
 $('#disburse-wallet-form',$thisPage).css('display',"block");// hide the loader
-$('#loader-modal').get(0).hide();}).catch(function(){// hide the page preloader
+$('#loader-modal').get(0).hide();}).catch(function(err){console.log(err);// hide the page preloader
 $('.page-preloader',$thisPage).css('display',"none");// display the form
 $('#disburse-wallet-form',$thisPage).css('display',"block");// inform the user that they cannot proceed without Internet
 window.plugins.toast.showWithOptions({message:"some content could be loaded without an Internet Connection",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#ff0000',//red
