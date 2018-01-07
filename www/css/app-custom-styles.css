@@ -312,6 +312,17 @@
 /** STYLE FOR ROTATING THE HOUR-GLASS ON THE HOUR GLASS LOADER ENDS **/
 
 
+/** STYLE FOR DASHBOARD PAGE BEGINS **/
+#dashboard-page .page--material__content {
+    position: absolute;
+    top: 56px;
+    background-color: #ffffff;
+}
+#dashboard-page .page--material__background {
+    background-color: #ffffff;
+}
+/** STYLE FOR DASHBOARD PAGE ENDS **/
+
 /** STYLE FOR THE ACCOUNT PAGE BEGINS **/
 #account-page ons-list, #account-page ons-list-item {
     background-color: transparent;
