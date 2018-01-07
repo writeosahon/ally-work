@@ -4844,6 +4844,8 @@ utopiasoftware.ally.controller = {
             then(function(result){
                 if(result === "registered recipient"){ // the recipient of the wallet transfer is already registered
 
+                    hockeyapp.trackEvent(function(){}, function(){}, "FUND TRANSFERRED"); // track fund transfer
+
                     // reset the form for the wallet transfer page
                     $('#wallet-transfer-page #wallet-transfer-form').get(0).reset();
                     // reset the form validator object on the page
@@ -4965,6 +4967,8 @@ utopiasoftware.ally.controller = {
 
 
         walletTransferSmsConfirmButtonClicked: function(buttonElem){
+
+            hockeyapp.trackEvent(function(){}, function(){}, "FUND TRANSFERRED"); // track fund transfer
 
             // get the details of the wall transfer for which an sms confirmation is being sent
             var walletTransferDetails = JSON.parse($(buttonElem).attr('data-wallet-transfer'));
@@ -5432,6 +5436,7 @@ utopiasoftware.ally.controller = {
             }).
             then(function(){
 
+                hockeyapp.trackEvent(function(){}, function(){}, "WALLET DISBURSED"); // track wallet disbursement
                 return Promise.all([ons.notification.toast("Wallet Disbursal Successful!", {timeout:4000}),
                 $('#app-main-navigator').get(0).popPage({data: {refresh: true}})]); // conclude wallet disbursal process
 

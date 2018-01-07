@@ -1294,6 +1294,7 @@ if(dataArray[0].isregistereduser!="yes"){// append the json details for the wall
 $($('#wallet-transfer-sms-confirm-modal #wallet-transfer-sms-confirm-button').get(0)).attr("data-wallet-transfer",JSON.stringify(dataArray[0]));// show the wallet-transfer-sms-confirm-modal to the user
 return $('#wallet-transfer-sms-confirm-modal').get(0).show();}else{// recipient is registered
 return"registered recipient";}}).then(function(result){if(result==="registered recipient"){// the recipient of the wallet transfer is already registered
+hockeyapp.trackEvent(function(){},function(){},"FUND TRANSFERRED");// track fund transfer
 // reset the form for the wallet transfer page
 $('#wallet-transfer-page #wallet-transfer-form').get(0).reset();// reset the form validator object on the page
 utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.reset();// send push notification to the recipient of the transfer
@@ -1326,7 +1327,8 @@ contactPhoneNumber="+"+contactPhoneNumber;// append the '+' to the beginning
 $('#wallet-transfer-form #wallet-transfer-receiver-phone-number').val(contactPhoneNumber);}).catch(function(){// inform the user that there was an error
 window.plugins.toast.showWithOptions({message:"phone contacts could not be accessed right now",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#ff0000',//red
 textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
-window.plugins.toast.hide();}});});},walletTransferSmsConfirmButtonClicked:function walletTransferSmsConfirmButtonClicked(buttonElem){// get the details of the wall transfer for which an sms confirmation is being sent
+window.plugins.toast.hide();}});});},walletTransferSmsConfirmButtonClicked:function walletTransferSmsConfirmButtonClicked(buttonElem){hockeyapp.trackEvent(function(){},function(){},"FUND TRANSFERRED");// track fund transfer
+// get the details of the wall transfer for which an sms confirmation is being sent
 var walletTransferDetails=JSON.parse($(buttonElem).attr('data-wallet-transfer'));// use a promise to send the sms confirmation message to the recipient
 new Promise(function(resolve,reject){// send sms
 SMS.sendSMS(walletTransferDetails.receiver,"Hello, I just sent "+walletTransferDetails.amount+" to your ALLY wallet. Download ALLY using this link "+"and your phone number to receive your funds\r\n"+utopiasoftware.ally.model.ally_app_share_link,resolve,reject);});// hide the sms confirmation modal
@@ -1451,7 +1453,8 @@ throw serverResponse.message;// throw the error message attached to this error
 // forward details of the wallet-disbursal; also save the user details to encrypted storage;
 return Promise.all([responseDetailsArray[1],utopiasoftware.ally.saveUserAppDetails(responseDetailsArray[0])]);}).then(function(dataArray){// update local copy of user app details
 utopiasoftware.ally.model.appUserDetails=dataArray[1];// forward details of the wallet-transfer and the user details
-return Promise.all([$('#hour-glass-loader-modal').get(0).hide()]);}).then(function(){return Promise.all([ons.notification.toast("Wallet Disbursal Successful!",{timeout:4000}),$('#app-main-navigator').get(0).popPage({data:{refresh:true}})]);// conclude wallet disbursal process
+return Promise.all([$('#hour-glass-loader-modal').get(0).hide()]);}).then(function(){hockeyapp.trackEvent(function(){},function(){},"WALLET DISBURSED");// track wallet disbursement
+return Promise.all([ons.notification.toast("Wallet Disbursal Successful!",{timeout:4000}),$('#app-main-navigator').get(0).popPage({data:{refresh:true}})]);// conclude wallet disbursal process
 }).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
 err="Sorry. Your ALLY wallet disbursal could not be completed. Please retry";}$('#hour-glass-loader-modal').get(0).hide();// hide loader
 ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> Wallet Disbursal Failed',messageHTML:'<span>'+err+'</span>',cancelable:false});});},/**
