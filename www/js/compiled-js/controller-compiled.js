@@ -1610,7 +1610,9 @@ width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#3
 legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType,titleStyle:{size:'1em',textAlignment:'center'}},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k',titleStyle:{size:'1em',textAlignment:'center'}},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Outgoing Payments',//Series type as line
 type:'Area'}]});// remove the loader content
 $('#payments-ally-scan-page #payments-ally-scan-payments-out-chart').html("");//append the newly created chart
-utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.paymentsOutChart.appendTo('#payments-ally-scan-payments-out-chart');});/**
+//utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.paymentsOutChart.
+//appendTo('#payments-ally-scan-payments-out-chart');
+});/**
              * function is used to map the chart data into an appropriate form that can be displayed by the chart
              * @param chartDataArray {Array} array containing chart data objects to be mapped
              *

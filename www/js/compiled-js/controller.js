@@ -6022,8 +6022,8 @@ utopiasoftware.ally.controller = {
                 // remove the loader content
                 $('#payments-ally-scan-page #payments-ally-scan-payments-out-chart').html("");
                 //append the newly created chart
-                utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.paymentsOutChart.
-                appendTo('#payments-ally-scan-payments-out-chart');
+                //utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.paymentsOutChart.
+                //appendTo('#payments-ally-scan-payments-out-chart');
             });
 
 
