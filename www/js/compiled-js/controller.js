@@ -167,6 +167,7 @@ utopiasoftware.ally.controller = {
             hockeyapp.start(function(){
                 hockeyapp.trackEvent(function(){}, function(){}, "USER SESSION STARTED"); // track start app session
             }, function(){}, "eeb9deb1b58d44948be72f178c159fbc");
+
         }).
         then(function(){
             // notify the app that the app has been successfully initialised and is ready for further execution (set app ready flag to true)
@@ -5220,7 +5221,6 @@ utopiasoftware.ally.controller = {
 
                 }).
                 catch(function(err){
-                    console.log(err);
                     // hide the page preloader
                     $('.page-preloader', $thisPage).css('display', "none");
 

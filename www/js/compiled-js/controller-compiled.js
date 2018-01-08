@@ -1400,7 +1400,7 @@ $('#disburse-wallet-page #disburse-wallet-account-name').val("");$('#disburse-wa
 utopiasoftware.ally.controller.disburseWalletPageViewModel.banksDropDownList.dataBind();});// hide the page preloader
 $('.page-preloader',$thisPage).css('display',"none");// display the form
 $('#disburse-wallet-form',$thisPage).css('display',"block");// hide the loader
-$('#loader-modal').get(0).hide();}).catch(function(err){console.log(err);// hide the page preloader
+$('#loader-modal').get(0).hide();}).catch(function(err){// hide the page preloader
 $('.page-preloader',$thisPage).css('display',"none");// display the form
 $('#disburse-wallet-form',$thisPage).css('display',"block");// inform the user that they cannot proceed without Internet
 window.plugins.toast.showWithOptions({message:"some content could be loaded without an Internet Connection",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#ff0000',//red
