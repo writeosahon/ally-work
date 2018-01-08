@@ -3101,7 +3101,7 @@ utopiasoftware.ally.controller = {
             }).
             then(function(){
                 // populate the payments-out chart
-                utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.updatePaymentOutChart('today');
+                //utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.updatePaymentOutChart('today');
 
                 // send push notification that account was updated
                 let pushNotification = { // create the push notification object
@@ -4328,7 +4328,7 @@ utopiasoftware.ally.controller = {
                     utopiasoftware.ally.controller.walletTransferPageViewModel.backButtonClicked;
 
                 // update the transfers-out chart
-                utopiasoftware.ally.controller.walletTransferPageViewModel.updateTransfersOutChart('today');
+                //utopiasoftware.ally.controller.walletTransferPageViewModel.updateTransfersOutChart('today');
 
                 // attach listen for when the 'wallet-transfer-add-recipient-button' is clicked
                 $('#wallet-transfer-add-recipient-button').get(0).onclick =
@@ -4822,7 +4822,7 @@ utopiasoftware.ally.controller = {
                 // update local copy of user app details
                 utopiasoftware.ally.model.appUserDetails = dataArray[1];
                 // update the transfers-out chart
-                utopiasoftware.ally.controller.walletTransferPageViewModel.updateTransfersOutChart('today');
+                //utopiasoftware.ally.controller.walletTransferPageViewModel.updateTransfersOutChart('today');
                 // reset the page scroll position to the top
                 $('#wallet-transfer-page .page__content').scrollTop(0);
                 // forward details of the wallet-transfer and the user details
@@ -5695,7 +5695,7 @@ utopiasoftware.ally.controller = {
                         };
 
                 // populate the payments-out chart
-                utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.updatePaymentOutChart('today');
+                //utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.updatePaymentOutChart('today');
 
                 // listen for the form field validation failure event
                 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.on('field:error', function(fieldInstance) {
@@ -6022,8 +6022,8 @@ utopiasoftware.ally.controller = {
                 // remove the loader content
                 $('#payments-ally-scan-page #payments-ally-scan-payments-out-chart').html("");
                 //append the newly created chart
-                //utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.paymentsOutChart.
-                //appendTo('#payments-ally-scan-payments-out-chart');
+                utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.paymentsOutChart.
+                appendTo('#payments-ally-scan-payments-out-chart');
             });
 
 
@@ -6382,7 +6382,6 @@ utopiasoftware.ally.controller = {
                 $('#payments-ally-direct-page [data-hint]').removeAttr("data-hint");
                 // destroy the form validator objects on the page
                 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.amountFieldValidator.destroy();
-                utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantCodeValidator.destroy();
                 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.formValidator.destroy();
 
             }
@@ -6497,7 +6496,7 @@ utopiasoftware.ally.controller = {
                 $('#payments-ally-direct-page .page__content').scrollTop(0);
 
                 // populate the payments-out chart
-                utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.updatePaymentOutChart('today');
+                //utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.updatePaymentOutChart('today');
 
                 // send push notification to the recipient of the transfer
                 let pushNotification = { // create the push notification object

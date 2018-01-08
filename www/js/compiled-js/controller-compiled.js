@@ -830,7 +830,8 @@ $('#account-page #account-list').css("display","block");$('#account-page #accoun
 $('#account-page #account-save').css("display","none");$('#account-page #account-page-error').css("display","none");// hide page preloader
 $('#account-page #account-preloading-fab').css("display","none");return $('#hour-glass-loader-modal').get(0).hide();// hide loader
 }).then(function(){// populate the payments-out chart
-utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.updatePaymentOutChart('today');// send push notification that account was updated
+//utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.updatePaymentOutChart('today');
+// send push notification that account was updated
 var pushNotification={// create the push notification object
 "app_id":"d5d2bdba-eec0-46b1-836e-c5b8e318e928","filters":[{"field":"tag","key":"phone","relation":"=","value":utopiasoftware.ally.model.appUserDetails.phone}],"contents":{"en":"Your ALLY account details were just updated"},"headings":{"en":"Account Updated"},"android_channel_id":"605bcdb3-611b-4aed-ba02-7e33c3d50542","android_visibility":1,"priority":10};Promise.resolve($.ajax({url:"https://onesignal.com/api/v1/notifications",type:"post",contentType:"application/json",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("Authorization","Basic MmQ3ODcwZGUtYmIyYS00NzY5LWIwZWQtMTk5ZGRjNzU2M2Q3");},dataType:"json",timeout:240000,// wait for 4 minutes before timeout of request
 processData:false,data:JSON.stringify(pushNotification)}));// display toast to user that account was updated
@@ -1170,7 +1171,8 @@ function loadPageOnAppReady(){// check to see if onsen is ready and if all app l
 if(!ons.isReady()||utopiasoftware.ally.model.isAppReady===false){setTimeout(loadPageOnAppReady,500);// call this function again after half a second
 return;}// listen for the back button event
 $('#app-main-navigator').get(0).topPage.onDeviceBackButton=utopiasoftware.ally.controller.walletTransferPageViewModel.backButtonClicked;// update the transfers-out chart
-utopiasoftware.ally.controller.walletTransferPageViewModel.updateTransfersOutChart('today');// attach listen for when the 'wallet-transfer-add-recipient-button' is clicked
+//utopiasoftware.ally.controller.walletTransferPageViewModel.updateTransfersOutChart('today');
+// attach listen for when the 'wallet-transfer-add-recipient-button' is clicked
 $('#wallet-transfer-add-recipient-button').get(0).onclick=utopiasoftware.ally.controller.walletTransferPageViewModel.pickContactButtonClicked;// display the page preloader
 $('.page-preloader',$thisPage).css('display',"block");// hide the form
 $('#wallet-transfer-form',$thisPage).css('display',"none");// start a promise chain to setup the page
@@ -1287,7 +1289,8 @@ throw serverResponse.message;// throw the error message attached to this error
 // forward details of the wallet-transfer; also save the user details to encrypted storage;
 return Promise.all([responseDetailsArray[1],utopiasoftware.ally.saveUserAppDetails(responseDetailsArray[0])]);}).then(function(dataArray){// update local copy of user app details
 utopiasoftware.ally.model.appUserDetails=dataArray[1];// update the transfers-out chart
-utopiasoftware.ally.controller.walletTransferPageViewModel.updateTransfersOutChart('today');// reset the page scroll position to the top
+//utopiasoftware.ally.controller.walletTransferPageViewModel.updateTransfersOutChart('today');
+// reset the page scroll position to the top
 $('#wallet-transfer-page .page__content').scrollTop(0);// forward details of the wallet-transfer and the user details
 return Promise.all([].concat(_toConsumableArray(dataArray),[$('#hour-glass-loader-modal').get(0).hide()]));}).then(function(dataArray){// check if the recipient of the wallet transfer is a registered user
 if(dataArray[0].isregistereduser!="yes"){// append the json details for the wallet-transfer to the wallet-transfer-sms-confirm-modal confirmation button
@@ -1543,7 +1546,8 @@ utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.whenV
 $('#payments-ally-scan-modal').get(0).onDeviceBackButton=$('#payments-ally-scan-modal-back-button').get(0).onclick=function(){// hide the payments-ally-scan-modal
 $('#payments-ally-scan-modal').get(0).hide();// call the hide method for the currently active page
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.pageHide();};// populate the payments-out chart
-utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.updatePaymentOutChart('today');// listen for the form field validation failure event
+//utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.updatePaymentOutChart('today');
+// listen for the form field validation failure event
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.on('field:error',function(fieldInstance){// get the element that triggered the field validation error and use it to display tooltip
 // display tooltip
 $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$(fieldInstance.$element).attr("data-hint",fieldInstance.getErrorsMessages()[0]);$(fieldInstance.$element).attr("title",fieldInstance.getErrorsMessages()[0]);});// listen for the form field validation success event
@@ -1610,9 +1614,7 @@ width:'100%',height:'100%',margin:{left:0,right:15,top:0,bottom:0},palettes:["#3
 legendSettings:{visible:true},primaryXAxis:{title:'Time (GMT +1)',valueType:'DateTime',labelFormat:chartCustomisableSettings.labelFormat,intervalType:chartCustomisableSettings.intervalType,titleStyle:{size:'1em',textAlignment:'center'}},primaryYAxis:{title:'Amount in thousands (N)',valueType:'Double',labelFormat:'{value}k',titleStyle:{size:'1em',textAlignment:'center'}},series:[{dataSource:chartDataArray,width:2,marker:{visible:true,width:8,height:8},xName:'DDATE',yName:'AMOUNT',name:'Outgoing Payments',//Series type as line
 type:'Area'}]});// remove the loader content
 $('#payments-ally-scan-page #payments-ally-scan-payments-out-chart').html("");//append the newly created chart
-//utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.paymentsOutChart.
-//appendTo('#payments-ally-scan-payments-out-chart');
-});/**
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.paymentsOutChart.appendTo('#payments-ally-scan-payments-out-chart');});/**
              * function is used to map the chart data into an appropriate form that can be displayed by the chart
              * @param chartDataArray {Array} array containing chart data objects to be mapped
              *
@@ -1720,7 +1722,7 @@ $('#payments-ally-direct-page .page__content').scrollTop(0);}catch(err){}},/**
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment=false;// remove the transparency from the webpage
 $('html, body').removeClass('ally-transparent');$('#payments-page').removeClass('transparent');$('#payments-ally-direct-page').removeClass('transparent');// remove any tooltip being displayed on all forms on the page
 $('#payments-ally-direct-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-direct-page [title]').removeAttr("title");$('#payments-ally-direct-page [data-hint]').removeAttr("data-hint");// destroy the form validator objects on the page
-utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.amountFieldValidator.destroy();utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantCodeValidator.destroy();utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.formValidator.destroy();}catch(err){}},/**
+utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.amountFieldValidator.destroy();utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.formValidator.destroy();}catch(err){}},/**
          * method is triggered when the form is successfully validated
          */formValidated:function formValidated(){// check if Internet Connection is available before proceeding
 if(navigator.connection.type===Connection.NONE){// no Internet Connection
@@ -1749,7 +1751,8 @@ $('#payments-ally-direct-page [data-hint]').removeClass("hint--always hint--succ
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.formValidator.reset();// reset the form
 $('#payments-ally-direct-page #payments-ally-direct-form').get(0).reset();// reset the page scroll position to the top
 $('#payments-ally-direct-page .page__content').scrollTop(0);// populate the payments-out chart
-utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.updatePaymentOutChart('today');// send push notification to the recipient of the transfer
+//utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.updatePaymentOutChart('today');
+// send push notification to the recipient of the transfer
 var pushNotification={// create the push notification object
 "app_id":"d5d2bdba-eec0-46b1-836e-c5b8e318e928","filters":[{"field":"tag","key":"phone","relation":"=","value":formData.phone_receiver}],"contents":{"en":"You received payment into your ALLY WALLET from "+utopiasoftware.ally.model.appUserDetails.firstname+" "+utopiasoftware.ally.model.appUserDetails.lastname},"headings":{"en":"Payment Received"},"android_channel_id":"81baf9bc-d068-4f4c-9bae-1a3dc8488491","android_visibility":0,"priority":5};Promise.resolve($.ajax({url:"https://onesignal.com/api/v1/notifications",type:"post",contentType:"application/json",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("Authorization","Basic MmQ3ODcwZGUtYmIyYS00NzY5LWIwZWQtMTk5ZGRjNzU2M2Q3");},dataType:"json",timeout:240000,// wait for 4 minutes before timeout of request
 processData:false,data:JSON.stringify(pushNotification)}));hockeyapp.trackEvent(function(){},function(){},"MERCHANT PAYMENT");// track merchant payments
