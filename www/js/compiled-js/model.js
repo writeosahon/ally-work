@@ -32,7 +32,7 @@ utopiasoftware.ally._model = {
     /**
      * property holds the google app share/dynamic link for this app
      */
-    ally_app_share_link: "",
+    ally_app_share_link: "https://dg86m.app.goo.gl/mVFa",
 
 
     /**
