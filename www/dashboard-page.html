@@ -13,7 +13,8 @@
         </div>
     </ons-toolbar>
 
-    <ons-card style="width: 100%; background-color: #30a401; !important; color: #ffffff !important;
+    <ons-card style="width: calc(100% + 1em); display: block; z-index: 2;
+    margin-left: -1em; background-color: #30a401; !important; color: #ffffff !important;
             background-image: url('css/app-images/watermark_background.jpg');
     background-repeat: no-repeat; background-size: cover;">
         <div class="title" style="font-size: 0.85em; text-align: center !important;">
@@ -36,20 +37,18 @@
         </div>
     </ons-card>
 
-    <ons-list>
+    <ons-row valign="bottom" style="margin-top: 0; padding-top: 0;">
+        <ons-col width="50%" style="margin-top: 0; padding-top: 0;"></ons-col>
+        <ons-col width="50%" class="dashboard-period-select-col" style="margin-top: 0; padding-top: 0;">
+            <select id="dashboard-period-select">
+                <option value="today" selected>Today</option>
+                <option value="weekly">Last 7 Days</option>
+                <option value="monthly">Last 30 Days</option>
+            </select>
+        </ons-col>
+    </ons-row>
 
-        <ons-list-item modifier="nodivider" lock-on-drag="true">
-            <ons-row valign="bottom">
-                <ons-col width="50%"></ons-col>
-                <ons-col width="50%" class="dashboard-period-select-col">
-                    <select id="dashboard-period-select">
-                        <option value="today" selected>Today</option>
-                        <option value="weekly">Last 7 Days</option>
-                        <option value="monthly">Last 30 Days</option>
-                    </select>
-                </ons-col>
-            </ons-row>
-        </ons-list-item>
+    <ons-list style="margin-top: 0; padding-top: 0; display: block; width: 100%; z-index: 1;">
 
         <ons-list-item id="dashboard-wallet-incoming-list-item" modifier="nodivider" lock-on-drag="true">
             <ons-card id="dashboard-wallet-incoming-chart" style="width: 100%; height: 20em; padding: 0 !important; background-color: #ffffff">
