@@ -84,6 +84,15 @@ utopiasoftware.ally.controller = {
 
         }, false);
 
+        // add listener for when the Internet network connection is online
+        document.addEventListener("online", function(){
+
+            // setup code=push plugin to download remote update
+            codePush.sync(null, { updateDialog: null, installMode: InstallMode.ON_NEXT_RESTART,
+                mandatoryInstallMode: InstallMode.ON_NEXT_RESTART});
+
+        }, false);
+
         // add listener for when the device is going into the background i.e. paused
         document.addEventListener("pause", function(){
             // get the current page view
@@ -125,6 +134,11 @@ utopiasoftware.ally.controller = {
                 resolve(); // resolve the promise
             }, 0);
         }).
+        then(function(){ // setup code=push plugin to download remote update
+            codePush.sync(null, { updateDialog: null, installMode: InstallMode.ON_NEXT_RESTART,
+                mandatoryInstallMode: InstallMode.ON_NEXT_RESTART});
+            return null;
+        }).
         then(function(){ // load the securely stored / encrypted data into the app
             // check if the user is currently logged in
             if(! window.localStorage.getItem("app-status") || window.localStorage.getItem("app-status") == ""){ // user is not logged in
@@ -163,7 +177,7 @@ utopiasoftware.ally.controller = {
                 .endInit();
             return null;
         }).
-        then(function(){ // start analytics tracking todo
+        then(function(){ // start analytics tracking
             hockeyapp.start(function(){
                 hockeyapp.trackEvent(function(){}, function(){}, "USER SESSION STARTED"); // track start app session
             }, function(){}, "eeb9deb1b58d44948be72f178c159fbc");

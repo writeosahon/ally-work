@@ -31,7 +31,9 @@ $('#lock-screen-modal #lock-screen-lock-pin').val("");return;// exit
 // add listener for when the Internet network connection is offline
 document.addEventListener("offline",function(){// display a toast message to let user no there is no Internet connection
 window.plugins.toast.showWithOptions({message:"No Internet Connection. App functionality may be limited",duration:4000,// 4000 ms
-position:"bottom",styling:{opacity:1,backgroundColor:'#000000',textColor:'#FFFFFF',textSize:14}});},false);// add listener for when the device is going into the background i.e. paused
+position:"bottom",styling:{opacity:1,backgroundColor:'#000000',textColor:'#FFFFFF',textSize:14}});},false);// add listener for when the Internet network connection is online
+document.addEventListener("online",function(){// setup code=push plugin to download remote update
+codePush.sync(null,{updateDialog:null,installMode:InstallMode.ON_NEXT_RESTART,mandatoryInstallMode:InstallMode.ON_NEXT_RESTART});},false);// add listener for when the device is going into the background i.e. paused
 document.addEventListener("pause",function(){// get the current page view
 var currentPageView=$('ons-splitter').get(0).content.page;// if user is on the onboarding or login screens, do nothing
 if(currentPageView.toString()=='onboarding-template'||currentPageView.toString()=='login-template'){return;// exit
@@ -45,14 +47,15 @@ StatusBar.backgroundColorByHexString("#2C8E01");// prepare the inapp browser plu
 window.open=cordova.InAppBrowser.open;// use Promises to load the other cordova plugins
 new Promise(function(resolve,reject){// this promise  just sets the promise chain in motion
 window.setTimeout(function(){resolve();// resolve the promise
-},0);}).then(function(){// load the securely stored / encrypted data into the app
+},0);}).then(function(){// setup code=push plugin to download remote update
+codePush.sync(null,{updateDialog:null,installMode:InstallMode.ON_NEXT_RESTART,mandatoryInstallMode:InstallMode.ON_NEXT_RESTART});return null;}).then(function(){// load the securely stored / encrypted data into the app
 // check if the user is currently logged in
 if(!window.localStorage.getItem("app-status")||window.localStorage.getItem("app-status")==""){// user is not logged in
 return null;}return Promise.all([Promise.resolve(intel.security.secureStorage.read({"id":"ally-user-details"})),Promise.resolve(intel.security.secureStorage.read({"id":"ally-user-secure-pin"}))]);}).then(function(instanceIdArray){if(instanceIdArray==null||instanceIdArray[0]==null||instanceIdArray[1]==null){// user is not logged in
 return null;}return Promise.all([Promise.resolve(intel.security.secureData.getData(instanceIdArray[0])),Promise.resolve(intel.security.secureData.getData(instanceIdArray[1]))]);}).then(function(secureDataArray){if(secureDataArray==null||secureDataArray[0]==null||secureDataArray[1]==null){// user is not logged in
 return null;}utopiasoftware.ally.model.appUserDetails=JSON.parse(secureDataArray[0]);// transfer the collected user details to the app
 utopiasoftware.ally.model.appSecurePin=secureDataArray[1];return null;}).then(function(){// setup push notification for the app
-window.plugins.OneSignal.startInit("d5d2bdba-eec0-46b1-836e-c5b8e318e928").inFocusDisplaying(window.plugins.OneSignal.OSInFocusDisplayOption.None).handleNotificationReceived(utopiasoftware.ally.controller.pushNotificationModel.notificationOpened).handleNotificationOpened(utopiasoftware.ally.controller.pushNotificationModel.notificationOpened).endInit();return null;}).then(function(){// start analytics tracking todo
+window.plugins.OneSignal.startInit("d5d2bdba-eec0-46b1-836e-c5b8e318e928").inFocusDisplaying(window.plugins.OneSignal.OSInFocusDisplayOption.None).handleNotificationReceived(utopiasoftware.ally.controller.pushNotificationModel.notificationOpened).handleNotificationOpened(utopiasoftware.ally.controller.pushNotificationModel.notificationOpened).endInit();return null;}).then(function(){// start analytics tracking
 hockeyapp.start(function(){hockeyapp.trackEvent(function(){},function(){},"USER SESSION STARTED");// track start app session
 },function(){},"eeb9deb1b58d44948be72f178c159fbc");}).then(function(){// notify the app that the app has been successfully initialised and is ready for further execution (set app ready flag to true)
 utopiasoftware.ally.model.isAppReady=true;// hide the splash screen
