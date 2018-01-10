@@ -59,7 +59,7 @@ window.plugins.OneSignal.startInit("d5d2bdba-eec0-46b1-836e-c5b8e318e928").inFoc
 hockeyapp.start(function(){hockeyapp.trackEvent(function(){},function(){},"USER SESSION STARTED");// track start app session
 },function(){},"eeb9deb1b58d44948be72f178c159fbc");}).then(function(){// notify the app that the app has been successfully initialised and is ready for further execution (set app ready flag to true)
 utopiasoftware.ally.model.isAppReady=true;// hide the splash screen
-navigator.splashscreen.hide();}).catch(function(err){// notify the app that the app has been successfully initialised and is ready for further execution (set app ready flag to true)
+navigator.splashscreen.hide();}).catch(function(err){console.log(err);// notify the app that the app has been successfully initialised and is ready for further execution (set app ready flag to true)
 utopiasoftware.ally.model.isAppReady=true;// hide the splash screen
 navigator.splashscreen.hide();// display a toast message to let user no there is no Internet connection
 window.plugins.toast.showWithOptions({message:"Startup Error. App functionality may be limited. Always update the app to "+"get the best secure experience. Please contact us if problem continues",duration:5000,// 5000 ms

@@ -135,6 +135,7 @@ utopiasoftware.ally.controller = {
             }, 0);
         }).
         then(function(){ // setup code=push plugin to download remote update
+
             codePush.sync(null, { updateDialog: null, installMode: InstallMode.ON_NEXT_RESTART,
                 mandatoryInstallMode: InstallMode.ON_NEXT_RESTART});
             return null;
@@ -190,7 +191,7 @@ utopiasoftware.ally.controller = {
             navigator.splashscreen.hide();
         }).
         catch(function(err){
-
+console.log(err);
             // notify the app that the app has been successfully initialised and is ready for further execution (set app ready flag to true)
             utopiasoftware.ally.model.isAppReady = true;
             // hide the splash screen
