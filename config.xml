@@ -18,6 +18,7 @@
 <allow-intent href="data:*"/>
 <allow-intent href="twitter:*"/>
 <allow-intent href="fb:*"/>
+<allow-intent href="allyapp:*"/>
 
 <access origin="*"/>
 <preference name="phonegap-version" value="cli-6.5.0" />
@@ -39,6 +40,12 @@
 <plugin name="cordova-plugin-qrscanner" spec="2.5.0"/>
 <plugin name="ionic-plugin-keyboard" spec="2.2.1"/>
 <plugin name="cordova-plugin-file" spec="4.3.0"/>
+<plugin name="cordova-plugin-customurlscheme" spec="4.3.0">
+    <variable name="URL_SCHEME" value="allyapp"/>
+    <variable name="ANDROID_SCHEME" value=" "/>
+    <variable name="ANDROID_HOST" value=" "/>
+    <variable name="ANDROID_PATHPREFIX" value="/"/>
+</plugin>
 <plugin name="onesignal-cordova-plugin" spec="2.2.5"/>
 <plugin name="ally-images-sounds" spec="https://github.com/writeosahon/ally-work-images.git#1.0.0"/>
 <plugin name="cordova-plugin-hockeyapp" spec="5.1.1"/>
