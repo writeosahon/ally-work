@@ -64,13 +64,13 @@
 
 <plugin name="cordova-plugin-whitelist" spec="1.2.2"/>
 
-<config-file platform="android" parent="/*">
+<config-file platform="android" parent="/*" mode="merge">
     <uses-permission android:name="android.permission.INTERNET" />
 </config-file>
 
 <preference name="AndroidPersistentFileLocation" value="Internal" />
 
-<config-file platform="android" target="AndroidManifest.xml" parent="/*" mode="add">
+<config-file platform="android" target="AndroidManifest.xml" parent="/*" mode="merge">
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 </config-file>
