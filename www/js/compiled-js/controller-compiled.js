@@ -48,7 +48,9 @@ window.open=cordova.InAppBrowser.open;// use Promises to load the other cordova 
 new Promise(function(resolve,reject){// this promise  just sets the promise chain in motion
 window.setTimeout(function(){resolve();// resolve the promise
 },0);}).then(function(){// setup code=push plugin to download remote update
-codePush.sync(null,{updateDialog:null,installMode:InstallMode.ON_NEXT_RESTART,mandatoryInstallMode:InstallMode.ON_NEXT_RESTART});return null;}).then(function(){// load the securely stored / encrypted data into the app
+//codePush.sync(null, { updateDialog: null, installMode: InstallMode.ON_NEXT_RESTART,
+//  mandatoryInstallMode: InstallMode.ON_NEXT_RESTART});
+return null;}).then(function(){// load the securely stored / encrypted data into the app
 // check if the user is currently logged in
 if(!window.localStorage.getItem("app-status")||window.localStorage.getItem("app-status")==""){// user is not logged in
 return null;}return Promise.all([Promise.resolve(intel.security.secureStorage.read({"id":"ally-user-details"})),Promise.resolve(intel.security.secureStorage.read({"id":"ally-user-secure-pin"}))]);}).then(function(instanceIdArray){if(instanceIdArray==null||instanceIdArray[0]==null||instanceIdArray[1]==null){// user is not logged in
@@ -59,7 +61,7 @@ window.plugins.OneSignal.startInit("d5d2bdba-eec0-46b1-836e-c5b8e318e928").inFoc
 hockeyapp.start(function(){hockeyapp.trackEvent(function(){},function(){},"USER SESSION STARTED");// track start app session
 },function(){},"eeb9deb1b58d44948be72f178c159fbc");}).then(function(){// notify the app that the app has been successfully initialised and is ready for further execution (set app ready flag to true)
 utopiasoftware.ally.model.isAppReady=true;// hide the splash screen
-navigator.splashscreen.hide();}).catch(function(err){console.log(err);// notify the app that the app has been successfully initialised and is ready for further execution (set app ready flag to true)
+navigator.splashscreen.hide();}).catch(function(err){// notify the app that the app has been successfully initialised and is ready for further execution (set app ready flag to true)
 utopiasoftware.ally.model.isAppReady=true;// hide the splash screen
 navigator.splashscreen.hide();// display a toast message to let user no there is no Internet connection
 window.plugins.toast.showWithOptions({message:"Startup Error. App functionality may be limited. Always update the app to "+"get the best secure experience. Please contact us if problem continues",duration:5000,// 5000 ms
@@ -1165,7 +1167,7 @@ $('#app-main-navigator').get(0).replacePage('fund-wallet-page.html',{animation:'
          * used to hold the parsley validator for the Amount field
          */amountFieldValidator:null,/**
          * * used to hold the ej Tooltip component
-         */formTooltip:null,/**
+         */formTooltip:null,x2:null,/**
          * event is triggered when page is initialised
          */pageInit:function pageInit(event){var $thisPage=$(event.target);// get the current page shown
 // call the function used to initialise the app page if the app is fully loaded
@@ -1193,7 +1195,7 @@ $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium h
 utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.on('form:success',utopiasoftware.ally.controller.walletTransferPageViewModel.formValidated);// hide the page preloader
 $('.page-preloader',$thisPage).css('display',"none");// display the form
 $('#wallet-transfer-form',$thisPage).css('display',"block");// hide the loader
-$('#loader-modal').get(0).hide();}).catch(function(){// hide the page preloader
+$('#loader-modal').get(0).hide();}).catch(function(err){console.log(err);// hide the page preloader
 $('.page-preloader',$thisPage).css('display',"none");// display the form
 $('#wallet-transfer-form',$thisPage).css('display',"block");});}},/**
          * method is triggered when page is shown

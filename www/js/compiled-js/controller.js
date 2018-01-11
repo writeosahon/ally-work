@@ -136,8 +136,8 @@ utopiasoftware.ally.controller = {
         }).
         then(function(){ // setup code=push plugin to download remote update
 
-            codePush.sync(null, { updateDialog: null, installMode: InstallMode.ON_NEXT_RESTART,
-                mandatoryInstallMode: InstallMode.ON_NEXT_RESTART});
+            //codePush.sync(null, { updateDialog: null, installMode: InstallMode.ON_NEXT_RESTART,
+              //  mandatoryInstallMode: InstallMode.ON_NEXT_RESTART});
             return null;
         }).
         then(function(){ // load the securely stored / encrypted data into the app
@@ -191,7 +191,6 @@ utopiasoftware.ally.controller = {
             navigator.splashscreen.hide();
         }).
         catch(function(err){
-console.log(err);
             // notify the app that the app has been successfully initialised and is ready for further execution (set app ready flag to true)
             utopiasoftware.ally.model.isAppReady = true;
             // hide the splash screen
@@ -3590,6 +3589,8 @@ console.log(err);
                 // render initialized card DropDownList
                 utopiasoftware.ally.controller.fundWalletPageViewModel.cardDropDownList.appendTo('#fund-wallet-card-number');
 
+
+
                 // initialise form tooltips
                 utopiasoftware.ally.controller.fundWalletPageViewModel.formTooltip = new ej.popups.Tooltip({
                     target: '.ally-input-tooltip',
@@ -4321,6 +4322,8 @@ console.log(err);
          */
         formTooltip: null,
 
+        x2: null,
+
         /**
          * event is triggered when page is initialised
          */
@@ -4356,10 +4359,10 @@ console.log(err);
                 // hide the form
                 $('#wallet-transfer-form', $thisPage).css('display', "none");
 
-
                 // start a promise chain to setup the page
                 Promise.resolve({}).
                 then(function(){
+
                     // initialise the amount field
                     utopiasoftware.ally.controller.walletTransferPageViewModel.amountFieldValidator =
                         $('#wallet-transfer-amount').parsley({
@@ -4409,8 +4412,10 @@ console.log(err);
                     // hide the loader
                     $('#loader-modal').get(0).hide();
 
+
                 }).
-                catch(function(){
+                catch(function(err){
+                    console.log(err);
                     // hide the page preloader
                     $('.page-preloader', $thisPage).css('display', "none");
 
@@ -4430,7 +4435,8 @@ console.log(err);
          *
          * @param event
          */
-        pageShow: (event) => {},
+        pageShow: (event) => {
+        },
 
         /**
          * method is triggered when the page is hidden
