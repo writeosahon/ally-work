@@ -362,6 +362,9 @@
 #wallet-transfer-page .page--material__background {
     background-color: #ffffff;
 }
+#wallet-transfer-mode_popup, #wallet-transfer-card-number_popup {
+    left: 60px !important;
+}
 /** STYLE FOR THE WALLET TRANSFER PAGE ENDS **/
 
 

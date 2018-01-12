@@ -30,18 +30,6 @@
                               input[type=reset], input[type=hidden], [disabled], :hidden" style="display: block;">
 
         <ons-list>
-            <!--<ons-list-title>Mode of Transfer</ons-list-title>
-
-            <ons-list-item modifier="nodivider">
-                <div class="left">
-                    <ons-icon icon="md-swap" class="list-item__icon" fixed-width size="28px"></ons-icon>
-                </div>
-                <div class="center">
-                    <div style="width: 80%">
-                        <input id="xxx-transfer-mode2" type="text">
-                    </div>
-                </div>
-            </ons-list-item> -->
 
             <ons-list-title>Transfer Funds To User Wallet</ons-list-title>
             <ons-list-item modifier="nodivider">
@@ -90,6 +78,42 @@
                 </div>
             </ons-list-item>
 
+            <ons-list-title>Mode of Transfer</ons-list-title>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-swap" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <div style="width: 80%">
+                        <select id="wallet-transfer-mode">
+                            <option value="wallet transfer" selected>Transfer From Wallet</option>
+                            <option value="card transfer">Transfer From Card</option>
+                        </select>
+                    </div>
+                </div>
+            </ons-list-item>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-ally-icon-credit-card" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <div style="width: 75%; display: inline-block">
+                        <input id="wallet-transfer-card-number" type="tel" required
+                               data-parsley-required-message="Card Number is required"
+                               class="ally-input-tooltip">
+                    </div>
+                    <div style="width: 25%; text-align: center;">
+                        <!-- display the add card page -->
+                        <ons-fab id="wallet-transfer-add-card" modifier="mini"
+                                 style="color: #ffffff; background-color: #30a401;">
+                            <ons-icon icon="md-plus"></ons-icon>
+                        </ons-fab>
+                    </div>
+
+                </div>
+            </ons-list-item>
 
         </ons-list>
     </form>

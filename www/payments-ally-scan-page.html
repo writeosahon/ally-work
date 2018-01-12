@@ -12,27 +12,27 @@
         </div>
     </ons-card>
     <!-- page layout -->
-    <ons-row vertical-align="top" style="margin-top: 2em;">
-        <ons-col width="65%" style="height: 100%;">
+    <ons-row vertical-align="top" style="margin-top: 2em; margin-bottom: 2em;">
+        <ons-col width="100%" style="height: 100%;">
             <!-- create the payment form that displays all details for payment -->
             <form id="payments-ally-scan-form" autocomplete="off" data-parsley-inputs="ons-input,input,textarea,select"
                   data-parsley-excluded="input[type=button], input[type=submit],
                               input[type=reset], input[type=hidden], [disabled], :hidden" style="height: 100%; display: block;">
 
-                <ons-list>
+                <ons-list style="margin-top: -1em;">
 
-                    <ons-list-item modifier="nodivider" style="margin-bottom: 3em">
+                    <ons-list-item modifier="nodivider" style="margin-top: 2em;">
                         <div class="left">
                             <ons-icon icon="md-ally-icon-account-card-details" class="list-item__icon" fixed-width size="28px"></ons-icon>
                         </div>
 
                         <div class="center">
-                            <div style="width: 100%; display: inline-block">
+                            <div style="width: 90%; display: inline-block">
                                 <ons-input id="payments-ally-scan-merchant-code" required float placeholder="Merchant Code"
                                            style="text-transform: uppercase; font-size: 0.85em; width: 100%;"
                                            type="text"
                                            data-parsley-required-message="provide merchant code"
-                                           class="hint--bottom"></ons-input>
+                                           class="hint--top"></ons-input>
                                 <!-- this input is hidden from user. It is used to store merchant phone number for onward submission -->
                                 <input id="payments-ally-scan-merchant-phone" type="hidden">
                             </div>
@@ -44,22 +44,18 @@
         </ons-col>
 
         <!-- col used to display the search button -->
-        <ons-col width="35%" style="text-align: center;">
+        <ons-col style="text-align: center;"></ons-col>
+        <ons-col width="100%" style="text-align: center;">
             <!-- display the find merchant button -->
-
-            <!--<ons-fab id="payments-ally-scan-find-button" modifier="mini"
-                     style="color: #ffffff; background-color: #30a401;"
-            onclick="utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.findButtonClicked()">
-                <ons-icon icon="md-ally-icon-account-search"></ons-icon>
-            </ons-fab>-->
             <ons-button id="payments-ally-scan-find-button" modifier="large"
-                        style="background-color: #30a401; color: #ffffff; border-radius: 21px; font-size: 0.75em; text-transform: none"
+                        style="background-color: #30a401; color: #ffffff; width: 60%;
+                                            border-radius: 21px; font-size: 1em; text-transform: none"
                         onclick="utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.findButtonClicked()">Pay Merchant</ons-button>
         </ons-col>
     </ons-row>
 
     <!-- row used to display alternative "OR" statement -->
-    <ons-row vertical-align="top" style="margin-top: -2em; margin-bottom: 1.5em">
+    <ons-row vertical-align="top" style="margin-bottom: 1.5em">
         <ons-col width="calc((100% - 200px) / 2 )"></ons-col>
         <ons-col width="200px" style="text-align: center">
             <ons-icon icon="md-minus" size="28px"></ons-icon><span style="font-size: 2em">OR</span><ons-icon icon="md-minus" size="28px"></ons-icon>
@@ -71,13 +67,13 @@
 
     <!-- this section displays the QR Code icon AND button -->
     <ons-row vertical-align="top">
-        <ons-col width="calc((100% - 200px) / 2 )" style="height: 200px"></ons-col>
-        <ons-col width="200px" style="height: 200px">
-            <ons-card style="width: 100%; height: 200px; padding: 0 !important; background-color: #e8e8e8;
+        <ons-col width="calc((100% - 150px) / 2 )" style="height: 200px"></ons-col>
+        <ons-col width="150px" style="height: 150px">
+            <ons-card style="width: 100%; height: 150px; padding: 0 !important; background-color: #e8e8e8;
             text-align: center !important;"
                       onclick="utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.scanButtonClicked();">
                 <ons-ripple modifier="light-gray"></ons-ripple>
-                <img src="css/app-images/qr-code.png" style="width: 160px; height: 160px; margin-top: 13px">
+                <img src="css/app-images/qr-code.png" style="width: 110px; height: 110px; margin-top: 13px">
                 <div style="font-size: 1.1em; font-weight: bold; color: #30a401;">
                     Tap To Scan
                 </div>

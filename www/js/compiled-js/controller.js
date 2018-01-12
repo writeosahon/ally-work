@@ -4322,7 +4322,10 @@ utopiasoftware.ally.controller = {
          */
         formTooltip: null,
 
-        x2: null,
+        /**
+         * used to hold the transfer mode ej DropdownLisr component
+         */
+        transferModeDropdown: null,
 
         /**
          * event is triggered when page is initialised
@@ -4359,8 +4362,57 @@ utopiasoftware.ally.controller = {
                 // hide the form
                 $('#wallet-transfer-form', $thisPage).css('display', "none");
 
+                // initialise transfer mode dropdownlist
+                utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown =
+                    new ej.dropdowns.DropDownList({
+                    //placeholder: "Select Period",
+                    floatLabelType: 'Never'
+                });
+                utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.appendTo('#wallet-transfer-mode');
+
+                // initialise the card DropDown widget
+                utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList =  new ej.dropdowns.DropDownList({
+                    //set the data to dataSource property
+                    dataSource: [],
+                    fields: {text: 'CARDNUMBER2', value: 'CARDNUMBER2'},
+                    placeholder: "Select Card",
+                    floatLabelType: "Auto",
+                    popupHeight: "300px"
+                });
+
+                // render initialized card DropDownList
+                utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.
+                appendTo('#wallet-transfer-card-number');
+
+                // create the form data to be sent
+                var formData = {phone: utopiasoftware.ally.model.appUserDetails.phone};
+
                 // start a promise chain to setup the page
-                Promise.resolve({}).
+                Promise.resolve($.ajax(
+                    {
+                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/get-my-cards.php",
+                        type: "post",
+                        contentType: "application/x-www-form-urlencoded",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                        },
+                        dataType: "text",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: true,
+                        data: formData // data to submit to server
+                    }
+                )).
+                then(function(serverResponse){
+                    serverResponse +=  "";
+                    serverResponse = JSON.parse(serverResponse.trim()); // get the response object
+
+                    // initialise the card DropDown widget
+                    utopiasoftware.ally.controller.walletTransferPageViewModel.
+                        cardDropDownList.dataSource = serverResponse;
+
+                    // bind the new update to the dropdown list
+                    utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.dataBind();
+                }).
                 then(function(){
 
                     // initialise the amount field
