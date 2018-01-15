@@ -433,6 +433,9 @@
 }
 
 
+#payments-ally-scan-page [data-hint]:after {
+    font-size: 0.8em !important;
+}
 #payments-ally-scan-page #payments-ally-scan-merchant-name { /** style for form input elements **/
     color: green;
     font-family: 'Roboto', 'Noto', sans-serif;

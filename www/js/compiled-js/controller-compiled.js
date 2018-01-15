@@ -415,7 +415,7 @@ window.plugins.toast.showWithOptions({message:"ALLY account cannot be created wi
 textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
 window.plugins.toast.hide();}});return;// exit method immediately
 }// create the form data to be submitted
-var createAcctFormData={firstName:$('#signup-page #signup-firstname').val(),lastName:$('#signup-page #signup-lastname').val(),lock:$('#signup-page #signup-secure-pin').val(),phone:$('#signup-page #signup-phone-number').val().startsWith("0")?$('#signup-page #signup-phone-number').val().replace("0","+234"):$('#signup-page #signup-phone-number').val()};// tell the user that phone number verification is necessary
+var createAcctFormData={firstName:$('#signup-page #signup-firstname').val().trim(),lastName:$('#signup-page #signup-lastname').val().trim(),lock:$('#signup-page #signup-secure-pin').val(),phone:$('#signup-page #signup-phone-number').val().startsWith("0")?$('#signup-page #signup-phone-number').val().replace("0","+234"):$('#signup-page #signup-phone-number').val()};// tell the user that phone number verification is necessary
 new Promise(function(resolve,reject){ons.notification.confirm('To complete sign up, your phone number must be verified. <br>'+'Usual SMS charge from your phone network provider will apply.<br> '+'Please ensure you have sufficient airtime to send/receive one SMS',{title:'Verify Phone Number',buttonLabels:['Cancel','Ok']})// Ask for confirmation
 .then(function(index){if(index===1){// OK button
 resolve();}else{reject("your phone number could not be verified");}});}).then(function(){// verify the user's phone number
@@ -818,7 +818,7 @@ ons.notification.prompt({title:'<ons-icon icon="ion-lock-combination" size="28px
 $('#account-page [data-ally-readonly-field]').attr('readonly',true);// hide the edit account button
 $('#account-page #account-edit-fab').css("display","none");// hide the save account button
 $('#account-page #account-save').css("display","none");// create the form data to be submitted
-var formData={firstName:$('#account-page #account-firstname').val(),lastName:$('#account-page #account-lastname').val(),lock:userInput,phone:$('#account-page #account-phone-number').val(),email:$('#account-page #account-email').val()};// display the loader message to indicate that account is being created;
+var formData={firstName:$('#account-page #account-firstname').val().trim(),lastName:$('#account-page #account-lastname').val().trim(),lock:userInput,phone:$('#account-page #account-phone-number').val(),email:$('#account-page #account-email').val()};// display the loader message to indicate that account is being created;
 $('#hour-glass-loader-modal .modal-message').html("Saving Account Details...");// forward the form data &show loader
 return Promise.all([formData,Promise.resolve($('#hour-glass-loader-modal').get(0).show())]);}).then(function(dataArray){// submit the form data
 return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/update-profile.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
@@ -1168,8 +1168,10 @@ $('#app-main-navigator').get(0).replacePage('fund-wallet-page.html',{animation:'
          */amountFieldValidator:null,/**
          * * used to hold the ej Tooltip component
          */formTooltip:null,/**
-         * used to hold the transfer mode ej DropdownLisr component
+         * used to hold the transfer mode ej DropdownList component
          */transferModeDropdown:null,/**
+         * used to hold the card ej DropdownList component
+         */cardDropDownList:null,/**
          * event is triggered when page is initialised
          */pageInit:function pageInit(event){var $thisPage=$(event.target);// get the current page shown
 // call the function used to initialise the app page if the app is fully loaded
@@ -1184,17 +1186,20 @@ $('#wallet-transfer-add-recipient-button').get(0).onclick=utopiasoftware.ally.co
 $('.page-preloader',$thisPage).css('display',"block");// hide the form
 $('#wallet-transfer-form',$thisPage).css('display',"none");// initialise transfer mode dropdownlist
 utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown=new ej.dropdowns.DropDownList({//placeholder: "Select Period",
-floatLabelType:'Never'});utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.appendTo('#wallet-transfer-mode');// initialise the card DropDown widget
+floatLabelType:'Never',change:function change(){// change event handler
+// check the value of the transfer mode dropdown
+switch(utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.value){case"wallet transfer":// user selected wallet transfer
+// remove the required attribute for the card number dropdown
+$('#wallet-transfer-card-number').removeAttr("required");// so animatedly hide the card selection
+anime({targets:'#wallet-transfer-card-section',height:"0em",duration:450});break;case"card transfer":// user selected card transfer
+// add the required attribute for the card dropdown
+$('#wallet-transfer-card-number').attr("required",true);// so animatedly show the card selection
+anime({targets:'#wallet-transfer-card-section',height:"3.5em",duration:450,complete:function complete(){$('#wallet-transfer-card-section').css("height","auto");}});break;}}});utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.appendTo('#wallet-transfer-mode');// initialise the card DropDown widget
 utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList=new ej.dropdowns.DropDownList({//set the data to dataSource property
 dataSource:[],fields:{text:'CARDNUMBER2',value:'CARDNUMBER2'},placeholder:"Select Card",floatLabelType:"Auto",popupHeight:"300px"});// render initialized card DropDownList
-utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.appendTo('#wallet-transfer-card-number');// create the form data to be sent
-var formData={phone:utopiasoftware.ally.model.appUserDetails.phone};// start a promise chain to setup the page
-Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/get-my-cards.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
-processData:true,data:formData// data to submit to server
-})).then(function(serverResponse){serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// get the response object
-// initialise the card DropDown widget
-utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.dataSource=serverResponse;// bind the new update to the dropdown list
-utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.dataBind();}).then(function(){// initialise the amount field
+utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.appendTo('#wallet-transfer-card-number');// initialise form tooltips
+utopiasoftware.ally.controller.walletTransferPageViewModel.formTooltip=new ej.popups.Tooltip({target:'.ally-input-tooltip',position:'top center',cssClass:'ally-input-tooltip',opensOn:'focus'});// render the initialized form tooltip
+utopiasoftware.ally.controller.walletTransferPageViewModel.formTooltip.appendTo('#wallet-transfer-form');// initialise the amount field
 utopiasoftware.ally.controller.walletTransferPageViewModel.amountFieldValidator=$('#wallet-transfer-amount').parsley({value:function value(parsley){// convert the amount back to a plain text without the thousand separator
 var parsedNumber=kendo.parseFloat($('#wallet-transfer-amount',$thisPage).val());return parsedNumber?parsedNumber:$('#wallet-transfer-amount',$thisPage).val();}});// initialise the form validation
 utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator=$('#wallet-transfer-form').parsley();// attach listener for the wallet-transfer button on the page
@@ -1205,7 +1210,14 @@ utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.on('fie
 $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$(fieldInstance.$element).attr("data-hint",fieldInstance.getErrorsMessages()[0]);$(fieldInstance.$element).attr("title",fieldInstance.getErrorsMessages()[0]);});// listen for the form field validation success event
 utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.on('field:success',function(fieldInstance){// remove tooltip from element
 $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$(fieldInstance.$element).removeAttr("data-hint");$(fieldInstance.$element).removeAttr("title");});// listen for the form validation success
-utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.on('form:success',utopiasoftware.ally.controller.walletTransferPageViewModel.formValidated);// hide the page preloader
+utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.on('form:success',utopiasoftware.ally.controller.walletTransferPageViewModel.formValidated);$('#wallet-transfer-card-section').css("height","0em");// create the form data to be sent
+var formData={phone:utopiasoftware.ally.model.appUserDetails.phone};// start a promise chain to setup the page
+Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/get-my-cards.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
+processData:true,data:formData// data to submit to server
+})).then(function(serverResponse){serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// get the response object
+// initialise the card DropDown widget
+utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.dataSource=serverResponse;// bind the new update to the dropdown list
+utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.dataBind();}).then(function(){// hide the page preloader
 $('.page-preloader',$thisPage).css('display',"none");// display the form
 $('#wallet-transfer-form',$thisPage).css('display',"block");// hide the loader
 $('#loader-modal').get(0).hide();}).catch(function(err){console.log(err);// hide the page preloader
@@ -1280,7 +1292,11 @@ window.plugins.toast.hide();}});return;// exit method immediately
 }// create the form data to be submitted
 var formData={phone_sender:utopiasoftware.ally.model.appUserDetails.phone,phone_receiver:$('#wallet-transfer-page #wallet-transfer-receiver-phone-number').val(),amount:kendo.parseFloat($('#wallet-transfer-page #wallet-transfer-amount').val())};// check if the phone_receiver parameter is properly formatted for sending
 if(formData.phone_receiver.startsWith("0")){// the phone number starts with 0, replace it with international dialing code
-formData.phone_receiver=formData.phone_receiver.replace("0","+234");}// display the loader message to indicate that account is being created;
+formData.phone_receiver=formData.phone_receiver.replace("0","+234");}// check the transfer mode for the wallet transfer
+if(utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.value=="wallet transfer"){// add the specified transfer mode to the form data
+formData.transfer_mode="wallet transfer";}// check the transfer mode for the wallet transfer
+if(utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.value=="card transfer"){// add the specified transfer mode and card number to the form data
+formData.transfer_mode="card transfer";formData.cardno=utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.value;}// display the loader message to indicate that account is being created;
 $('#hour-glass-loader-modal .modal-message').html("Completing Wallet Transfer...");// forward the form data & show loader
 Promise.all([formData,Promise.resolve($('#hour-glass-loader-modal').get(0).show())]).then(function(dataArray){// submit the form data
 return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/transfer-wallet-to-wallet.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
@@ -1348,7 +1364,23 @@ contactPhoneNumber="+"+contactPhoneNumber;// append the '+' to the beginning
 $('#wallet-transfer-form #wallet-transfer-receiver-phone-number').val(contactPhoneNumber);}).catch(function(){// inform the user that there was an error
 window.plugins.toast.showWithOptions({message:"phone contacts could not be accessed right now",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#ff0000',//red
 textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
-window.plugins.toast.hide();}});});},walletTransferSmsConfirmButtonClicked:function walletTransferSmsConfirmButtonClicked(buttonElem){hockeyapp.trackEvent(function(){},function(){},"FUND TRANSFERRED");// track fund transfer
+window.plugins.toast.hide();}});});},/**
+         * method is triggered when the "Add Card" button is clicked
+         */addCardButtonClicked:function addCardButtonClicked(){// generate the formData that will be passed over to the "Add Card (Wallet Transfer) page
+// create the form data to be submitted
+var formData={phone_sender:utopiasoftware.ally.model.appUserDetails.phone,phone_receiver:$('#wallet-transfer-page #wallet-transfer-receiver-phone-number').val(),amount:kendo.parseFloat($('#wallet-transfer-page #wallet-transfer-amount').val())};// check if the phone_receiver parameter is properly formatted for sending
+if(formData.phone_receiver.startsWith("0")){// the phone number starts with 0, replace it with international dialing code
+formData.phone_receiver=formData.phone_receiver.replace("0","+234");}// check the transfer mode for the wallet transfer
+if(utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.value=="wallet transfer"){// add the specified transfer mode to the form data
+formData.transfer_mode="wallet transfer";}// check the transfer mode for the wallet transfer
+if(utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.value=="card transfer"){// add the specified transfer mode to the form data
+formData.transfer_mode="card transfer";}// display the "Add Card (Wallet Transfer)" page
+$('#app-main-navigator').get(0).pushPage('add-card-wallet-transfer-page.html',{data:formData,animation:'lift-md'});},/**
+         * method is triggered when the 'Confirm' button on the transfer wallet sms confirmation message is clicked
+         *
+         * @param buttonElem
+         * @returns {Promise}
+         */walletTransferSmsConfirmButtonClicked:function walletTransferSmsConfirmButtonClicked(buttonElem){hockeyapp.trackEvent(function(){},function(){},"FUND TRANSFERRED");// track fund transfer
 // get the details of the wall transfer for which an sms confirmation is being sent
 var walletTransferDetails=JSON.parse($(buttonElem).attr('data-wallet-transfer'));// use a promise to send the sms confirmation message to the recipient
 new Promise(function(resolve,reject){// send sms
@@ -1547,6 +1579,8 @@ utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.pageHide();paymen
          * used to hold the parsley validator for the Amount field
          *///amountFieldValidator: null,
 /**
+         * * used to hold the ej Tooltip component
+         */formTooltip:null,/**
          * property is used to track whether there is an active ongoing payment.
          * A value of true means there is an active payment; any other value means there is none
          */activePayment:null,/**
@@ -1557,7 +1591,9 @@ loadPageOnAppReady();//function is used to initialise the page if the app is ful
 function loadPageOnAppReady(){// check to see if onsen is ready and if all app loading has been completed
 if(!ons.isReady()||utopiasoftware.ally.model.isAppReady===false){setTimeout(loadPageOnAppReady,500);// call this function again after half a second
 return;}// initialise the 'active payment' status to false i.e. no active payment
-utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=false;// initialise the form validation
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment=false;// initialise form tooltips
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formTooltip=new ej.popups.Tooltip({target:'.ally-input-tooltip',position:'top center',cssClass:'ally-input-tooltip',opensOn:'focus'});// render the initialized form tooltip
+utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formTooltip.appendTo('#payments-ally-scan-form');// initialise the form validation
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator=$('#payments-ally-scan-form').parsley();// attach listener for the FIND button on the page
 $('#payments-ally-scan-find-button').get(0).onclick=function(){// run the validation method for the form
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.whenValidate();};// attach listener for the payments-ally-scan-modal back buttons

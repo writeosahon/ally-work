@@ -94,20 +94,21 @@
                 </div>
             </ons-list-item>
 
-            <ons-list-item modifier="nodivider">
+            <ons-list-item id="wallet-transfer-card-section" modifier="nodivider" style="height: 0em;">
                 <div class="left">
                     <ons-icon icon="md-ally-icon-credit-card" class="list-item__icon" fixed-width size="28px"></ons-icon>
                 </div>
                 <div class="center">
                     <div style="width: 75%; display: inline-block">
-                        <input id="wallet-transfer-card-number" type="tel" required
+                        <input id="wallet-transfer-card-number" type="tel"
                                data-parsley-required-message="Card Number is required"
                                class="ally-input-tooltip">
                     </div>
                     <div style="width: 25%; text-align: center;">
                         <!-- display the add card page -->
                         <ons-fab id="wallet-transfer-add-card" modifier="mini"
-                                 style="color: #ffffff; background-color: #30a401;">
+                                 style="color: #ffffff; background-color: #30a401;"
+                                 onclick="utopiasoftware.ally.controller.walletTransferPageViewModel.addCardButtonClicked()">
                             <ons-icon icon="md-plus"></ons-icon>
                         </ons-fab>
                     </div>

@@ -1346,8 +1346,8 @@ utopiasoftware.ally.controller = {
 
             // create the form data to be submitted
             var createAcctFormData = {
-                firstName: $('#signup-page #signup-firstname').val(),
-                lastName: $('#signup-page #signup-lastname').val(),
+                firstName: $('#signup-page #signup-firstname').val().trim(),
+                lastName: $('#signup-page #signup-lastname').val().trim(),
                 lock: $('#signup-page #signup-secure-pin').val(),
                 phone: $('#signup-page #signup-phone-number').val().startsWith("0") ?
                     $('#signup-page #signup-phone-number').val().replace("0", "+234"):$('#signup-page #signup-phone-number').val()
@@ -3050,8 +3050,8 @@ utopiasoftware.ally.controller = {
 
                 // create the form data to be submitted
                 var formData = {
-                    firstName: $('#account-page #account-firstname').val(),
-                    lastName: $('#account-page #account-lastname').val(),
+                    firstName: $('#account-page #account-firstname').val().trim(),
+                    lastName: $('#account-page #account-lastname').val().trim(),
                     lock: userInput,
                     phone: $('#account-page #account-phone-number').val(),
                     email: $('#account-page #account-email').val()
@@ -4316,16 +4316,20 @@ utopiasoftware.ally.controller = {
          */
         amountFieldValidator: null,
 
-
         /**
          * * used to hold the ej Tooltip component
          */
         formTooltip: null,
 
         /**
-         * used to hold the transfer mode ej DropdownLisr component
+         * used to hold the transfer mode ej DropdownList component
          */
         transferModeDropdown: null,
+
+        /**
+         * used to hold the card ej DropdownList component
+         */
+        cardDropDownList: null,
 
         /**
          * event is triggered when page is initialised
@@ -4366,7 +4370,25 @@ utopiasoftware.ally.controller = {
                 utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown =
                     new ej.dropdowns.DropDownList({
                     //placeholder: "Select Period",
-                    floatLabelType: 'Never'
+                    floatLabelType: 'Never',
+                    change: function(){ // change event handler
+                        // check the value of the transfer mode dropdown
+                        switch(utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.value){
+                            case "wallet transfer": // user selected wallet transfer
+                                // remove the required attribute for the card number dropdown
+                                $('#wallet-transfer-card-number').removeAttr("required");
+                                // so animatedly hide the card selection
+                                anime({targets: '#wallet-transfer-card-section', height: "0em", duration: 450});
+                                break;
+                            case "card transfer": // user selected card transfer
+                                // add the required attribute for the card dropdown
+                                $('#wallet-transfer-card-number').attr("required", true);
+                                // so animatedly show the card selection
+                                anime({targets: '#wallet-transfer-card-section', height: "3.5em", duration: 450,
+                                complete: function(){$('#wallet-transfer-card-section').css("height", "auto")}});
+                                break;
+                        }
+                    }
                 });
                 utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.appendTo('#wallet-transfer-mode');
 
@@ -4383,6 +4405,59 @@ utopiasoftware.ally.controller = {
                 // render initialized card DropDownList
                 utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.
                 appendTo('#wallet-transfer-card-number');
+
+                // initialise form tooltips
+                utopiasoftware.ally.controller.walletTransferPageViewModel.formTooltip = new ej.popups.Tooltip({
+                    target: '.ally-input-tooltip',
+                    position: 'top center',
+                    cssClass: 'ally-input-tooltip',
+                    opensOn: 'focus'
+                });
+
+                // render the initialized form tooltip
+                utopiasoftware.ally.controller.walletTransferPageViewModel.formTooltip.appendTo('#wallet-transfer-form');
+
+                // initialise the amount field
+                utopiasoftware.ally.controller.walletTransferPageViewModel.amountFieldValidator =
+                    $('#wallet-transfer-amount').parsley({
+                        value: function(parsley) {
+                            // convert the amount back to a plain text without the thousand separator
+                            let parsedNumber = kendo.parseFloat($('#wallet-transfer-amount', $thisPage).val());
+                            return (parsedNumber ? parsedNumber : $('#wallet-transfer-amount', $thisPage).val());
+                        }
+                    });
+
+                // initialise the form validation
+                utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator = $('#wallet-transfer-form').parsley();
+
+                // attach listener for the wallet-transfer button on the page
+                $('#wallet-transfer-transfer-button').get(0).onclick = function(){
+                    // run the validation method for the form
+                    utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.whenValidate();
+                };
+
+                // listen for the form field validation failure event
+                utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.on('field:error', function(fieldInstance) {
+                    // get the element that triggered the field validation error and use it to display tooltip
+                    // display tooltip
+                    $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                    $(fieldInstance.$element).attr("data-hint", fieldInstance.getErrorsMessages()[0]);
+                    $(fieldInstance.$element).attr("title", fieldInstance.getErrorsMessages()[0]);
+                });
+
+                // listen for the form field validation success event
+                utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.on('field:success', function(fieldInstance) {
+                    // remove tooltip from element
+                    $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                    $(fieldInstance.$element).removeAttr("data-hint");
+                    $(fieldInstance.$element).removeAttr("title");
+                });
+
+                // listen for the form validation success
+                utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.on('form:success',
+                    utopiasoftware.ally.controller.walletTransferPageViewModel.formValidated);
+
+                $('#wallet-transfer-card-section').css("height", "0em");
 
                 // create the form data to be sent
                 var formData = {phone: utopiasoftware.ally.model.appUserDetails.phone};
@@ -4414,47 +4489,6 @@ utopiasoftware.ally.controller = {
                     utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.dataBind();
                 }).
                 then(function(){
-
-                    // initialise the amount field
-                    utopiasoftware.ally.controller.walletTransferPageViewModel.amountFieldValidator =
-                        $('#wallet-transfer-amount').parsley({
-                            value: function(parsley) {
-                                // convert the amount back to a plain text without the thousand separator
-                                let parsedNumber = kendo.parseFloat($('#wallet-transfer-amount', $thisPage).val());
-                                return (parsedNumber ? parsedNumber : $('#wallet-transfer-amount', $thisPage).val());
-                            }
-                        });
-
-                    // initialise the form validation
-                    utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator = $('#wallet-transfer-form').parsley();
-
-                    // attach listener for the wallet-transfer button on the page
-                    $('#wallet-transfer-transfer-button').get(0).onclick = function(){
-                        // run the validation method for the form
-                        utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.whenValidate();
-                    };
-
-                    // listen for the form field validation failure event
-                    utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.on('field:error', function(fieldInstance) {
-                        // get the element that triggered the field validation error and use it to display tooltip
-                        // display tooltip
-                        $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
-                        $(fieldInstance.$element).attr("data-hint", fieldInstance.getErrorsMessages()[0]);
-                        $(fieldInstance.$element).attr("title", fieldInstance.getErrorsMessages()[0]);
-                    });
-
-                    // listen for the form field validation success event
-                    utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.on('field:success', function(fieldInstance) {
-                        // remove tooltip from element
-                        $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
-                        $(fieldInstance.$element).removeAttr("data-hint");
-                        $(fieldInstance.$element).removeAttr("title");
-                    });
-
-                    // listen for the form validation success
-                    utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.on('form:success',
-                        utopiasoftware.ally.controller.walletTransferPageViewModel.formValidated);
-
                     // hide the page preloader
                     $('.page-preloader', $thisPage).css('display', "none");
 
@@ -4800,6 +4834,18 @@ utopiasoftware.ally.controller = {
                 formData.phone_receiver = formData.phone_receiver.replace("0", "+234");
             }
 
+            // check the transfer mode for the wallet transfer
+            if(utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.value == "wallet transfer"){
+                // add the specified transfer mode to the form data
+                formData.transfer_mode = "wallet transfer";
+            }
+            // check the transfer mode for the wallet transfer
+            if(utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.value == "card transfer"){
+                // add the specified transfer mode and card number to the form data
+                formData.transfer_mode = "card transfer";
+                formData.cardno = utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.value;
+            }
+
             // display the loader message to indicate that account is being created;
             $('#hour-glass-loader-modal .modal-message').html("Completing Wallet Transfer...");
             // forward the form data & show loader
@@ -5040,6 +5086,47 @@ utopiasoftware.ally.controller = {
         },
 
 
+        /**
+         * method is triggered when the "Add Card" button is clicked
+         */
+        addCardButtonClicked: function(){
+
+            // generate the formData that will be passed over to the "Add Card (Wallet Transfer) page
+            // create the form data to be submitted
+            var formData = {
+                phone_sender: utopiasoftware.ally.model.appUserDetails.phone,
+                phone_receiver: $('#wallet-transfer-page #wallet-transfer-receiver-phone-number').val(),
+                amount: kendo.parseFloat($('#wallet-transfer-page #wallet-transfer-amount').val())
+            };
+
+            // check if the phone_receiver parameter is properly formatted for sending
+            if(formData.phone_receiver.startsWith("0")){ // the phone number starts with 0, replace it with international dialing code
+                formData.phone_receiver = formData.phone_receiver.replace("0", "+234");
+            }
+
+            // check the transfer mode for the wallet transfer
+            if(utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.value == "wallet transfer"){
+                // add the specified transfer mode to the form data
+                formData.transfer_mode = "wallet transfer";
+            }
+            // check the transfer mode for the wallet transfer
+            if(utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.value == "card transfer"){
+                // add the specified transfer mode to the form data
+                formData.transfer_mode = "card transfer";
+            }
+
+            // display the "Add Card (Wallet Transfer)" page
+            $('#app-main-navigator').get(0).pushPage('add-card-wallet-transfer-page.html',
+                {data: formData, animation: 'lift-md'});
+        },
+
+
+        /**
+         * method is triggered when the 'Confirm' button on the transfer wallet sms confirmation message is clicked
+         *
+         * @param buttonElem
+         * @returns {Promise}
+         */
         walletTransferSmsConfirmButtonClicked: function(buttonElem){
 
             hockeyapp.trackEvent(function(){}, function(){}, "FUND TRANSFERRED"); // track fund transfer
@@ -5719,6 +5806,11 @@ utopiasoftware.ally.controller = {
         //amountFieldValidator: null,
 
         /**
+         * * used to hold the ej Tooltip component
+         */
+        formTooltip: null,
+
+        /**
          * property is used to track whether there is an active ongoing payment.
          * A value of true means there is an active payment; any other value means there is none
          */
@@ -5744,6 +5836,17 @@ utopiasoftware.ally.controller = {
 
                 // initialise the 'active payment' status to false i.e. no active payment
                 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.activePayment = false;
+
+                // initialise form tooltips
+                utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formTooltip = new ej.popups.Tooltip({
+                    target: '.ally-input-tooltip',
+                    position: 'top center',
+                    cssClass: 'ally-input-tooltip',
+                    opensOn: 'focus'
+                });
+
+                // render the initialized form tooltip
+                utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formTooltip.appendTo('#payments-ally-scan-form');
 
 
                 // initialise the form validation
