@@ -1955,12 +1955,7 @@ return Promise.all([serverResponse,utopiasoftware.ally.transactionHistoryCharts.
 dataArray[1]=dataArray[1];dataArray[1]=dataArray[0];return utopiasoftware.ally.transactionHistoryCharts.saveTransactionHistoryData(dataArray[1]);}).then(function(dataArray){// get the data array to be used by grid
 // format the chart data array so it can be properly used
 return gridDataMapping(dataArray);}).then(function(dataArray){var _ref;console.log(dataArray);utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid=new ej.grids.Grid((_ref={// Width for grid
-width:'100%',allowTextWrap:true,showColumnChooser:true},_defineProperty(_ref,'allowTextWrap',true),_defineProperty(_ref,'showColumnChooser',true),_defineProperty(_ref,'allowPdfExport',true),_defineProperty(_ref,'toolbar',['search','columnchooser','pdfexport']),_defineProperty(_ref,'columns',[{field:'SENDER',headerText:'Sender',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'RECEIVER',headerText:'Recipient',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'AMOUNT',headerText:'Amount',width:"25%",textAlign:'right',clipMode:'ellipsiswithtooltip'},{field:'DDATE',headerText:'Date',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'TRANSFERTYPE',headerText:'Type',width:"25%",clipMode:'ellipsiswithtooltip',visible:false},{field:'TRANSACTIONREF',headerText:'Ref',width:"25%",clipMode:'ellipsiswithtooltip',visible:false}]),_defineProperty(_ref,'dataSource',dataArray),_ref));// remove the loader content
-$('#transaction-history-page #transaction-history-transaction-grid').html("");//append the newly created grid
-utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.appendTo('#transaction-history-transaction-grid');// append the listener for the toolbar 'Export PDF' button click
-utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.toolbarClick=function(args){console.log("ID ",args.item.id);if(args.item.id==='transaction-history-transaction-grid_pdfexport'){// the toolbar button being clicked is the 'PDF Export'
-utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.pdfExport(null,null,null,true);}};// add a listener function for when the pdf export is completed
-utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.pdfExportComplete=function(pdfExportCompleteArgs){var fileObj=null;// variable holds the file object to be created
+width:'100%',allowTextWrap:true,showColumnChooser:true},_defineProperty(_ref,'allowTextWrap',true),_defineProperty(_ref,'showColumnChooser',true),_defineProperty(_ref,'allowPdfExport',true),_defineProperty(_ref,'toolbar',['search','columnchooser','pdfexport']),_defineProperty(_ref,'columns',[{field:'SENDER',headerText:'Sender',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'RECEIVER',headerText:'Recipient',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'AMOUNT',headerText:'Amount',width:"25%",textAlign:'right',clipMode:'ellipsiswithtooltip'},{field:'DDATE',headerText:'Date',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'TRANSFERTYPE',headerText:'Type',width:"25%",clipMode:'ellipsiswithtooltip',visible:false},{field:'TRANSACTIONREF',headerText:'Ref',width:"25%",clipMode:'ellipsiswithtooltip',visible:false}]),_defineProperty(_ref,'dataSource',dataArray),_defineProperty(_ref,'pdfExportComplete',function pdfExportComplete(pdfExportCompleteArgs){var fileObj=null;// variable holds the file object to be created
 // get the blob data when the export process is completed
 pdfExportCompleteArgs.promise.then(function(pdfData){// get the pdf structure if the content being exported
 pdfExportBlob=pdfData.blobData;// get the blob for the exported pdf
@@ -1971,7 +1966,11 @@ fileObj=file;// assign the file object to the function variable
 return new Promise(function(resolve,reject){// return the FileWriter object used to write content to the created file
 file.createWriter(resolve,reject);});}).then(function(fileWriter){// get the FileWriter object
 return new Promise(function(resolve,reject){fileWriter.onwriteend=resolve;fileWriter.onerror=reject;fileWriter.write(pdfExportBlob);// write the content of the blob to the file
-});}).catch(function(err){console.log("EXPORT FAILED",err);});};});/**
+});}).catch(function(err){console.log("EXPORT FAILED",err);});}),_ref));// remove the loader content
+$('#transaction-history-page #transaction-history-transaction-grid').html("");//append the newly created grid
+utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.appendTo('#transaction-history-transaction-grid');// append the listener for the toolbar 'Export PDF' button click
+utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.toolbarClick=function(args){console.log("ID ",args.item.id);if(args.item.id==='transaction-history-transaction-grid_pdfexport'){// the toolbar button being clicked is the 'PDF Export'
+utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.pdfExport(null,null,null,true);}};});/**
              * function is used to map the grid data into an appropriate form that can be displayed by the chart
              * @param gridDataArray {Array} array containing grid data objects to be mapped
              *

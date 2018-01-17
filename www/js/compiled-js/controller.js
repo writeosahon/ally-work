@@ -7233,7 +7233,41 @@ utopiasoftware.ally.controller = {
                             { field: 'TRANSACTIONREF', headerText: 'Ref', width: "25%", clipMode: 'ellipsiswithtooltip',
                                 visible: false}
                         ],
-                        dataSource: dataArray
+                        dataSource: dataArray,
+                        pdfExportComplete: function(pdfExportCompleteArgs){
+                        var fileObj = null; // variable holds the file object to be created
+
+                        // get the blob data when the export process is completed
+                        pdfExportCompleteArgs.promise.then(function(pdfData){ // get the pdf structure if the content being exported
+                            pdfExportBlob = pdfData.blobData; // get the blob for the exported pdf
+                            console.log("EXPORTED", pdfData);
+
+                            return new Promise(function(resolve, reject){ // return the directory where to store the document/image
+                                window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory, resolve, reject);
+                            });
+                        }).then(function(directory){
+                            return new Promise(function(resolve, reject){ // return the created file which holds the pdf document
+                                directory.getFile('ALLY-Transactions-' + Date.now() + '.pdf', {create:true, exclusive: false},
+                                    resolve, reject);
+                            });
+                        }).
+                        then(function(file){ // get the file object
+                            fileObj = file; // assign the file object to the function variable
+
+                            return new Promise(function(resolve, reject){ // return the FileWriter object used to write content to the created file
+                                file.createWriter(resolve, reject);
+                            });
+                        }).
+                        then(function(fileWriter){ // get the FileWriter object
+                            return new Promise(function(resolve, reject){
+                                fileWriter.onwriteend = resolve;
+                                fileWriter.onerror = reject;
+
+                                fileWriter.write(pdfExportBlob); // write the content of the blob to the file
+                            });
+                        }).
+                        catch(function(err){console.log("EXPORT FAILED", err)});
+                    }
                     });
 
                 // remove the loader content
@@ -7253,42 +7287,6 @@ utopiasoftware.ally.controller = {
                     }
                 };
 
-                // add a listener function for when the pdf export is completed
-                utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.
-                pdfExportComplete = function(pdfExportCompleteArgs){
-                    var fileObj = null; // variable holds the file object to be created
-
-                    // get the blob data when the export process is completed
-                    pdfExportCompleteArgs.promise.then(function(pdfData){ // get the pdf structure if the content being exported
-                        pdfExportBlob = pdfData.blobData; // get the blob for the exported pdf
-                        console.log("EXPORTED", pdfData);
-
-                        return new Promise(function(resolve, reject){ // return the directory where to store the document/image
-                            window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory, resolve, reject);
-                        });
-                    }).then(function(directory){
-                        return new Promise(function(resolve, reject){ // return the created file which holds the pdf document
-                            directory.getFile('ALLY-Transactions-' + Date.now() + '.pdf', {create:true, exclusive: false},
-                                resolve, reject);
-                        });
-                    }).
-                    then(function(file){ // get the file object
-                        fileObj = file; // assign the file object to the function variable
-
-                        return new Promise(function(resolve, reject){ // return the FileWriter object used to write content to the created file
-                            file.createWriter(resolve, reject);
-                        });
-                    }).
-                    then(function(fileWriter){ // get the FileWriter object
-                        return new Promise(function(resolve, reject){
-                            fileWriter.onwriteend = resolve;
-                            fileWriter.onerror = reject;
-
-                            fileWriter.write(pdfExportBlob); // write the content of the blob to the file
-                        });
-                    }).
-                    catch(function(err){console.log("EXPORT FAILED", err)});
-                };
             });
 
 
