@@ -276,4 +276,16 @@ $(document).on("hide", "#transaction-history-page", utopiasoftware.ally.controll
 // listen for when the Transaction History page is destroyed
 $(document).on("destroy", "#transaction-history-page", utopiasoftware.ally.controller.transactionHistoryPageViewModel.pageDestroy);
 
+// listen for the initialisation of the Add-Card-Wallet-Transfer page
+$(document).on("init", "#add-card-wallet-transfer", utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.pageInit);
+
+// listen for when the Add-Card-Wallet-Transfer page is shown
+$(document).on("show", "#add-card-wallet-transfer", utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.pageShow);
+
+// listen for when the Add-Card-Wallet-Transfer page is hidden
+$(document).on("hide", "#add-card-wallet-transfer", utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.pageHide);
+
+// listen for when the Add-Card-Wallet-Transfer page is destroyed
+$(document).on("destroy", "#add-card-wallet-transfer", utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.pageDestroy);
+
 //# sourceMappingURL=model-compiled.js.map

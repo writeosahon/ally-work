@@ -3,7 +3,7 @@
 <ons-page id="add-card-wallet-transfer-page">
     <ons-toolbar>
         <div class="left">
-            <ons-toolbar-button onclick="utopiasoftware.ally.controller.addCardPageViewModel.backButtonClicked();">
+            <ons-toolbar-button onclick="utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.backButtonClicked();">
                 <ons-icon icon="md-long-arrow-left"></ons-icon>
             </ons-toolbar-button>
         </div>
@@ -126,13 +126,44 @@
             </ons-list-item>
 
             <ons-list-title>Save Card Details</ons-list-title>
-            <ons-list-item modifier="nodivider" style="margin-bottom: 300px;">
+            <ons-list-item modifier="nodivider">
                 <div class="left">
-                    <ons-switch id="add-card-wallet-transfer-save-card-details" input-id="add-card-wallet-transfer-save-card-details-alt" checked disable-auto-styling>
+                    <ons-switch id="add-card-wallet-transfer-save-card-details"
+                                input-id="add-card-wallet-transfer-save-card-details-alt" checked disable-auto-styling>
                     </ons-switch>
                 </div>
                 <div class="center">
                     <label for="add-card-wallet-transfer-save-card-details-alt" style="font-size: 1.4em;">&nbsp;Save Card</label>
+                </div>
+            </ons-list-item>
+
+            <ons-list-title>Transfer Recipient</ons-list-title>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-account-box-phone" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <div style="width: 75%; display: inline-block">
+                        <ons-input id="add-card-wallet-transfer-receiver-phone-number" type="tel"
+                                   placeholder="Recipient Phone Number"
+                                   modifier="transparent"
+                                   required float
+                                   pattern="((0[1-9]{1}[0-9]{9}|\+234[1-9]{1}[0-9]{9})|\+[1-9]{1}[0-9]{4,})"
+                                   data-parsley-required-message="recipient phone number is required"
+                                   data-parsley-pattern-message="incorrect phone number format. phone number must be in international format (starting with '+')"
+                                   data-parsley-type-message="incorrect phone number format. phone number must be in international format (starting with '+')"
+                                   style="width: 100%" class="hint--bottom"></ons-input>
+                    </div>
+                    <div style="width: 25%; text-align: center;">
+                        <!-- display the add card page -->
+                        <ons-fab id="add-card-wallet-transfer-add-recipient-button" modifier="mini"
+                                 style="color: #ffffff; background-color: #30a401;"
+                        onclick="utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.pickContactButtonClicked()">
+                            <ons-icon icon="md-account-add"></ons-icon>
+                        </ons-fab>
+                    </div>
+
                 </div>
             </ons-list-item>
 
@@ -143,9 +174,9 @@
         <div style="width: 100%; padding-top: 6px; padding-bottom: 6px; text-align: center">
             <ons-button id="add-card-wallet-transfer-cancel-button" disable-auto-styling
                         style="background-color: #dd0000; color: #ffffff; width: 45%; border-radius: 21px;"
-                        onclick="utopiasoftware.ally.controller.addCardPageViewModel.backButtonClicked();">Cancel</ons-button>
+                        onclick="utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.backButtonClicked();">Cancel</ons-button>
 
-            <ons-button id="add-card-wallet-transfer-fund-button" disable-auto-styling
+            <ons-button id="add-card-wallet-transfer-transfer-button" disable-auto-styling
                         style="background-color: #30a401; color: #ffffff; width: 45%; border-radius: 21px;">Transfer</ons-button>
         </div>
     </ons-bottom-toolbar>

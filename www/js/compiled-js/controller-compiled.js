@@ -1910,7 +1910,7 @@ function loadPageOnAppReady(){// check to see if onsen is ready and if all app l
 if(!ons.isReady()||utopiasoftware.ally.model.isAppReady===false){setTimeout(loadPageOnAppReady,500);// call this function again after half a second
 return;}// listen for the back button event
 $('#app-main-navigator').get(0).topPage.onDeviceBackButton=utopiasoftware.ally.controller.transactionHistoryPageViewModel.backButtonClicked;// inject the the modules required to create the transaction history grid
-ej.grids.Grid.Inject(ej.grids.Selection,ej.grids.Scroll,ej.grids.Search,ej.grids.Toolbar,ej.grids.PdfExport);// update the Transaction History Grid
+ej.grids.Grid.Inject(ej.grids.Page,ej.grids.Selection,ej.grids.Scroll,ej.grids.Search,ej.grids.Toolbar,ej.grids.PdfExport,ej.grids.ExcelExport);// update the Transaction History Grid
 utopiasoftware.ally.controller.transactionHistoryPageViewModel.updateTransactionHistoryGrid();// hide the loader
 $('#loader-modal').get(0).hide();}},/**
          * method is triggered when page is shown
@@ -1942,7 +1942,7 @@ window.plugins.toast.hide();}});// load the previously cached data
 utopiasoftware.ally.transactionHistoryCharts.loadTransactionHistoryData().then(function(dataArray){// get the data array to be used by grid
 // format the data array so it can be properly used
 return gridDataMapping(dataArray);}).then(function(dataArray){utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid=new ej.grids.Grid({// Width for grid
-width:'100%',allowTextWrap:true,showColumnChooser:true,allowPdfExport:true,toolbar:['search','columnchooser','pdfexport'],columns:[{field:'SENDER',headerText:'Sender',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'RECEIVER',headerText:'Recipient',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'AMOUNT',headerText:'Amount',width:"25%",textAlign:'right',clipMode:'ellipsiswithtooltip'},{field:'DDATE',headerText:'Date',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'TRANSFERTYPE',headerText:'Type',width:"25%",clipMode:'ellipsiswithtooltip',visible:false},{field:'TRANSACTIONREF',headerText:'Ref',width:"25%",clipMode:'ellipsiswithtooltip',visible:false}],dataSource:dataArray});// remove the loader content
+width:'100%',allowTextWrap:true,showColumnChooser:true,allowPdfExport:true,toolbar:['search','columnchooser'],columns:[{field:'SENDER',headerText:'Sender',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'RECEIVER',headerText:'Recipient',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'AMOUNT',headerText:'Amount',width:"25%",textAlign:'right',clipMode:'ellipsiswithtooltip'},{field:'DDATE',headerText:'Date',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'TRANSFERTYPE',headerText:'Type',width:"25%",clipMode:'ellipsiswithtooltip',visible:false},{field:'TRANSACTIONREF',headerText:'Ref',width:"25%",clipMode:'ellipsiswithtooltip',visible:false}],dataSource:dataArray});// remove the loader content
 $('#transaction-history-page #transaction-history-transaction-grid').html("");//append the newly created grid
 utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.appendTo('#transaction-history-transaction-grid');});return;// exit method
 }//THERE IS AN INTERNET CONNECTION
@@ -1955,7 +1955,7 @@ return Promise.all([serverResponse,utopiasoftware.ally.transactionHistoryCharts.
 dataArray[1]=dataArray[1];dataArray[1]=dataArray[0];return utopiasoftware.ally.transactionHistoryCharts.saveTransactionHistoryData(dataArray[1]);}).then(function(dataArray){// get the data array to be used by grid
 // format the chart data array so it can be properly used
 return gridDataMapping(dataArray);}).then(function(dataArray){var _ref;console.log(dataArray);utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid=new ej.grids.Grid((_ref={// Width for grid
-width:'100%',allowTextWrap:true,showColumnChooser:true},_defineProperty(_ref,'allowTextWrap',true),_defineProperty(_ref,'showColumnChooser',true),_defineProperty(_ref,'allowPdfExport',true),_defineProperty(_ref,'toolbar',['search','columnchooser','pdfexport']),_defineProperty(_ref,'columns',[{field:'SENDER',headerText:'Sender',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'RECEIVER',headerText:'Recipient',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'AMOUNT',headerText:'Amount',width:"25%",textAlign:'right',clipMode:'ellipsiswithtooltip'},{field:'DDATE',headerText:'Date',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'TRANSFERTYPE',headerText:'Type',width:"25%",clipMode:'ellipsiswithtooltip',visible:false},{field:'TRANSACTIONREF',headerText:'Ref',width:"25%",clipMode:'ellipsiswithtooltip',visible:false}]),_defineProperty(_ref,'dataSource',dataArray),_defineProperty(_ref,'pdfExportComplete',function pdfExportComplete(pdfExportCompleteArgs){var fileObj=null;// variable holds the file object to be created
+width:'100%',allowTextWrap:true,showColumnChooser:true},_defineProperty(_ref,'allowTextWrap',true),_defineProperty(_ref,'showColumnChooser',true),_defineProperty(_ref,'allowPdfExport',true),_defineProperty(_ref,'allowExcelExport',true),_defineProperty(_ref,'toolbar',['search','columnchooser','pdfexport']),_defineProperty(_ref,'columns',[{field:'SENDER',headerText:'Sender',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'RECEIVER',headerText:'Recipient',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'AMOUNT',headerText:'Amount',width:"25%",textAlign:'right',clipMode:'ellipsiswithtooltip'},{field:'DDATE',headerText:'Date',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'TRANSFERTYPE',headerText:'Type',width:"25%",clipMode:'ellipsiswithtooltip',visible:false},{field:'TRANSACTIONREF',headerText:'Ref',width:"25%",clipMode:'ellipsiswithtooltip',visible:false}]),_defineProperty(_ref,'dataSource',dataArray),_defineProperty(_ref,'pdfExportComplete',function pdfExportComplete(pdfExportCompleteArgs){console.log("ARGUMENTS",pdfExportCompleteArgs);var fileObj=null;// variable holds the file object to be created
 // get the blob data when the export process is completed
 pdfExportCompleteArgs.promise.then(function(pdfData){// get the pdf structure if the content being exported
 pdfExportBlob=pdfData.blobData;// get the blob for the exported pdf
@@ -1970,7 +1970,7 @@ return new Promise(function(resolve,reject){fileWriter.onwriteend=resolve;fileWr
 $('#transaction-history-page #transaction-history-transaction-grid').html("");//append the newly created grid
 utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.appendTo('#transaction-history-transaction-grid');// append the listener for the toolbar 'Export PDF' button click
 utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.toolbarClick=function(args){console.log("ID ",args.item.id);if(args.item.id==='transaction-history-transaction-grid_pdfexport'){// the toolbar button being clicked is the 'PDF Export'
-utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.pdfExport(null,null,null,true);}};});/**
+console.log("DATASOURCE ",utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.dataSource);utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.pdfExport(undefined,undefined,undefined,false).then(function(p){console.log("P",p);});}};});/**
              * function is used to map the grid data into an appropriate form that can be displayed by the chart
              * @param gridDataArray {Array} array containing grid data objects to be mapped
              *
@@ -1978,6 +1978,130 @@ utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistor
              */function gridDataMapping(gridDataArray){return gridDataArray.map(function(dataObject){dataObject.AMOUNT=kendo.toString(kendo.parseFloat(dataObject.AMOUNT),"n2");// convert to currency format
 dataObject.DDATE=kendo.toString(kendo.parseDate(dataObject.DDATE,"yyyy-MM-dd HH:mm:ss"),"yyyy-MM-dd; h:mmtt");// convert to date object
 return dataObject;// return the modified object
-});}}}};
+});}}},/**
+     * object is view-model for Wallet Transfer Add Card page
+     */addCardWalletTransferPageViewModel:{/**
+         * used to hold the parsley form validation object for the page
+         */formValidator:null,/**
+         * used to validate the card number field
+         */cardNumberFieldValidator:null,/**
+         * used to hold the parsley validator for the Amount field
+         */amountFieldValidator:null,/**
+         * used to hold the ej library card masked text input
+         */cardMaskedTextInput:null,/**
+         * used to hold the ej library card month dropdown list component
+         */cardMonthDropDownList:null,/**
+         * used to hold the ej library card year dropdown list component
+         */cardYearDropDownList:null,/**
+         * * used to hold the ej Tooltip component
+         */formTooltip:null,/**
+         * event is triggered when page is initialised
+         */pageInit:function pageInit(event){var $thisPage=$(event.target);// get the current page shown
+// call the function used to initialise the app page if the app is fully loaded
+loadPageOnAppReady();//function is used to initialise the page if the app is fully ready for execution
+function loadPageOnAppReady(){// check to see if onsen is ready and if all app loading has been completed
+if(!ons.isReady()||utopiasoftware.ally.model.isAppReady===false){setTimeout(loadPageOnAppReady,500);// call this function again after half a second
+return;}// listen for the back button event
+$('#app-main-navigator').get(0).topPage.onDeviceBackButton=utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.backButtonClicked;// initialise the card masked input widget
+utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.cardMaskedTextInput=new ej.inputs.MaskedTextBox({mask:'0000 0000 0000 0000 99999',placeholder:"Card Number",promptChar:'*',floatLabelType:"Always"});// render initialized card masked input widget
+utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.cardMaskedTextInput.appendTo('#add-card-wallet-transfer-card-number');// initialise the card month DropDown widget
+utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.cardMonthDropDownList=new ej.dropdowns.DropDownList({dataSource:[{value:"01",displayText:"01"},{value:"02",displayText:"02"},{value:"03",displayText:"03"},{value:"04",displayText:"04"},{value:"05",displayText:"05"},{value:"06",displayText:"06"},{value:"07",displayText:"07"},{value:"08",displayText:"08"},{value:"09",displayText:"09"},{value:"10",displayText:"10"},{value:"11",displayText:"11"},{value:"12",displayText:"12"}],fields:{text:'displayText',value:'value'},placeholder:"Expiry Month",floatLabelType:"Auto"});// render the initialized card month dropdown list
+utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.cardMonthDropDownList.appendTo('#add-card-wallet-transfer-expiry-month');// initialise the array to hold the valid card expiry years
+var cardYearsArray=[];var yearOption=new Date().getFullYear();// get the current year
+// add the current year as an object in the cardYearsArray
+cardYearsArray.push({value:(""+yearOption).substring(2,4),displayText:yearOption});// add 3 more years to the cardYearsArray for the Card Expiry Year
+for(var index=0;index<3;index++){// increase the yearOption by 1
+yearOption+=1;// add the additional year as an object in the cardYearsArray
+cardYearsArray.push({value:(""+yearOption).substring(2,4),displayText:yearOption});}// initialise the card expiry year DropDown widget
+utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.cardYearDropDownList=new ej.dropdowns.DropDownList({dataSource:cardYearsArray,fields:{text:'displayText',value:'value'},placeholder:"Expiry Year",floatLabelType:"Auto"});// render the initialized card expiry year dropdown list
+utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.cardYearDropDownList.appendTo('#add-card-wallet-transfer-expiry-year');// initialise form tooltips
+utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.formTooltip=new ej.popups.Tooltip({target:'.ally-input-tooltip',position:'top center',cssClass:'ally-input-tooltip',opensOn:'focus'});// render the initialized form tooltip
+utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.formTooltip.appendTo('#add-card-wallet-transfer-form');// initialise the card number field validator
+utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.cardNumberFieldValidator=$('#add-card-wallet-transfer-card-number').parsley({value:function value(parsley){// return the unmasked input from the card number field
+return utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.cardMaskedTextInput.value;}});// initialise the amount field
+utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.amountFieldValidator=$('#add-card-wallet-transfer-charge-amount').parsley({value:function value(parsley){// convert the amount back to a plain text without the thousand separator
+var parsedNumber=kendo.parseFloat($('#add-card-wallet-transfer-charge-amount',$thisPage).val());return parsedNumber?parsedNumber:$('#add-card-wallet-transfer-charge-amount',$thisPage).val();}});// initialise the form validation
+utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.formValidator=$('#add-card-wallet-transfer-form').parsley();// attach listener for the transfer button on the page
+$('#add-card-wallet-transfer-transfer-button').get(0).onclick=function(){// run the validation method for the form
+utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.formValidator.whenValidate();};// listen for the form field validation failure event
+utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.formValidator.on('field:error',function(fieldInstance){// get the element that triggered the field validation error and use it to display tooltip
+// display tooltip
+$(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$(fieldInstance.$element).attr("data-hint",fieldInstance.getErrorsMessages()[0]);$(fieldInstance.$element).attr("title",fieldInstance.getErrorsMessages()[0]);});// listen for the form field validation success event
+utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.formValidator.on('field:success',function(fieldInstance){// remove tooltip from element
+$(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$(fieldInstance.$element).removeAttr("data-hint");$(fieldInstance.$element).removeAttr("title");});// listen for the form validation success
+utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.formValidator.on('form:success',utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.formValidated);// display the form
+$('#add-card-form',$thisPage).css("display","block");// hide the preloader
+$('.page-preloader',$thisPage).css("display","none");// hide the loader
+$('#loader-modal').get(0).hide();}},/**
+         * method is triggered when page is shown
+         *
+         * @param event
+         */pageShow:function pageShow(event){},/**
+         * method is triggered when the page is hidden
+         * @param event
+         */pageHide:function pageHide(event){try{// remove any tooltip being displayed on all forms on the page
+$('#add-card-wallet-transfer-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#add-card-wallet-transfer-page [title]').removeAttr("title");$('#add-card-wallet-transfer-page [data-hint]').removeAttr("data-hint");// reset the form validator object on the page
+utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.formValidator.reset();}catch(err){}},/**
+         * method is triggered when the page is destroyed
+         * @param event
+         */pageDestroy:function pageDestroy(event){try{// remove any tooltip being displayed on all forms on the page
+$('#add-card-wallet-transfer-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#add-card-wallet-transfer-page [title]').removeAttr("title");$('#add-card-wallet-transfer-page [data-hint]').removeAttr("data-hint");// destroy the form validator objects on the page
+utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.cardNumberFieldValidator.destroy();utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.amountFieldValidator.destroy();utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.formValidator.destroy();// destroy other form components
+utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.cardMaskedTextInput.destroy();utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.cardMonthDropDownList.destroy();utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.cardYearDropDownList.destroy();utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.formTooltip.destroy();}catch(err){}},/**
+         * method is triggered when the form is successfully validated
+         */formValidated:function formValidated(){// check if Internet Connection is available before proceeding
+if(navigator.connection.type===Connection.NONE){// no Internet Connection
+// inform the user that they cannot proceed without Internet
+window.plugins.toast.showWithOptions({message:"ALLY wallet cannot be saved without an Internet Connection",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#ff0000',//red
+textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
+window.plugins.toast.hide();}});return;// exit method immediately
+}// create the form data to be submitted
+var formData={firstName:utopiasoftware.ally.model.appUserDetails.firstname,lastName:utopiasoftware.ally.model.appUserDetails.lastname,phone:utopiasoftware.ally.model.appUserDetails.phone,email:utopiasoftware.ally.model.appUserDetails.email?utopiasoftware.ally.model.appUserDetails.email:"",cardno:utopiasoftware.ally.controller.addCardPageViewModel.cardMaskedTextInput.value,cvv:$('#add-card-page #add-card-cvv').val(),expirymonth:utopiasoftware.ally.controller.addCardPageViewModel.cardMonthDropDownList.value,expiryyear:utopiasoftware.ally.controller.addCardPageViewModel.cardYearDropDownList.value,pin:$('#add-card-page #add-card-pin').val(),amount:kendo.parseFloat($('#add-card-page #add-card-charge-amount').val())};// display the loader message to indicate that account is being created;
+$('#hour-glass-loader-modal .modal-message').html("Funding User Wallet...");// forward the form data & show loader
+Promise.all([formData,Promise.resolve($('#hour-glass-loader-modal').get(0).show())]).then(function(dataArray){// submit the form data
+return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/rave-card-payment.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
+processData:true,data:dataArray[0]// data to submit to server
+}));}).then(function(serverResponse){serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// get the response object
+// check if any error occurred
+if(serverResponse.status!="success"){// an error occured
+throw serverResponse.message||serverResponse.data.message;// throw the error message attached to this error
+}return serverResponse;// forward the server response
+}).then(function(serverResponse){// hide the loader
+return Promise.all([serverResponse,$('#hour-glass-loader-modal').get(0).hide()]);}).then(function(responseArray){// ask user for transaction otp
+return Promise.all([responseArray[0],ons.notification.prompt({title:"OTP Confirmation",messageHTML:'<div><ons-icon icon="md-ally-icon-otp" size="24px"\n                    style="color: #30a401; float: left; width: 26px;"></ons-icon>\n                    <span style="float: right; width: calc(100% - 26px);">\n                    FUNDING FEE: '+kendo.toString(kendo.parseFloat(responseArray[0].data.appfee),'n2')+'<br>\n                    AMOUNT TO CHARGE: '+kendo.toString(kendo.parseFloat(responseArray[0].data.charged_amount),'n2')+'<br>\n                    Confirm Transaction by providing OTP sent to your phone or generated by your bank token</span></div>',cancelable:false,placeholder:"OTP",inputType:"number",defaultValue:"",autofocus:false,submitOnEnter:true})]);}).then(function(responseArray){// display the loader message to indicate that account is being created;
+$('#hour-glass-loader-modal .modal-message').html("Authorizing Wallet Fund...");return Promise.all([].concat(_toConsumableArray(responseArray),[$('#hour-glass-loader-modal').get(0).show()]));}).then(function(responseArray){// create the data object to be sent
+var submitData={raverefid:responseArray[0].data.flwRef,otp:responseArray[1],phone:utopiasoftware.ally.model.appUserDetails.phone};submitData.savecard=$('#add-card-page #add-card-save-card-details').get(0).checked;// submit the form data
+return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/rave-approve-card-payment-via-otp.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
+processData:true,data:submitData// data to submit to server
+}));}).then(function(serverResponse){serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// get the new user object
+// check if any error occurred
+if(serverResponse.status=="error"){// an error occured
+throw serverResponse.message;// throw the error message attached to this error
+}return $('#hour-glass-loader-modal').get(0).hide();// hide loader
+}).then(function(){return Promise.all([ons.notification.toast("Wallet Funded Successfully!",{timeout:4000}),$('#app-main-navigator').get(0).popPage({data:{refresh:true}})]);}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
+err="Sorry. Your ALLY wallet could not be funded. Please retry";}$('#hour-glass-loader-modal').get(0).hide();// hide loader
+ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> Wallet Funding Failed',messageHTML:'<span>'+err+'</span>',cancelable:false});});},/**
+         * method is triggered when back button or device back button is clicked
+         */backButtonClicked:function backButtonClicked(){// check if the side menu is open
+if($('ons-splitter').get(0).right.isOpen){// side menu open, so close it
+$('ons-splitter').get(0).right.close();return;// exit the method
+}// remove this page form the main navigator stack
+$('#app-main-navigator').get(0).popPage();},/**
+         * method is triggered when the 'Pick Contact" button is clicked
+         */pickContactButtonClicked:function pickContactButtonClicked(){// display the list of contacts from the user's phone address book
+new Promise(function(resolve,reject){window.plugins.contactNumberPicker.pick(resolve,reject);}).then(function(contact){// retrieve picked contact
+// get the selected contact phone number
+var contactPhoneNumber=contact.phoneNumber;//format the retrieved phone number to acceptable app standards
+contactPhoneNumber=contactPhoneNumber.replace(/\D/ig,"");// remove any non-digit character between phone numbers
+// if any number brings with '0' replace it with '+234'
+if(contactPhoneNumber.startsWith("0")){// the phone number starts with 0, replace it with international dialing code
+contactPhoneNumber=contactPhoneNumber.replace("0","+234");}//ensure phone number begins with a '+'
+if(!contactPhoneNumber.startsWith("+")){// the phone number does not start with '+'
+contactPhoneNumber="+"+contactPhoneNumber;// append the '+' to the beginning
+}// update the recipient phone input field with the retrieved & formatted phone number
+$('#add-card-wallet-transfer-form #add-card-wallet-transfer-receiver-phone-number').val(contactPhoneNumber);}).catch(function(){// inform the user that there was an error
+window.plugins.toast.showWithOptions({message:"phone contacts could not be accessed right now",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#ff0000',//red
+textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
+window.plugins.toast.hide();}});});}}};
 
 //# sourceMappingURL=controller-compiled.js.map
