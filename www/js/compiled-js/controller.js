@@ -7503,6 +7503,12 @@ utopiasoftware.ally.controller = {
                 utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.formValidator.on('form:success',
                     utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.formValidated);
 
+                // populate the form using the data retrieved from the previous page
+                var prePopulatedData = $('#app-main-navigator').get(0).topPage.data;
+                $('#add-card-wallet-transfer-charge-amount', $thisPage).
+                val(kendo.toString(prePopulatedData.amount, "n2"));
+                $('#add-card-wallet-transfer-receiver-phone-number', $thisPage).val(prePopulatedData.phone_receiver);
+
                 // display the form
                 $('#add-card-form', $thisPage).css("display", "block");
                 // hide the preloader
@@ -7595,16 +7601,17 @@ utopiasoftware.ally.controller = {
                 lastName: utopiasoftware.ally.model.appUserDetails.lastname,
                 phone: utopiasoftware.ally.model.appUserDetails.phone,
                 email: utopiasoftware.ally.model.appUserDetails.email ? utopiasoftware.ally.model.appUserDetails.email : "",
-                cardno: utopiasoftware.ally.controller.addCardPageViewModel.cardMaskedTextInput.value,
-                cvv: $('#add-card-page #add-card-cvv').val(),
-                expirymonth: utopiasoftware.ally.controller.addCardPageViewModel.cardMonthDropDownList.value,
-                expiryyear: utopiasoftware.ally.controller.addCardPageViewModel.cardYearDropDownList.value,
-                pin: $('#add-card-page #add-card-pin').val(),
-                amount: kendo.parseFloat($('#add-card-page #add-card-charge-amount').val())
+                cardno: utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.cardMaskedTextInput.value,
+                cvv: $('#add-card-wallet-transfer-page #add-card-wallet-transfer-cvv').val(),
+                expirymonth: utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.cardMonthDropDownList.value,
+                expiryyear: utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.cardYearDropDownList.value,
+                pin: $('#add-card-wallet-transfer-page #add-card-wallet-transfer-pin').val(),
+                amount: kendo.parseFloat($('#add-card-wallet-transfer-page #add-card-wallet-transfer-charge-amount').val()),
+                phone_receiver: $('#add-card-wallet-transfer-page #wallet-transfer-receiver-phone-number').val()
             };
 
             // display the loader message to indicate that account is being created;
-            $('#hour-glass-loader-modal .modal-message').html("Funding User Wallet...");
+            $('#hour-glass-loader-modal .modal-message').html("Completing Wallet Transfer...");
             // forward the form data & show loader
             Promise.all([formData, Promise.resolve($('#hour-glass-loader-modal').get(0).show())]).
             then(function(dataArray){
