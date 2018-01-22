@@ -7599,7 +7599,7 @@ utopiasoftware.ally.controller = {
             var formData = {
                 firstName: utopiasoftware.ally.model.appUserDetails.firstname,
                 lastName: utopiasoftware.ally.model.appUserDetails.lastname,
-                phone: utopiasoftware.ally.model.appUserDetails.phone,
+                phone_sender: utopiasoftware.ally.model.appUserDetails.phone,
                 email: utopiasoftware.ally.model.appUserDetails.email ? utopiasoftware.ally.model.appUserDetails.email : "",
                 cardno: utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.cardMaskedTextInput.value,
                 cvv: $('#add-card-wallet-transfer-page #add-card-wallet-transfer-cvv').val(),
@@ -7618,7 +7618,7 @@ utopiasoftware.ally.controller = {
                 // submit the form data
                 return Promise.resolve($.ajax(
                     {
-                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/rave-card-payment.php",
+                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/transfer-wallet-to-wallet-via-card.php",
                         type: "post",
                         contentType: "application/x-www-form-urlencoded",
                         beforeSend: function(jqxhr) {
@@ -7661,20 +7661,22 @@ utopiasoftware.ally.controller = {
             }).
             then(function(responseArray){
                 // display the loader message to indicate that account is being created;
-                $('#hour-glass-loader-modal .modal-message').html("Authorizing Wallet Fund...");
+                $('#hour-glass-loader-modal .modal-message').html("Authorizing Wallet Transfer...");
                 return Promise.all([...responseArray, $('#hour-glass-loader-modal').get(0).show()])
             }).
             then(function(responseArray){
 
                 // create the data object to be sent
                 var submitData = {raverefid: responseArray[0].data.flwRef, otp: responseArray[1],
-                    phone: utopiasoftware.ally.model.appUserDetails.phone};
+                    phone_sender: utopiasoftware.ally.model.appUserDetails.phone,
+                phone_receiver: formData.phone_receiver};
                 submitData.savecard = $('#add-card-page #add-card-save-card-details').get(0).checked;
 
                 // submit the form data
                 return Promise.resolve($.ajax(
                     {
-                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/rave-approve-card-payment-via-otp.php",
+                        url: utopiasoftware.ally.model.ally_base_url +
+                        "/mobile/transfer-wallet-to-wallet-via-card-confirm-otp.php",
                         type: "post",
                         contentType: "application/x-www-form-urlencoded",
                         beforeSend: function(jqxhr) {
@@ -7699,13 +7701,48 @@ utopiasoftware.ally.controller = {
                 return $('#hour-glass-loader-modal').get(0).hide(); // hide loader
             }).
             then(function(){
-                return Promise.all([ons.notification.toast("Wallet Funded Successfully!", {timeout:4000}),
+                hockeyapp.trackEvent(function(){}, function(){}, "FUND TRANSFERRED"); // track fund transfer
+
+                // reset the form for the add card wallet transfer page
+                $('#add-card-wallet-transfer-page #add-card-wallet-transfer-form').get(0).reset();
+                // reset the form validator object on the page
+                utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.formValidator.reset();
+
+                // send push notification to the recipient of the transfer
+                let pushNotification = { // create the push notification object
+                    "app_id": "d5d2bdba-eec0-46b1-836e-c5b8e318e928",
+                    "filters": [{"field": "tag", "key": "phone", "relation": "=", "value":
+                    formData.phone_receiver}],
+                    "contents": {"en": "You received funds into your ALLY WALLET from " +
+                    utopiasoftware.ally.model.appUserDetails.firstname + " " + utopiasoftware.ally.model.appUserDetails.lastname},
+                    "headings": {"en": "Funds Received"},
+                    "android_channel_id": "66dfeddf-12d7-4194-b3d9-38325042d258",
+                    "android_visibility": 0,
+                    "priority": 5
+                };
+
+                Promise.resolve($.ajax(
+                    {
+                        url: "https://onesignal.com/api/v1/notifications",
+                        type: "post",
+                        contentType: "application/json",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("Authorization", "Basic MmQ3ODcwZGUtYmIyYS00NzY5LWIwZWQtMTk5ZGRjNzU2M2Q3");
+                        },
+                        dataType: "json",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: false,
+                        data: JSON.stringify(pushNotification)
+                    }
+                ));
+
+                return Promise.all([ons.notification.toast("Recipient Wallet Funded Successfully!", {timeout:4000}),
                     $('#app-main-navigator').get(0).popPage({data: {refresh: true}})]);
 
             }).
             catch(function(err){
                 if(typeof err !== "string"){ // if err is NOT a String
-                    err = "Sorry. Your ALLY wallet could not be funded. Please retry"
+                    err = "Sorry. Recipient ALLY wallet could not be funded. Please retry"
                 }
 
                 $('#hour-glass-loader-modal').get(0).hide(); // hide loader
