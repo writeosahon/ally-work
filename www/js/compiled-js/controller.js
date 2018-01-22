@@ -4907,6 +4907,7 @@ utopiasoftware.ally.controller = {
                 // create the data to be sent for confirm of wallet transfer
                 var confirmationData = responseArray[0];
                 confirmationData.lock = responseArray[1];
+                confirmationData.cardno = utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.value
 
                 // submit the data
                 return Promise.all([Promise.resolve($.ajax(
@@ -7607,8 +7608,12 @@ utopiasoftware.ally.controller = {
                 expiryyear: utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.cardYearDropDownList.value,
                 pin: $('#add-card-wallet-transfer-page #add-card-wallet-transfer-pin').val(),
                 amount: kendo.parseFloat($('#add-card-wallet-transfer-page #add-card-wallet-transfer-charge-amount').val()),
-                phone_receiver: $('#add-card-wallet-transfer-page #wallet-transfer-receiver-phone-number').val()
+                phone_receiver: $('#add-card-wallet-transfer-page #add-card-wallet-transfer-receiver-phone-number').val()
             };
+
+            if(formData.phone_receiver.startsWith("0")){ // the phone number starts with 0, replace it with international dialing code
+                formData.phone_receiver = formData.phone_receiver.replace("0", "+234");
+            }
 
             // display the loader message to indicate that account is being created;
             $('#hour-glass-loader-modal .modal-message').html("Completing Wallet Transfer...");
