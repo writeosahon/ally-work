@@ -7670,7 +7670,7 @@ utopiasoftware.ally.controller = {
                 var submitData = {raverefid: responseArray[0].data.flwRef, otp: responseArray[1],
                     phone_sender: utopiasoftware.ally.model.appUserDetails.phone,
                 phone_receiver: formData.phone_receiver};
-                submitData.savecard = $('#add-card-page #add-card-save-card-details').get(0).checked;
+                submitData.savecard = $('#add-card-wallet-transfer-page #add-card-wallet-transfer-save-card-details').get(0).checked;
 
                 // submit the form data
                 return Promise.resolve($.ajax(
