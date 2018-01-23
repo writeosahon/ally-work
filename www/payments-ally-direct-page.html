@@ -15,8 +15,8 @@
                             <ons-icon icon="md-ally-icon-account-card-details" class="list-item__icon" fixed-width size="28px"></ons-icon>
                         </div>
                         <div class="center">
-                            <label style="font-size: 0.8em; color: green; display: block; margin-bottom: 0.2em">Merchant Code</label>
-                            <div style="width: 75%; display: inline-block">
+                            <label style="font-size: 0.8em; color: green; display: block; margin-bottom: 0.2em; width: 100% !important;">Merchant Code</label>
+                            <div style="width: 75%; display: block">
                                 <ons-input id="payments-ally-direct-merchant-code" required readonly placeholder="Merchant Code"
                                            style="font-size: 0.8em; text-transform: uppercase; width: 100%;"
                                            type="text"
@@ -39,7 +39,7 @@
                         </div>
                     </ons-list-item>
 
-                    <ons-list-item modifier="nodivider" style="margin-bottom: 50px;">
+                    <ons-list-item modifier="nodivider">
                         <ons-icon icon="md-ally-icon-cash" class="list-item__icon" fixed-width size="28px"></ons-icon>
                         <div class="center">
                             <div style="width: 70%; display: inline-block">
@@ -58,6 +58,45 @@
                             </div>
                         </div>
                     </ons-list-item>
+
+                    <ons-list-title>Mode of Payment</ons-list-title>
+
+                    <ons-list-item modifier="nodivider">
+                        <div class="left">
+                            <ons-icon icon="md-toll" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                        </div>
+                        <div class="center">
+                            <div style="width: 80%">
+                                <select id="payments-ally-direct-payment-mode">
+                                    <option value="wallet payment" selected>Pay From Wallet</option>
+                                    <option value="card payment">Pay From Card</option>
+                                </select>
+                            </div>
+                        </div>
+                    </ons-list-item>
+
+                    <ons-list-item id="payments-ally-direct-card-section" modifier="nodivider" style="height: 0em;">
+                        <div class="left">
+                            <ons-icon icon="md-ally-icon-credit-card" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                        </div>
+                        <div class="center">
+                            <div style="width: 75%; display: inline-block">
+                                <input id="payments-ally-direct-card-number" type="tel"
+                                       data-parsley-required-message="Card Number is required"
+                                       class="ally-input-tooltip">
+                            </div>
+                            <div style="width: 25%; text-align: center;">
+                                <!-- display the add card page -->
+                                <ons-fab id="payments-ally-direct-add-card" modifier="mini"
+                                         style="color: #ffffff; background-color: #30a401;"
+                                         onclick="utopiasoftware.ally.controller.walletTransferPageViewModel.addCardButtonClicked()">
+                                    <ons-icon icon="md-plus"></ons-icon>
+                                </ons-fab>
+                            </div>
+
+                        </div>
+                    </ons-list-item>
+
 
                 </ons-list>
             </form>

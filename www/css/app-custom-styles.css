@@ -458,7 +458,9 @@
 #payments-ally-direct-page .page--material__background {
     background-color: #ffffff;
 }
-
+#payments-ally-direct-card-number_popup, #payments-ally-direct-payment-mode_popup {
+    left: 60px !important;
+}
 #payments-ally-direct-page #payments-ally-direct-merchant-name { /** style for form input elements **/
     color: green;
     font-family: 'Roboto', 'Noto', sans-serif;

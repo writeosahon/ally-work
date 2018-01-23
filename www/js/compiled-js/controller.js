@@ -4369,8 +4369,8 @@ utopiasoftware.ally.controller = {
                 // initialise transfer mode dropdownlist
                 utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown =
                     new ej.dropdowns.DropDownList({
-                    //placeholder: "Select Period",
-                    floatLabelType: 'Never',
+                    placeholder: "Select Mode",
+                    floatLabelType: 'Auto',
                     change: function(){ // change event handler
                         // check the value of the transfer mode dropdown
                         switch(utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.value){
@@ -4907,7 +4907,8 @@ utopiasoftware.ally.controller = {
                 // create the data to be sent for confirm of wallet transfer
                 var confirmationData = responseArray[0];
                 confirmationData.lock = responseArray[1];
-                confirmationData.cardno = utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.value
+                confirmationData.cardno = utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.value;
+                confirmationData.transfer_mode = formData.transfer_mode;
 
                 // submit the data
                 return Promise.all([Promise.resolve($.ajax(
@@ -6435,6 +6436,21 @@ utopiasoftware.ally.controller = {
         activePayment: null,
 
         /**
+         * property is used to hold the payment mode dropdown list
+         */
+        paymentModeDropdown: null,
+
+        /**
+         * property is used to hold the Cards dropdown list
+         */
+        cardDropDownList: null,
+
+        /**
+         * * used to hold the ej Tooltip component
+         */
+        formTooltip: null,
+
+        /**
          * event is triggered when page is initialised
          */
         pageInit: function(event){
@@ -6454,6 +6470,58 @@ utopiasoftware.ally.controller = {
 
                 // initialise the 'active payment' status to false i.e. no active payment
                 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment = false;
+
+                // initialise payment mode dropdownlist
+                utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown =
+                    new ej.dropdowns.DropDownList({
+                        placeholder: "Select Mode",
+                        floatLabelType: 'Auto',
+                        change: function(){ // change event handler
+                            // check the value of the payment mode dropdown
+                            switch(utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown.value){
+                                case "wallet payment": // user selected wallet payment
+                                    // remove the required attribute for the card number dropdown
+                                    $('#payments-ally-direct-card-number').removeAttr("required");
+                                    // so animatedly hide the card selection
+                                    anime({targets: '#payments-ally-direct-card-section', height: "0em", duration: 450});
+                                    break;
+                                case "card payment": // user selected card payment
+                                    // add the required attribute for the card dropdown
+                                    $('#payments-ally-direct-card-number').attr("required", true);
+                                    // so animatedly show the card selection
+                                    anime({targets: '#wallet-transfer-card-section', height: "3.5em", duration: 450,
+                                        complete: function(){$('#payments-ally-direct-card-section').css("height", "auto")}});
+                                    break;
+                            }
+                        }
+                    });
+                utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown.
+                appendTo('#payments-ally-direct-payment-mode');
+
+                // initialise the card DropDown widget
+                utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.cardDropDownList =  new ej.dropdowns.DropDownList({
+                    //set the data to dataSource property
+                    dataSource: [],
+                    fields: {text: 'CARDNUMBER2', value: 'CARDNUMBER2'},
+                    placeholder: "Select Card",
+                    floatLabelType: "Auto",
+                    popupHeight: "300px"
+                });
+
+                // render initialized card DropDownList
+                utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.cardDropDownList.
+                appendTo('#payments-ally-direct-card-number');
+
+                // initialise form tooltips
+                utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.formTooltip = new ej.popups.Tooltip({
+                    target: '.ally-input-tooltip',
+                    position: 'top center',
+                    cssClass: 'ally-input-tooltip',
+                    opensOn: 'focus'
+                });
+
+                // render the initialized form tooltip
+                utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formTooltip.appendTo('#payments-ally-direct-form');
 
                 // initialise the amount field
                 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.amountFieldValidator =
@@ -6496,10 +6564,56 @@ utopiasoftware.ally.controller = {
                 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.formValidator.on('form:success',
                     utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.formValidated);
 
-                // hide the loader
-                $('#loader-modal').get(0).hide();
+                // create the form data to be sent
+                var formData = {phone: utopiasoftware.ally.model.appUserDetails.phone};
 
-            }
+                // start a promise chain to setup the page
+                Promise.resolve($.ajax(
+                    {
+                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/get-my-cards.php",
+                        type: "post",
+                        contentType: "application/x-www-form-urlencoded",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                        },
+                        dataType: "text",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: true,
+                        data: formData // data to submit to server
+                    }
+                )).
+                then(function(serverResponse){
+                    serverResponse +=  "";
+                    serverResponse = JSON.parse(serverResponse.trim()); // get the response object
+
+                    // initialise the card DropDown widget
+                    utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.
+                        cardDropDownList.dataSource = serverResponse;
+
+                    // bind the new update to the dropdown list
+                    utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.cardDropDownList.dataBind();
+                }).
+                then(function(){
+                    // hide the page preloader
+                    //$('.page-preloader', $thisPage).css('display', "none");
+
+                    // display the form
+                    //$('#wallet-transfer-form', $thisPage).css('display', "block");
+
+                    // hide the loader
+                    $('#loader-modal').get(0).hide();
+
+
+                }).
+                catch(function(err){
+                    console.log(err);
+                    // hide the page preloader
+                    //$('.page-preloader', $thisPage).css('display', "none");
+                    // hide the loader
+                    $('#loader-modal').get(0).hide();
+                });
+
+            };
 
         },
 
@@ -7657,8 +7771,8 @@ utopiasoftware.ally.controller = {
                     messageHTML: `<div><ons-icon icon="md-ally-icon-otp" size="24px"
                     style="color: #30a401; float: left; width: 26px;"></ons-icon>
                     <span style="float: right; width: calc(100% - 26px);">
-                    FUNDING FEE: ${kendo.toString(kendo.parseFloat(responseArray[0].data.appfee), 'n2')}<br>
-                    AMOUNT TO CHARGE: ${kendo.toString(kendo.parseFloat(responseArray[0].data.charged_amount), 'n2')}<br>
+                    FUNDING FEE: ${kendo.toString(kendo.parseFloat(responseArray[0].appfee), 'n2')}<br>
+                    AMOUNT TO CHARGE: ${kendo.toString(kendo.parseFloat(responseArray[0].total), 'n2')}<br>
                     Confirm Transaction by providing OTP sent to your phone or generated by your bank token</span></div>`,
                     cancelable: false, placeholder: "OTP", inputType: "number", defaultValue: "", autofocus: false,
                     submitOnEnter: true
@@ -7672,13 +7786,13 @@ utopiasoftware.ally.controller = {
             then(function(responseArray){
 
                 // create the data object to be sent
-                var submitData = {raverefid: responseArray[0].data.flwRef, otp: responseArray[1],
+                var submitData = {raverefid: responseArray[0].raverefid, otp: responseArray[1],
                     phone_sender: utopiasoftware.ally.model.appUserDetails.phone,
                 phone_receiver: formData.phone_receiver};
                 submitData.savecard = $('#add-card-wallet-transfer-page #add-card-wallet-transfer-save-card-details').get(0).checked;
 
                 // submit the form data
-                return Promise.resolve($.ajax(
+                return Promise.all([Promise.resolve($.ajax(
                     {
                         url: utopiasoftware.ally.model.ally_base_url +
                         "/mobile/transfer-wallet-to-wallet-via-card-confirm-otp.php",
@@ -7692,18 +7806,31 @@ utopiasoftware.ally.controller = {
                         processData: true,
                         data: submitData // data to submit to server
                     }
-                ));
+                )), responseArray[0]]);
             }).
-            then(function(serverResponse){
-                serverResponse +=  "";
-                serverResponse = JSON.parse(serverResponse.trim()); // get the new user object
+            then(function(serverResponseArray){ //todo
+                // serverResponse +=  "";
+                serverResponseArray[0] = JSON.parse(serverResponseArray[0].trim()); // get the new user object
 
                 // check if any error occurred
-                if(serverResponse.status == "error"){ // an error occured
-                    throw serverResponse.message; // throw the error message attached to this error
+                if(serverResponseArray[0].status == "error"){ // an error occured
+                    throw serverResponseArray[0].message; // throw the error message attached to this error
                 }
 
-                return $('#hour-glass-loader-modal').get(0).hide(); // hide loader
+                return Promise.all([...serverResponseArray, $('#hour-glass-loader-modal').get(0).hide()]); // hide loader
+            }).
+            then(function(dataArray){
+                // check if the recipient of the wallet transfer is a registered user
+                if(dataArray[1].isregistereduser != "yes") {
+                    // append the json details for the wallet-transfer to the wallet-transfer-sms-confirm-modal confirmation button
+                    $($('#wallet-transfer-sms-confirm-modal #wallet-transfer-sms-confirm-button').get(0)).
+                    attr("data-wallet-transfer", JSON.stringify({receiver: formData.phone_receiver, amount: formData.amount}));
+                    // show the wallet-transfer-sms-confirm-modal to the user
+                    return $('#wallet-transfer-sms-confirm-modal').get(0).show();
+                }
+                else{ // recipient is registered
+                    return "registered recipient";
+                }
             }).
             then(function(){
                 hockeyapp.trackEvent(function(){}, function(){}, "FUND TRANSFERRED"); // track fund transfer
