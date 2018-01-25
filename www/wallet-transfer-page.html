@@ -86,7 +86,8 @@
                 </div>
                 <div class="center">
                     <div style="width: 80%">
-                        <select id="wallet-transfer-mode">
+                        <select id="wallet-transfer-mode" required class="ally-input-tooltip"
+                                data-parsley-required-message="Transfer Mode is required">
                             <option value="wallet transfer" selected>Transfer From Wallet</option>
                             <option value="card transfer">Transfer From Card</option>
                         </select>

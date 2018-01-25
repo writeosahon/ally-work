@@ -1,12 +1,14 @@
 <!-- payments ally-direct page -->
 <ons-page id="payments-ally-direct-page">
+    <!-- page preloader -->
+    <ons-progress-bar class="page-preloader" indeterminate style="display: block;"></ons-progress-bar>
     <!-- page layout -->
     <ons-row vertical-align="top" style="margin-top: 2em;">
         <ons-col width="100%">
             <!-- create the payment form that displays all details for payment -->
             <form id="payments-ally-direct-form" autocomplete="off" data-parsley-inputs="ons-input,input,textarea,select"
                   data-parsley-excluded="input[type=button], input[type=submit],
-                              input[type=reset], input[type=hidden], [disabled], :hidden" style="height: 100%; display: block;">
+                              input[type=reset], input[type=hidden], [disabled], :hidden" style="height: 100%; display: none;">
 
                 <ons-list>
 
@@ -67,7 +69,8 @@
                         </div>
                         <div class="center">
                             <div style="width: 80%">
-                                <select id="payments-ally-direct-payment-mode">
+                                <select id="payments-ally-direct-payment-mode" required class="ally-input-tooltip"
+                                        data-parsley-required-message="Payment Mode is required">
                                     <option value="wallet payment" selected>Pay From Wallet</option>
                                     <option value="card payment">Pay From Card</option>
                                 </select>
@@ -89,7 +92,7 @@
                                 <!-- display the add card page -->
                                 <ons-fab id="payments-ally-direct-add-card" modifier="mini"
                                          style="color: #ffffff; background-color: #30a401;"
-                                         onclick="utopiasoftware.ally.controller.walletTransferPageViewModel.addCardButtonClicked()">
+                                         onclick="utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.addCardButtonClicked()">
                                     <ons-icon icon="md-plus"></ons-icon>
                                 </ons-fab>
                             </div>

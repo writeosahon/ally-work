@@ -1,0 +1,185 @@
+
+<!-- add-card-merchant-payment page -->
+<ons-page id="add-card-merchant-payment-page">
+    <ons-toolbar>
+        <div class="left">
+            <ons-toolbar-button onclick="utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.backButtonClicked();">
+                <ons-icon icon="md-long-arrow-left"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+        <div class="center">
+            Add Card
+        </div>
+        <div class="right">
+            <ons-toolbar-button onclick="$('#side-menu').get(0).toggle()">
+                <ons-icon icon="md-menu"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+    </ons-toolbar>
+
+    <ons-progress-bar class="page-preloader" indeterminate style="display: block;"></ons-progress-bar>
+
+    <form id="add-card-merchant-payment-form" autocomplete="off" data-parsley-inputs="ons-input,input,textarea,select"
+          data-parsley-excluded="input[type=button], input[type=submit],
+                              input[type=reset], [disabled], :hidden, [type=hidden]" style="display: block;">
+
+        <ons-list>
+            <ons-list-title>Add New Card Details</ons-list-title>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-ally-icon-credit-card" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <div style="width:80%; display: inline-block">
+                        <input id="add-card-merchant-payment-card-number" type="tel" required
+                               data-length="20"
+                               data-parsley-type="digits"
+                               data-parsley-minlength="16"
+                               data-parsley-maxlength="20"
+                               data-parsley-required-message="Card Number is required"
+                               data-parsley-type-message="Card Number must contain only numbers"
+                               data-parsley-minlength-message="Card Number must be at least 16 digits"
+                               data-parsley-maxlength-message="Card Number cannot be more than 20 digits"
+                               class="ally-input-tooltip"
+                        onfocus="this.select();">
+                    </div>
+                </div>
+            </ons-list-item>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-card" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <div style="width:50%; display: inline-block">
+                        <ons-input id="add-card-merchant-payment-cvv" type="number" placeholder="CVV" float required
+                               data-parsley-type="digits"
+                               data-parsley-minlength="3"
+                               data-parsley-maxlength="3"
+                               data-parsley-required-message="CVV is required"
+                               data-parsley-type-message="CVV must contain only numbers"
+                               data-parsley-minlength-message="CVV must be 3 digits"
+                               data-parsley-maxlength-message="CVV must be 3 digits"
+                        style="width: 100%;" class="hint--top"></ons-input>
+                    </div>
+                </div>
+            </ons-list-item>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-ally-icon-square-keypad" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <div style="width:52%; display: inline-block">
+                        <ons-input id="add-card-merchant-payment-pin" type="number" placeholder="Card ATM PIN" float required
+                                   data-parsley-type="digits"
+                                   data-parsley-minlength="4"
+                                   data-parsley-maxlength="4"
+                                   data-parsley-required-message="enter card PIN"
+                                   data-parsley-type-message="card PIN must contain only numbers"
+                                   data-parsley-minlength-message="card PIN must be at least 4 numbers"
+                                   data-parsley-maxlength-message="card PIN cannot be more than 4 numbers"
+                                   style="width: 100%;" class="hint--bottom"></ons-input>
+                    </div>
+                </div>
+            </ons-list-item>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-calendar" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <div style="width:40%; display: inline-block">
+                        <input id="add-card-merchant-payment-expiry-month" required
+                               data-parsley-required-message="no month"
+                               class="ally-input-tooltip hint--top">
+                    </div>
+                    <div style="width:10%; display: inline-block; text-align: center; font-weight: bold">
+                        /
+                    </div>
+                    <div style="width:50%; display: inline-block">
+                        <input id="add-card-merchant-payment-expiry-year" required
+                               data-parsley-required-message="no year"
+                               class="ally-input-tooltip hint--top">
+                    </div>
+                </div>
+            </ons-list-item>
+
+            <ons-list-title>Amount To Pay</ons-list-title>
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-ally-icon-cash" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <ons-input id="add-card-merchant-payment-charge-amount" required placeholder="Amount (NGN)"
+                               data-parsley-type="number" type="tel"
+                               data-parsley-min="100"
+                               data-parsley-max="50000"
+                               data-parsley-required-message="enter amount to charge"
+                               data-parsley-type-message="provide a valid cash amount"
+                               data-parsley-min-message="minimum amount per charge is 100"
+                               data-parsley-max-message="maximum amount per charge is 50,000"
+                               onchange="$(this).val(kendo.toString(kendo.parseFloat($(this).val()), 'n2'));"
+                               class="hint--bottom"></ons-input>
+                </div>
+            </ons-list-item>
+
+            <ons-list-title>Save Card Details</ons-list-title>
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-switch id="add-card-merchant-payment-save-card-details"
+                                input-id="add-card-merchant-payment-save-card-details-alt" checked disable-auto-styling>
+                    </ons-switch>
+                </div>
+                <div class="center">
+                    <label for="add-card-merchant-payment-save-card-details-alt" style="font-size: 1.4em;">&nbsp;Save Card</label>
+                </div>
+            </ons-list-item>
+
+            <ons-list-title>Merchant Details</ons-list-title>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-ally-icon-account-card-details" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <label style="font-size: 0.8em; color: green; display: block; margin-bottom: 0.2em; width: 100% !important;">Merchant Code</label>
+                    <div style="width: 75%; display: block">
+                        <ons-input id="add-card-merchant-payment-merchant-code" required readonly placeholder="Merchant Code"
+                                   style="font-size: 0.8em; text-transform: uppercase; width: 100%;"
+                                   type="text"
+                                   data-parsley-required-message="provide merchant code"
+                                   class="hint--bottom"></ons-input>
+                        <!-- this input is hidden from user. It is used to store merchant phone number for onward submission -->
+                        <input id="add-card-merchant-payment-merchant-phone" type="hidden">
+                    </div>
+                </div>
+            </ons-list-item>
+
+            <ons-list-item modifier="nodivider">
+                <ons-icon icon="md-city-alt" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                <div class="center">
+                    <label style="font-size: 0.8em; color: green;display: block">Merchant / Business Name</label>
+                    <div style="width: 80%; display: inline-block">
+                                <textarea id="add-card-merchant-payment-merchant-name" rows="2" readonly
+                                          style="font-size: 1em; text-transform: uppercase; width: 100%;"></textarea>
+                    </div>
+                </div>
+            </ons-list-item>
+
+        </ons-list>
+    </form>
+
+    <ons-bottom-toolbar style="height: 56px; !important;">
+        <div style="width: 100%; padding-top: 6px; padding-bottom: 6px; text-align: center">
+            <ons-button id="add-card-merchant-payment-cancel-button" disable-auto-styling
+                        style="background-color: #dd0000; color: #ffffff; width: 45%; border-radius: 21px;"
+                        onclick="utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.backButtonClicked();">Cancel</ons-button>
+
+            <ons-button id="add-card-merchant-payment-pay-button" disable-auto-styling
+                        style="background-color: #30a401; color: #ffffff; width: 45%; border-radius: 21px;">Pay</ons-button>
+        </div>
+    </ons-bottom-toolbar>
+
+</ons-page>

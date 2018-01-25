@@ -549,3 +549,19 @@
     -webkit-text-security: disc;
 }
 /** STYLE FOR THE CHANGE PIN PAGE ENDS **/
+
+/** STYLE FOR THE ADD-CARD MERCHANT PAYMENT PAGE BEGINS **/
+#add-card-merchant-payment-page #add-card-merchant-payment-merchant-name { /** style for form input elements **/
+    color: green;
+    font-family: 'Roboto', 'Noto', sans-serif;
+    font-size: 1em;
+    border: none;
+    border-bottom: 2px lightgray solid;
+}
+#add-card-merchant-payment-page #add-card-merchant-payment-merchant-name:focus {
+    border-bottom: 2px green solid;
+}
+#add-card-merchant-payment-page #add-card-merchant-payment-merchant-code input {
+    text-transform: uppercase;
+}
+/** STYLE FOR THE ADD-CARD MERCHANT PAYMENT PAGE ENDS **/

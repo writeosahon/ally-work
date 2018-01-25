@@ -287,3 +287,15 @@ $(document).on("hide", "#add-card-wallet-transfer-page", utopiasoftware.ally.con
 
 // listen for when the Add-Card-Wallet-Transfer page is destroyed
 $(document).on("destroy", "#add-card-wallet-transfer-page", utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.pageDestroy);
+
+// listen for the initialisation of the Add-Card-Merchant-Payment page
+$(document).on("init", "#add-card-merchant-payment-page", utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.pageInit);
+
+// listen for when the Add-Card-Merchant-Payment page is shown
+$(document).on("show", "#add-card-merchant-payment-page", utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.pageShow);
+
+// listen for when the Add-Card-Merchant-Payment page is hidden
+$(document).on("hide", "#add-card-merchant-payment-page", utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.pageHide);
+
+// listen for when the Add-Card-Merchant-Payment page is destroyed
+$(document).on("destroy", "#add-card-merchant-payment-page", utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.pageDestroy);

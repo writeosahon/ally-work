@@ -6595,10 +6595,10 @@ utopiasoftware.ally.controller = {
                 }).
                 then(function(){
                     // hide the page preloader
-                    //$('.page-preloader', $thisPage).css('display', "none");
+                    $('.page-preloader', $thisPage).css('display', "none");
 
                     // display the form
-                    //$('#wallet-transfer-form', $thisPage).css('display', "block");
+                    $('#payments-ally-direct-form', $thisPage).css('display', "block");
 
                     // hide the loader
                     $('#loader-modal').get(0).hide();
@@ -6606,9 +6606,11 @@ utopiasoftware.ally.controller = {
 
                 }).
                 catch(function(err){
-                    console.log(err);
                     // hide the page preloader
-                    //$('.page-preloader', $thisPage).css('display', "none");
+                    $('.page-preloader', $thisPage).css('display', "none");
+
+                    // display the form
+                    $('#payments-ally-direct-form', $thisPage).css('display', "block");
                     // hide the loader
                     $('#loader-modal').get(0).hide();
                 });
@@ -6643,6 +6645,7 @@ utopiasoftware.ally.controller = {
                 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.formValidator.reset();
                 // reset the form
                 $('#payments-ally-direct-page #payments-ally-direct-form').get(0).reset();
+                $('#payments-ally-direct-page #payments-ally-direct-add-card').css("transform", "scale(1)");
 
                 // reset the page scroll position to the top
                 $('#payments-ally-direct-page .page__content').scrollTop(0);
@@ -6717,6 +6720,18 @@ utopiasoftware.ally.controller = {
                 merchantname: $('#payments-ally-direct-page #payments-ally-direct-merchant-name').val()
             };
 
+            // check the transfer mode for the merchant payment
+            if(utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown.value == "wallet payment"){
+                // add the specified payment mode to the form data
+                formData.payment_mode = "wallet payment";
+            }
+            // check the transfer mode for the merchant payment
+            if(utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown.value == "card payment"){
+                // add the specified card mode and card number to the form data
+                formData.payment_mode = "card payment";
+                formData.cardno = utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.cardDropDownList.value;
+            }
+
             ons.notification.prompt({title: "ALLY Secure PIN Confirmation",
                 id: 'pin-security-check2',
                 messageHTML: `<div><ons-icon icon="ion-lock-combination" size="24px"
@@ -6757,15 +6772,16 @@ utopiasoftware.ally.controller = {
                 serverResponse = JSON.parse((serverResponse +"").trim()); // get the new user object
 
                 // check if any error occurred
-                if(serverResponse.status == "error"){ // an error occured
-                    throw serverResponse.message; // throw the error message attached to this error
+                if(serverResponse[0].status == "error"){ // an error occured
+                    throw serverResponse[0].message; // throw the error message attached to this error
                 }
 
-                return serverResponse; // forward the serverResponse i.e the user details object
+                return serverResponse; // forward the serverResponse i.e the array containing user details & receipt objects
             }).
-            then(function(responseDetails){
-                // forward details of the save the user details to encrypted storage;
-                return Promise.all([utopiasoftware.ally.saveUserAppDetails(responseDetails)]);
+            then(function(responseDetailsArray){ //todo adjust result
+                // forward details of the save the user details to encrypted storage; also forward details of payment
+                return Promise.all([utopiasoftware.ally.saveUserAppDetails(responseDetailsArray[0]),
+                    responseDetailsArray[1]]);
             }).
             then(function(dataArray){
                 // update local copy of user app details
@@ -6838,6 +6854,38 @@ utopiasoftware.ally.controller = {
                 });
             });
 
+        },
+
+        /**
+         * method is triggered when the "Add Card" button is clicked
+         */
+        addCardButtonClicked: function(){
+
+            // generate the formData that will be passed over to the "Add Card (Merchant Payment) page
+            // create the form data to be submitted
+            var formData = {
+                phone_sender: utopiasoftware.ally.model.appUserDetails.phone,
+                phone_receiver: $('#payments-ally-direct-page #payments-ally-direct-merchant-phone').val(),
+                merchantcode: $('#payments-ally-direct-page #payments-ally-direct-merchant-code').val(),
+                amount: kendo.parseFloat($('#payments-ally-direct-page #payments-ally-direct-amount').val()),
+                merchantname: $('#payments-ally-direct-page #payments-ally-direct-merchant-name').val()
+            };
+
+
+            // check the payment mode for the merchant payment
+            if(utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown.value == "wallet transfer"){
+                // add the specified payment mode to the form data
+                formData.payment_mode = "wallet payment";
+            }
+            // check the payment mode for the merchant payment
+            if(utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown.value == "card transfer"){
+                // add the specified payment mode to the form data
+                formData.payment_mode = "card payment";
+            }
+
+            // display the "Add Card (Merchant Payment)" page
+            $('#app-main-navigator').get(0).pushPage('add-card-merchant-payment-page.html',
+                {data: formData, animation: 'lift-md'});
         }
 
     },
@@ -7808,7 +7856,7 @@ utopiasoftware.ally.controller = {
                     }
                 )), responseArray[0]]);
             }).
-            then(function(serverResponseArray){ //todo
+            then(function(serverResponseArray){
                 // serverResponse +=  "";
                 serverResponseArray[0] = JSON.parse(serverResponseArray[0].trim()); // get the new user object
 
@@ -7950,6 +7998,482 @@ utopiasoftware.ally.controller = {
                     }
                 });
             });
+        }
+
+    },
+
+
+    /**
+     * object is view-model for Merchant Payment Add Card page
+     */
+    addCardMerchantPaymentPageViewModel: {
+
+        /**
+         * used to hold the parsley form validation object for the page
+         */
+        formValidator: null,
+
+        /**
+         * used to validate the card number field
+         */
+        cardNumberFieldValidator: null,
+
+        /**
+         * used to hold the parsley validator for the Amount field
+         */
+        amountFieldValidator: null,
+
+        /**
+         * used to hold the ej library card masked text input
+         */
+        cardMaskedTextInput: null,
+
+        /**
+         * used to hold the ej library card month dropdown list component
+         */
+        cardMonthDropDownList: null,
+
+        /**
+         * used to hold the ej library card year dropdown list component
+         */
+        cardYearDropDownList: null,
+
+        /**
+         * * used to hold the ej Tooltip component
+         */
+        formTooltip: null,
+
+        /**
+         * event is triggered when page is initialised
+         */
+        pageInit: function(event){
+
+            var $thisPage = $(event.target); // get the current page shown
+
+            // call the function used to initialise the app page if the app is fully loaded
+            loadPageOnAppReady();
+
+            //function is used to initialise the page if the app is fully ready for execution
+            function loadPageOnAppReady(){
+                // check to see if onsen is ready and if all app loading has been completed
+                if(!ons.isReady() || utopiasoftware.ally.model.isAppReady === false){
+                    setTimeout(loadPageOnAppReady, 500); // call this function again after half a second
+                    return;
+                }
+
+                // listen for the back button event
+                $('#app-main-navigator').get(0).topPage.onDeviceBackButton =
+                    utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.backButtonClicked;
+
+
+
+                // initialise the card masked input widget
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.cardMaskedTextInput =
+                    new ej.inputs.MaskedTextBox({
+                    mask: '0000 0000 0000 0000 99999',
+                    placeholder: "Card Number",
+                    promptChar: '*',
+                    floatLabelType: "Always"
+                });
+
+                // render initialized card masked input widget
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.cardMaskedTextInput.
+                appendTo('#add-card-merchant-payment-card-number');
+
+                // initialise the card month DropDown widget
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.cardMonthDropDownList =
+                    new ej.dropdowns.DropDownList({
+                        dataSource: [{value: "01", displayText: "01"},
+                            {value: "02", displayText: "02"},
+                            {value: "03", displayText: "03"},
+                            {value: "04", displayText: "04"},
+                            {value: "05", displayText: "05"},
+                            {value: "06", displayText: "06"},
+                            {value: "07", displayText: "07"},
+                            {value: "08", displayText: "08"},
+                            {value: "09", displayText: "09"},
+                            {value: "10", displayText: "10"},
+                            {value: "11", displayText: "11"},
+                            {value: "12", displayText: "12"}],
+                        fields: {text: 'displayText', value: 'value'},
+                        placeholder: "Expiry Month",
+                        floatLabelType: "Auto"
+                    });
+
+                // render the initialized card month dropdown list
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.cardMonthDropDownList.
+                appendTo('#add-card-merchant-payment-expiry-month');
+
+                // initialise the array to hold the valid card expiry years
+                var cardYearsArray = [];
+                var yearOption = (new Date()).getFullYear(); // get the current year
+                // add the current year as an object in the cardYearsArray
+                cardYearsArray.push({value: ("" + yearOption).substring(2,4), displayText: yearOption});
+
+                // add 3 more years to the cardYearsArray for the Card Expiry Year
+                for(var index = 0; index < 3; index++){
+                    // increase the yearOption by 1
+                    yearOption += 1;
+                    // add the additional year as an object in the cardYearsArray
+                    cardYearsArray.push({value: ("" + yearOption).substring(2,4), displayText: yearOption});
+                }
+
+                // initialise the card expiry year DropDown widget
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.cardYearDropDownList =
+                    new ej.dropdowns.DropDownList({
+                        dataSource: cardYearsArray,
+                        fields: {text: 'displayText', value: 'value'},
+                        placeholder: "Expiry Year",
+                        floatLabelType: "Auto"
+                    });
+
+                // render the initialized card expiry year dropdown list
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.cardYearDropDownList.
+                appendTo('#add-card-merchant-payment-expiry-year');
+
+
+                // initialise form tooltips
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.formTooltip = new ej.popups.Tooltip({
+                    target: '.ally-input-tooltip',
+                    position: 'top center',
+                    cssClass: 'ally-input-tooltip',
+                    opensOn: 'focus'
+                });
+
+                // render the initialized form tooltip
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.formTooltip.
+                appendTo('#add-card-merchant-payment-form');
+
+                // initialise the card number field validator
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.cardNumberFieldValidator =
+                    $('#add-card-merchant-payment-card-number').parsley({
+                        value: function(parsley) {
+                            // return the unmasked input from the card number field
+                            return utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.
+                                cardMaskedTextInput.value;
+                        }
+                    });
+
+                // initialise the amount field
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.amountFieldValidator =
+                    $('#add-card-merchant-payment-charge-amount').parsley({
+                        value: function(parsley) {
+                            // convert the amount back to a plain text without the thousand separator
+                            let parsedNumber = kendo.parseFloat($('#add-card-merchant-payment-charge-amount', $thisPage).val());
+                            return (parsedNumber ? parsedNumber : $('#add-card-merchant-payment-charge-amount', $thisPage).val());
+                        }
+                    });
+
+                // initialise the form validation
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.formValidator =
+                    $('#add-card-merchant-payment-form').parsley();
+
+                // attach listener for the pay button on the page
+                $('#add-card-merchant-payment-pay-button').get(0).onclick = function(){
+                    // run the validation method for the form
+                    utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.formValidator.whenValidate();
+                };
+
+                // listen for the form field validation failure event
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.formValidator.on('field:error', function(fieldInstance) {
+                    // get the element that triggered the field validation error and use it to display tooltip
+                    // display tooltip
+                    $(fieldInstance.$element).addClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                    $(fieldInstance.$element).attr("data-hint", fieldInstance.getErrorsMessages()[0]);
+                    $(fieldInstance.$element).attr("title", fieldInstance.getErrorsMessages()[0]);
+                });
+
+                // listen for the form field validation success event
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.formValidator.on('field:success', function(fieldInstance) {
+                    // remove tooltip from element
+                    $(fieldInstance.$element).removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                    $(fieldInstance.$element).removeAttr("data-hint");
+                    $(fieldInstance.$element).removeAttr("title");
+                });
+
+                // listen for the form validation success
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.formValidator.on('form:success',
+                    utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.formValidated);
+
+                // populate the form using the data retrieved from the previous page
+                var prePopulatedData = $('#app-main-navigator').get(0).topPage.data;
+                $('#add-card-merchant-payment-charge-amount', $thisPage).
+                val(kendo.toString(prePopulatedData.amount, "n2"));
+                $('#add-card-merchant-payment-merchant-phone', $thisPage).val(prePopulatedData.phone_receiver);
+                $('#add-card-merchant-payment-merchant-code', $thisPage).val(prePopulatedData.merchantcode);
+                $('#add-card-merchant-payment-merchant-name', $thisPage).val(prePopulatedData.merchantname);
+
+                // display the form
+                $('#add-card-merchant-payment-form', $thisPage).css("display", "block");
+                // hide the preloader
+                $('.page-preloader', $thisPage).css("display", "none");
+                // hide the loader
+                $('#loader-modal').get(0).hide();
+
+            }
+
+        },
+
+
+        /**
+         * method is triggered when page is shown
+         *
+         * @param event
+         */
+        pageShow: (event) => {},
+
+        /**
+         * method is triggered when the page is hidden
+         * @param event
+         */
+        pageHide: (event) => {
+            try {
+                // remove any tooltip being displayed on all forms on the page
+                $('#add-card-merchant-payment-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                $('#add-card-merchant-payment-page [title]').removeAttr("title");
+                $('#add-card-merchant-payment-page [data-hint]').removeAttr("data-hint");
+                // reset the form validator object on the page
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.formValidator.reset();
+            }
+            catch(err){}
+        },
+
+        /**
+         * method is triggered when the page is destroyed
+         * @param event
+         */
+        pageDestroy: (event) => {
+
+            try{
+                // remove any tooltip being displayed on all forms on the page
+                $('#add-card-merchant-payment-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
+                $('#add-card-merchant-payment-page [title]').removeAttr("title");
+                $('#add-card-merchant-payment-page [data-hint]').removeAttr("data-hint");
+                // destroy the form validator objects on the page
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.cardNumberFieldValidator.destroy();
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.amountFieldValidator.destroy();
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.formValidator.destroy();
+                // destroy other form components
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.cardMaskedTextInput.destroy();
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.cardMonthDropDownList.destroy();
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.cardYearDropDownList.destroy();
+                utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.formTooltip.destroy();
+            }
+            catch(err){}
+        },
+
+        /**
+         * method is triggered when the form is successfully validated
+         */
+        formValidated: function(){
+
+            // check if Internet Connection is available before proceeding
+            if(navigator.connection.type === Connection.NONE){ // no Internet Connection
+                // inform the user that they cannot proceed without Internet
+                window.plugins.toast.showWithOptions({
+                    message: "ALLY wallet cannot be saved without an Internet Connection",
+                    duration: 4000,
+                    position: "top",
+                    styling: {
+                        opacity: 1,
+                        backgroundColor: '#ff0000', //red
+                        textColor: '#FFFFFF',
+                        textSize: 14
+                    }
+                }, function(toastEvent){
+                    if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                        window.plugins.toast.hide();
+                    }
+                });
+
+                return; // exit method immediately
+            }
+
+            // create the form data to be submitted
+            var formData = {
+                firstName: utopiasoftware.ally.model.appUserDetails.firstname,
+                lastName: utopiasoftware.ally.model.appUserDetails.lastname,
+                phone_sender: utopiasoftware.ally.model.appUserDetails.phone,
+                email: utopiasoftware.ally.model.appUserDetails.email ? utopiasoftware.ally.model.appUserDetails.email : "",
+                cardno: utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.cardMaskedTextInput.value,
+                cvv: $('#add-card-merchant-payment-page #add-card-merchant-payment-cvv').val(),
+                expirymonth: utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.cardMonthDropDownList.value,
+                expiryyear: utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.cardYearDropDownList.value,
+                pin: $('#add-card-merchant-payment-page #add-card-merchant-payment-pin').val(),
+                amount: kendo.parseFloat($('#add-card-merchant-payment-page #add-card-merchant-payment-charge-amount').val()),
+                phone_receiver: $('#add-card-merchant-payment-page #add-card-merchant-payment-merchant-phone').val(),
+                merchantcode: $('#add-card-merchant-payment-page #add-card-merchant-payment-merchant-code').val(),
+                merchantname: $('#add-card-merchant-payment-page #add-card-merchant-payment-merchant-name').val()
+            };
+
+            if(formData.phone_receiver.startsWith("0")){ // the phone number starts with 0, replace it with international dialing code
+                formData.phone_receiver = formData.phone_receiver.replace("0", "+234");
+            }
+
+            // display the loader message to indicate that account is being created;
+            $('#hour-glass-loader-modal .modal-message').html("Completing Merchant Payment...");
+            // forward the form data & show loader
+            Promise.all([formData, Promise.resolve($('#hour-glass-loader-modal').get(0).show())]).
+            then(function(dataArray){
+                // submit the form data
+                return Promise.resolve($.ajax(
+                    {
+                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/pay-merchant-via-card-direct.php",
+                        type: "post",
+                        contentType: "application/x-www-form-urlencoded",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                        },
+                        dataType: "text",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: true,
+                        data: dataArray[0] // data to submit to server
+                    }
+                ));
+            }).
+            then(function(serverResponse){
+                serverResponse +=  "";
+                serverResponse = JSON.parse(serverResponse.trim()); // get the response object
+                console.log("MERCHANT PAY", serverResponse);
+
+                // check if any error occurred
+                if(serverResponse.status != "success"){ // an error occured
+                    throw serverResponse.message || serverResponse.data.message; // throw the error message attached to this error
+                }
+
+                return serverResponse; // forward the server response
+            }).
+            then(function(serverResponse){
+                // hide the loader
+                return Promise.all([serverResponse, $('#hour-glass-loader-modal').get(0).hide()]);
+            }).
+            then(function(responseArray){
+                // ask user for transaction otp
+                return Promise.all([responseArray[0], ons.notification.prompt({title: "OTP Confirmation",
+                    messageHTML: `<div><ons-icon icon="md-ally-icon-otp" size="24px"
+                    style="color: #30a401; float: left; width: 26px;"></ons-icon>
+                    <span style="float: right; width: calc(100% - 26px);">
+                    APP FEE: ${kendo.toString(kendo.parseFloat(responseArray[0].appfee), 'n2')}<br>
+                    AMOUNT TO CHARGE: ${kendo.toString(kendo.parseFloat(responseArray[0].total), 'n2')}<br>
+                    Confirm Transaction by providing OTP sent to your phone or generated by your bank token</span></div>`,
+                    cancelable: false, placeholder: "OTP", inputType: "number", defaultValue: "", autofocus: false,
+                    submitOnEnter: true
+                })]);
+            }).
+            then(function(responseArray){
+                // display the loader message to indicate that account is being created;
+                $('#hour-glass-loader-modal .modal-message').html("Authorizing Merchant Payment...");
+                return Promise.all([...responseArray, $('#hour-glass-loader-modal').get(0).show()])
+            }).
+            then(function(responseArray){
+
+                // create the data object to be sent
+                responseArray[0].otp = responseArray[1];
+                responseArray[0].savecard = $('#add-card-merchant-payment-page #add-card-merchant-payment-save-card-details').get(0).checked;
+
+                // submit the form data
+                return Promise.all([Promise.resolve($.ajax(
+                    {
+                        url: utopiasoftware.ally.model.ally_base_url +
+                        "/mobile/pay-merchant-via-card-direct-confirm.php",
+                        type: "post",
+                        contentType: "application/x-www-form-urlencoded",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                        },
+                        dataType: "text",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: true,
+                        data: responseArray[0] // data to submit to server
+                    }
+                ))]);
+            }).
+            then(function(serverResponseArray){
+                // serverResponse +=  "";
+                serverResponseArray = JSON.parse(serverResponseArray[0].trim()); // get parse response object
+
+                // check if any error occurred
+                if(serverResponseArray[0].status == "error"){ // an error occured
+                    throw serverResponseArray[0].message; // throw the error message attached to this error
+                }
+
+                return Promise.all([...serverResponseArray, $('#hour-glass-loader-modal').get(0).hide()]); // hide loader
+            }).
+            then(function(dataArray){ //todo
+                console.log("PAY COMPLETE", dataArray);
+                // forward details of the save the user details to encrypted storage; also forward details of payment
+                return Promise.all([utopiasoftware.ally.saveUserAppDetails(dataArray[0]), dataArray[1]]);
+            }).
+            then(function(dataArray){
+                // update local copy of user app details
+                utopiasoftware.ally.model.appUserDetails = dataArray[0];
+
+                // send push notification to the recipient of the transfer
+                let pushNotification = { // create the push notification object
+                    "app_id": "d5d2bdba-eec0-46b1-836e-c5b8e318e928",
+                    "filters": [{"field": "tag", "key": "phone", "relation": "=", "value":
+                    formData.phone_receiver}],
+                    "contents": {"en": "You received payment into your ALLY WALLET from " +
+                    utopiasoftware.ally.model.appUserDetails.firstname + " " + utopiasoftware.ally.model.appUserDetails.lastname},
+                    "headings": {"en": "Payment Received"},
+                    "android_channel_id": "81baf9bc-d068-4f4c-9bae-1a3dc8488491",
+                    "android_visibility": 0,
+                    "priority": 5
+                };
+
+                Promise.resolve($.ajax(
+                    {
+                        url: "https://onesignal.com/api/v1/notifications",
+                        type: "post",
+                        contentType: "application/json",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("Authorization", "Basic MmQ3ODcwZGUtYmIyYS00NzY5LWIwZWQtMTk5ZGRjNzU2M2Q3");
+                        },
+                        dataType: "json",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: false,
+                        data: JSON.stringify(pushNotification)
+                    }
+                ));
+
+                hockeyapp.trackEvent(function(){}, function(){}, "MERCHANT PAYMENT"); // track merchant payments
+
+                // forward details of the wallet-transfer and the user details
+                return Promise.all([$('#hour-glass-loader-modal').get(0).hide(),
+                    $('#app-main-navigator').get(0).popPage({}),
+                    $('#payments-page #payments-tabbar').get(0).setActiveTab(0),
+                    ons.notification.toast("Merchant Payment Successful!", {timeout:4000})]);
+            }).
+            catch(function(err){
+                if(typeof err !== "string"){ // if err is NOT a String
+                    err = 'Sorry, merchant payment could not be made.<br> ' +
+                        'You can try again OR scan the QR Code to pay merchant';
+                }
+
+                $('#hour-glass-loader-modal').get(0).hide(); // hide loader
+                ons.notification.alert({title: '<ons-icon icon="md-close-circle-o" size="32px" ' +
+                'style="color: red;"></ons-icon> ALLY Payment Error',
+                    messageHTML: '<span>' + err + '</span>',
+                    cancelable: false
+                });
+            });
+        },
+
+
+
+        /**
+         * method is triggered when back button or device back button is clicked
+         */
+        backButtonClicked: function(){
+
+            // check if the side menu is open
+            if($('ons-splitter').get(0).right.isOpen){ // side menu open, so close it
+                $('ons-splitter').get(0).right.close();
+                return; // exit the method
+            }
+
+            // remove this page form the main navigator stack
+            $('#app-main-navigator').get(0).popPage();
         }
 
     }
