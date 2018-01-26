@@ -1987,9 +1987,23 @@ window.plugins.toast.hide();}});// load the previously cached data
 utopiasoftware.ally.transactionHistoryCharts.loadTransactionHistoryData().then(function(dataArray){// get the data array to be used by grid
 // format the data array so it can be properly used
 return gridDataMapping(dataArray);}).then(function(dataArray){utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid=new ej.grids.Grid({// Width for grid
-width:'100%',allowTextWrap:true,showColumnChooser:true,allowPdfExport:true,toolbar:['search','columnchooser'],columns:[{field:'SENDER',headerText:'Sender',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'RECEIVER',headerText:'Recipient',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'AMOUNT',headerText:'Amount',width:"25%",textAlign:'right',clipMode:'ellipsiswithtooltip'},{field:'DDATE',headerText:'Date',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'TRANSFERTYPE',headerText:'Type',width:"25%",clipMode:'ellipsiswithtooltip',visible:false},{field:'TRANSACTIONREF',headerText:'Ref',width:"25%",clipMode:'ellipsiswithtooltip',visible:false}],dataSource:dataArray});// remove the loader content
+width:'100%',allowTextWrap:true,showColumnChooser:true,allowPdfExport:true,toolbar:['search','columnchooser','pdfexport'],columns:[{field:'SENDER',headerText:'Sender',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'RECEIVER',headerText:'Recipient',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'AMOUNT',headerText:'Amount',width:"25%",textAlign:'right',clipMode:'ellipsiswithtooltip'},{field:'DDATE',headerText:'Date',width:"25%",clipMode:'ellipsiswithtooltip'},{field:'TRANSFERTYPE',headerText:'Type',width:"25%",clipMode:'ellipsiswithtooltip',visible:false},{field:'TRANSACTIONREF',headerText:'Ref',width:"25%",clipMode:'ellipsiswithtooltip',visible:false}],dataSource:dataArray,pdfExportComplete:function pdfExportComplete(pdfExportCompleteArgs){console.log("ARGUMENTS",pdfExportCompleteArgs);var fileObj=null;// variable holds the file object to be created
+// get the blob data when the export process is completed
+pdfExportCompleteArgs.promise.then(function(pdfData){// get the pdf structure if the content being exported
+pdfExportBlob=pdfData.blobData;// get the blob for the exported pdf
+console.log("EXPORTED",pdfData);return new Promise(function(resolve,reject){// return the directory where to store the document/image
+window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory,resolve,reject);});}).then(function(directory){return new Promise(function(resolve,reject){// return the created file which holds the pdf document
+directory.getFile('ALLY-Transactions-'+Date.now()+'.pdf',{create:true,exclusive:false},resolve,reject);});}).then(function(file){// get the file object
+fileObj=file;// assign the file object to the function variable
+return new Promise(function(resolve,reject){// return the FileWriter object used to write content to the created file
+file.createWriter(resolve,reject);});}).then(function(fileWriter){// get the FileWriter object
+return new Promise(function(resolve,reject){fileWriter.onwriteend=resolve;fileWriter.onerror=reject;fileWriter.write(pdfExportBlob);// write the content of the blob to the file
+});}).then(function(){// notify that export completed
+ons.notification.toast("PDF Exported!",{timeout:4000});}).catch(function(err){console.log("EXPORT FAILED",err);});}});// remove the loader content
 $('#transaction-history-page #transaction-history-transaction-grid').html("");//append the newly created grid
-utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.appendTo('#transaction-history-transaction-grid');});return;// exit method
+utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.appendTo('#transaction-history-transaction-grid');// append the listener for the toolbar 'Export PDF' button click
+utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.toolbarClick=function(args){console.log("ID ",args.item.id);if(args.item.id==='transaction-history-transaction-grid_pdfexport'){// the toolbar button being clicked is the 'PDF Export'
+console.log("DATASOURCE ",utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.dataSource);utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.pdfExport({pageOrientation:'landscape',includeHiddenColumn:true,pageSize:'a4',header:{fromTop:0,height:130,contents:[{type:'text',value:"ALLY Transaction History",position:{x:30,y:50},style:{textBrushColor:'#000000',fontSize:14,hAlign:'center',bold:true}}]}},null,null,true);}};});return;// exit method
 }//THERE IS AN INTERNET CONNECTION
 // request for the user wallet transfer-in data for the provided time period
 Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/transaction-report.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
@@ -2011,11 +2025,12 @@ fileObj=file;// assign the file object to the function variable
 return new Promise(function(resolve,reject){// return the FileWriter object used to write content to the created file
 file.createWriter(resolve,reject);});}).then(function(fileWriter){// get the FileWriter object
 return new Promise(function(resolve,reject){fileWriter.onwriteend=resolve;fileWriter.onerror=reject;fileWriter.write(pdfExportBlob);// write the content of the blob to the file
-});}).catch(function(err){console.log("EXPORT FAILED",err);});}),_ref));// remove the loader content
+});}).then(function(){// notify that export completed
+ons.notification.toast("PDF Exported!",{timeout:4000});}).catch(function(err){console.log("EXPORT FAILED",err);});}),_ref));// remove the loader content
 $('#transaction-history-page #transaction-history-transaction-grid').html("");//append the newly created grid
 utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.appendTo('#transaction-history-transaction-grid');// append the listener for the toolbar 'Export PDF' button click
 utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.toolbarClick=function(args){console.log("ID ",args.item.id);if(args.item.id==='transaction-history-transaction-grid_pdfexport'){// the toolbar button being clicked is the 'PDF Export'
-console.log("DATASOURCE ",utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.dataSource);utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.pdfExport(undefined,undefined,undefined,false).then(function(p){console.log("P",p);});}};});/**
+console.log("DATASOURCE ",utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.dataSource);utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.pdfExport({includeHiddenColumn:true,pageSize:'a4',pageOrientation:'landscape',header:{fromTop:0,height:130,contents:[{type:'text',value:"ALLY Transaction History",position:{x:30,y:50},style:{textBrushColor:'#000000',fontSize:14,hAlign:'center',bold:true}}]}},null,null,true);}};});/**
              * function is used to map the grid data into an appropriate form that can be displayed by the chart
              * @param gridDataArray {Array} array containing grid data objects to be mapped
              *
