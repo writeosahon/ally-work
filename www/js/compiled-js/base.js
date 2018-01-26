@@ -81,7 +81,22 @@ var utopiasoftware = {
                         SMS.stopWatch(function(){}, function(){});
                         SMS.enableIntercept(false, function(){}, function(){}); // stop sms intercept
                         document.removeEventListener('onSMSArrive');
-                        $('#hour-glass-loader-modal').get(0).hide(); // hide loader
+                        // hide loader
+                        $('#hour-glass-loader-modal').get(0).hide().
+                        then(function(){ // automatic verification could not be performed, verify phone manually
+
+                            // verify the phone number verification code manually entered by user
+                            return ons.notification.prompt({title: "Phone Number Verification",
+                                id: 'phone-verification-code-check',
+                                messageHTML: `<div><ons-icon icon="ion-lock-combination" size="24px"
+                    style="color: #30a401; float: left; width: 26px;"></ons-icon>
+                    <span style="float: right; width: calc(100% - 26px);">
+                    Your phone number could not be verified automatically.<br>
+                    Please enter the verification code that was sent to your phone</span></div>`,
+                                cancelable: false, placeholder: "ALLY-CODE", inputType: "number", defaultValue: "", autofocus: false,
+                                submitOnEnter: true
+                            });
+                        }).catch();
                         rejectPromise("phone number verification failed"); // reject the promise i.e. verification failed
                     }, 31000);
                 }).

@@ -6571,7 +6571,7 @@ utopiasoftware.ally.controller = {
                                     fileWriter.write(pdfExportBlob); // write the content of the blob to the file
                                 });
                             }).then(function(){ // notify that export completed
-                                ons.notification.toast("Receipt Saved!", {timeout:4000});
+                                ons.notification.toast("Receipt Saved to Root Folder!", {timeout:4000});
                             }).
                             catch(function(err){console.log("EXPORT FAILED", err)});
                         }
@@ -7487,7 +7487,7 @@ utopiasoftware.ally.controller = {
                                         fileWriter.write(pdfExportBlob); // write the content of the blob to the file
                                     });
                                 }).then(function(){ // notify that export completed
-                                    ons.notification.toast("PDF Exported!", {timeout:4000});
+                                    ons.notification.toast("PDF Exported to Root Folder!", {timeout:4000});
                                 }).
                                 catch(function(err){console.log("EXPORT FAILED", err)});
                             }
@@ -7621,7 +7621,7 @@ utopiasoftware.ally.controller = {
                                     fileWriter.write(pdfExportBlob); // write the content of the blob to the file
                                 });
                             }).then(function(){ // notify that export completed
-                                ons.notification.toast("PDF Exported!", {timeout:4000});
+                                ons.notification.toast("PDF Exported to Root Folder!", {timeout:4000});
                             }).
                             catch(function(err){console.log("EXPORT FAILED", err)});
                         }
