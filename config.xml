@@ -29,7 +29,7 @@
     <!--<preference name="xwalk64bit" value="true" />
     <preference name="buildArchitecture" value="x86_64" />-->
 
-    <!-- section required for devices 4.1-4.3 -->
+    <!-- section required for devices 4.1-4.4 -->
     <config-file platform="android" parent="/*" mode="merge">
         <uses-sdk android:minSdkVersion="16"
                   android:targetSdkVersion="20"
