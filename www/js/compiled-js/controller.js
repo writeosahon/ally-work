@@ -6446,6 +6446,11 @@ utopiasoftware.ally.controller = {
         cardDropDownList: null,
 
         /**
+         * property is used to hold the ej Grid component for payment receipts
+         */
+        merchantPaymentReceiptGrid: null,
+
+        /**
          * * used to hold the ej Tooltip component
          */
         formTooltip: null,
@@ -6470,6 +6475,10 @@ utopiasoftware.ally.controller = {
 
                 // initialise the 'active payment' status to false i.e. no active payment
                 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment = false;
+
+                // inject the the modules required to create the merchant payment receipt grid
+                ej.grids.Grid.Inject(ej.grids.Page, ej.grids.Selection, ej.grids.Scroll, ej.grids.Search, ej.grids.Toolbar, ej.grids.PdfExport,
+                    ej.grids.ExcelExport);
 
                 // initialise payment mode dropdownlist
                 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown =
@@ -6511,6 +6520,94 @@ utopiasoftware.ally.controller = {
                 // render initialized card DropDownList
                 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.cardDropDownList.
                 appendTo('#payments-ally-direct-card-number');
+
+                // initialise the ej Grid used for displaying payment receipts
+                utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid =
+                    new ej.grids.Grid({
+                        // Width for grid
+                        width: '100%',
+                        allowTextWrap: true,
+                        allowPdfExport: true,
+                        toolbar: ['pdfexport'],
+                        columns: [
+                            { field: 'paymentReceiptDesc', headerText: ' ', width: "50%", clipMode: 'ellipsiswithtooltip',
+                                customAttributes: {
+                                    class: 'payment-receipt-item-desc'
+                                }},
+                            { field: 'paymentReceiptValue', headerText: ' ', width: "50%", clipMode: 'ellipsiswithtooltip' }
+                        ],
+                        dataSource: [],
+                        pdfExportComplete: function(pdfExportCompleteArgs){
+                            console.log("ARGUMENTS", pdfExportCompleteArgs);
+                            var fileObj = null; // variable holds the file object to be created
+                            var pdfExportBlob = null; // holds the blob for the pdf content being exported
+
+                            // get the blob data when the export process is completed
+                            pdfExportCompleteArgs.promise.then(function(pdfData){ // get the pdf structure if the content being exported
+                                pdfExportBlob = pdfData.blobData; // get the blob for the exported pdf
+                                console.log("EXPORTED", pdfData);
+
+                                return new Promise(function(resolve, reject){ // return the directory where to store the document/image
+                                    window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory, resolve, reject);
+                                });
+                            }).then(function(directory){
+                                return new Promise(function(resolve, reject){ // return the created file which holds the pdf document
+                                    directory.getFile('ALLY-Receipt-' + Date.now() + '.pdf', {create:true, exclusive: false},
+                                        resolve, reject);
+                                });
+                            }).
+                            then(function(file){ // get the file object
+                                fileObj = file; // assign the file object to the function variable
+
+                                return new Promise(function(resolve, reject){ // return the FileWriter object used to write content to the created file
+                                    file.createWriter(resolve, reject);
+                                });
+                            }).
+                            then(function(fileWriter){ // get the FileWriter object
+                                return new Promise(function(resolve, reject){
+                                    fileWriter.onwriteend = resolve;
+                                    fileWriter.onerror = reject;
+
+                                    fileWriter.write(pdfExportBlob); // write the content of the blob to the file
+                                });
+                            }).then(function(){ // notify that export completed
+                                ons.notification.toast("Receipt Saved!", {timeout:4000});
+                            }).
+                            catch(function(err){console.log("EXPORT FAILED", err)});
+                        }
+                    });
+
+                //append the newly created grid
+                utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.
+                appendTo('#merchant-payment-receipt-grid');
+
+                // append the listener for the toolbar 'Export PDF' button click
+                utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.
+                    toolbarClick = function (args) {
+                    console.log("ID ", args.item.id);
+                    if (args.item.id === 'merchant-payment-receipt-grid_pdfexport') { // the toolbar button being clicked is the 'PDF Export'
+                        utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.
+                        pdfExport({
+                            pageOrientation: 'landscape',
+                            includeHiddenColumn: true,
+                            pageSize: 'a4',
+                            header: {
+                                fromTop: 0,
+                                height: 130,
+                                contents: [
+                                    {
+                                        type: 'text',
+                                        value: "ALLY Payment Receipt",
+                                        position: { x: 60, y: 50 },
+                                        style: { textBrushColor: '#30a401', fontSize: 14, hAlign: 'center', bold: true}
+                                    }
+
+                                ]
+                            }
+                        }, null, null, true);
+
+                    }
+                };
 
                 // initialise form tooltips
                 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.formTooltip = new ej.popups.Tooltip({
@@ -6802,8 +6899,11 @@ utopiasoftware.ally.controller = {
                 // reset the page scroll position to the top
                 $('#payments-ally-direct-page .page__content').scrollTop(0);
 
-                // populate the payments-out chart
-                //utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.updatePaymentOutChart('today');
+                // serialize the receipt data & bind it to the receipt grid component in preparation for user display
+                utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.dataSource =
+                utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.serializeReceiptData(dataArray[1]);
+                utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.dataBind();
+
 
                 // send push notification to the recipient of the transfer
                 let pushNotification = { // create the push notification object
@@ -6838,7 +6938,8 @@ utopiasoftware.ally.controller = {
                 // forward details of the wallet-transfer and the user details
                 return Promise.all([$('#hour-glass-loader-modal').get(0).hide(),
                     $('#payments-page #payments-tabbar').get(0).setActiveTab(0),
-                    ons.notification.toast("Merchant Payment Successful!", {timeout:4000})]);
+                    ons.notification.toast("Merchant Payment Successful!", {timeout:4000}),
+                    $('#merchant-payment-receipt-modal').get(0).show()]);
             }).
             catch(function(err){
                 if(typeof err !== "string"){ // if err is NOT a String
@@ -6886,6 +6987,28 @@ utopiasoftware.ally.controller = {
             // display the "Add Card (Merchant Payment)" page
             $('#app-main-navigator').get(0).pushPage('add-card-merchant-payment-page.html',
                 {data: formData, animation: 'lift-md'});
+        },
+
+
+        /**
+         *
+         * @param receiptObj {Object} a single receipt object to be serialized into objects within an array
+         * @returns {Array} the array containing componets of the receipt object to
+         * be displayed in the Grid component
+         */
+        serializeReceiptData: function(receiptObj){
+            var receiptItemsArray = [];
+            // create the receipt items array
+            receiptItemsArray.push({paymentReceiptDesc: 'Payment Reference', paymentReceiptValue: receiptObj.refid},
+                {paymentReceiptDesc: 'Payment Date', paymentReceiptValue: receiptObj.date},
+                {paymentReceiptDesc: 'Transaction Type', paymentReceiptValue: "Merchant Payment"},
+                {paymentReceiptDesc: 'Payment From',
+                    paymentReceiptValue: utopiasoftware.ally.model.appUserDetails.firstname + " " +
+                    utopiasoftware.ally.model.appUserDetails.lastname},
+                {paymentReceiptDesc: 'Payment To', paymentReceiptValue: receiptObj.merchantname},
+                {paymentReceiptDesc: 'Amount Paid', paymentReceiptValue: receiptObj.amount});
+
+            return receiptItemsArray; // return the receipt array
         }
 
     },

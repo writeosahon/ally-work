@@ -1741,6 +1741,8 @@ ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+
          */paymentModeDropdown:null,/**
          * property is used to hold the Cards dropdown list
          */cardDropDownList:null,/**
+         * property is used to hold the ej Grid component for payment receipts
+         */merchantPaymentReceiptGrid:null,/**
          * * used to hold the ej Tooltip component
          */formTooltip:null,/**
          * event is triggered when page is initialised
@@ -1750,7 +1752,8 @@ loadPageOnAppReady();//function is used to initialise the page if the app is ful
 function loadPageOnAppReady(){// check to see if onsen is ready and if all app loading has been completed
 if(!ons.isReady()||utopiasoftware.ally.model.isAppReady===false){setTimeout(loadPageOnAppReady,500);// call this function again after half a second
 return;}// initialise the 'active payment' status to false i.e. no active payment
-utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment=false;// initialise payment mode dropdownlist
+utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment=false;// inject the the modules required to create the merchant payment receipt grid
+ej.grids.Grid.Inject(ej.grids.Page,ej.grids.Selection,ej.grids.Scroll,ej.grids.Search,ej.grids.Toolbar,ej.grids.PdfExport,ej.grids.ExcelExport);// initialise payment mode dropdownlist
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown=new ej.dropdowns.DropDownList({placeholder:"Select Mode",floatLabelType:'Auto',change:function change(){// change event handler
 // check the value of the payment mode dropdown
 switch(utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown.value){case"wallet payment":// user selected wallet payment
@@ -1762,7 +1765,25 @@ $('#payments-ally-direct-card-number').attr("required",true);// so animatedly sh
 anime({targets:'#wallet-transfer-card-section',height:"3.5em",duration:450,complete:function complete(){$('#payments-ally-direct-card-section').css("height","auto");}});break;}}});utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown.appendTo('#payments-ally-direct-payment-mode');// initialise the card DropDown widget
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.cardDropDownList=new ej.dropdowns.DropDownList({//set the data to dataSource property
 dataSource:[],fields:{text:'CARDNUMBER2',value:'CARDNUMBER2'},placeholder:"Select Card",floatLabelType:"Auto",popupHeight:"300px"});// render initialized card DropDownList
-utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.cardDropDownList.appendTo('#payments-ally-direct-card-number');// initialise form tooltips
+utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.cardDropDownList.appendTo('#payments-ally-direct-card-number');// initialise the ej Grid used for displaying payment receipts
+utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid=new ej.grids.Grid({// Width for grid
+width:'100%',allowTextWrap:true,allowPdfExport:true,toolbar:['pdfexport'],columns:[{field:'paymentReceiptDesc',headerText:' ',width:"50%",clipMode:'ellipsiswithtooltip',customAttributes:{class:'payment-receipt-item-desc'}},{field:'paymentReceiptValue',headerText:' ',width:"50%",clipMode:'ellipsiswithtooltip'}],dataSource:[],pdfExportComplete:function pdfExportComplete(pdfExportCompleteArgs){console.log("ARGUMENTS",pdfExportCompleteArgs);var fileObj=null;// variable holds the file object to be created
+var pdfExportBlob=null;// holds the blob for the pdf content being exported
+// get the blob data when the export process is completed
+pdfExportCompleteArgs.promise.then(function(pdfData){// get the pdf structure if the content being exported
+pdfExportBlob=pdfData.blobData;// get the blob for the exported pdf
+console.log("EXPORTED",pdfData);return new Promise(function(resolve,reject){// return the directory where to store the document/image
+window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory,resolve,reject);});}).then(function(directory){return new Promise(function(resolve,reject){// return the created file which holds the pdf document
+directory.getFile('ALLY-Receipt-'+Date.now()+'.pdf',{create:true,exclusive:false},resolve,reject);});}).then(function(file){// get the file object
+fileObj=file;// assign the file object to the function variable
+return new Promise(function(resolve,reject){// return the FileWriter object used to write content to the created file
+file.createWriter(resolve,reject);});}).then(function(fileWriter){// get the FileWriter object
+return new Promise(function(resolve,reject){fileWriter.onwriteend=resolve;fileWriter.onerror=reject;fileWriter.write(pdfExportBlob);// write the content of the blob to the file
+});}).then(function(){// notify that export completed
+ons.notification.toast("Receipt Saved!",{timeout:4000});}).catch(function(err){console.log("EXPORT FAILED",err);});}});//append the newly created grid
+utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.appendTo('#merchant-payment-receipt-grid');// append the listener for the toolbar 'Export PDF' button click
+utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.toolbarClick=function(args){console.log("ID ",args.item.id);if(args.item.id==='merchant-payment-receipt-grid_pdfexport'){// the toolbar button being clicked is the 'PDF Export'
+utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.pdfExport({pageOrientation:'landscape',includeHiddenColumn:true,pageSize:'a4',header:{fromTop:0,height:130,contents:[{type:'text',value:"ALLY Payment Receipt",position:{x:60,y:50},style:{textBrushColor:'#30a401',fontSize:14,hAlign:'center',bold:true}}]}},null,null,true);}};// initialise form tooltips
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.formTooltip=new ej.popups.Tooltip({target:'.ally-input-tooltip',position:'top center',cssClass:'ally-input-tooltip',opensOn:'focus'});// render the initialized form tooltip
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formTooltip.appendTo('#payments-ally-direct-form');// initialise the amount field
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.amountFieldValidator=$('#payments-ally-direct-amount').parsley({value:function value(parsley){// convert the amount back to a plain text without the thousand separator
@@ -1840,14 +1861,13 @@ utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment=fal
 $('#payments-ally-direct-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-direct-page [title]').removeAttr("title");$('#payments-ally-direct-page [data-hint]').removeAttr("data-hint");// reset the form validator object on the page
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.formValidator.reset();// reset the form
 $('#payments-ally-direct-page #payments-ally-direct-form').get(0).reset();// reset the page scroll position to the top
-$('#payments-ally-direct-page .page__content').scrollTop(0);// populate the payments-out chart
-//utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.updatePaymentOutChart('today');
-// send push notification to the recipient of the transfer
+$('#payments-ally-direct-page .page__content').scrollTop(0);// serialize the receipt data & bind it to the receipt grid component in preparation for user display
+utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.dataSource=utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.serializeReceiptData(dataArray[1]);utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.dataBind();// send push notification to the recipient of the transfer
 var pushNotification={// create the push notification object
 "app_id":"d5d2bdba-eec0-46b1-836e-c5b8e318e928","filters":[{"field":"tag","key":"phone","relation":"=","value":formData.phone_receiver}],"contents":{"en":"You received payment into your ALLY WALLET from "+utopiasoftware.ally.model.appUserDetails.firstname+" "+utopiasoftware.ally.model.appUserDetails.lastname},"headings":{"en":"Payment Received"},"android_channel_id":"81baf9bc-d068-4f4c-9bae-1a3dc8488491","android_visibility":0,"priority":5};Promise.resolve($.ajax({url:"https://onesignal.com/api/v1/notifications",type:"post",contentType:"application/json",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("Authorization","Basic MmQ3ODcwZGUtYmIyYS00NzY5LWIwZWQtMTk5ZGRjNzU2M2Q3");},dataType:"json",timeout:240000,// wait for 4 minutes before timeout of request
 processData:false,data:JSON.stringify(pushNotification)}));hockeyapp.trackEvent(function(){},function(){},"MERCHANT PAYMENT");// track merchant payments
 // forward details of the wallet-transfer and the user details
-return Promise.all([$('#hour-glass-loader-modal').get(0).hide(),$('#payments-page #payments-tabbar').get(0).setActiveTab(0),ons.notification.toast("Merchant Payment Successful!",{timeout:4000})]);}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
+return Promise.all([$('#hour-glass-loader-modal').get(0).hide(),$('#payments-page #payments-tabbar').get(0).setActiveTab(0),ons.notification.toast("Merchant Payment Successful!",{timeout:4000}),$('#merchant-payment-receipt-modal').get(0).show()]);}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
 err='Sorry, merchant payment could not be made.<br> '+'You can try again OR scan the QR Code to pay merchant';}$('#hour-glass-loader-modal').get(0).hide();// hide loader
 ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> ALLY Payment Error',messageHTML:'<span>'+err+'</span>',cancelable:false});});},/**
          * method is triggered when the "Add Card" button is clicked
@@ -1858,7 +1878,14 @@ if(utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDro
 formData.payment_mode="wallet payment";}// check the payment mode for the merchant payment
 if(utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown.value=="card transfer"){// add the specified payment mode to the form data
 formData.payment_mode="card payment";}// display the "Add Card (Merchant Payment)" page
-$('#app-main-navigator').get(0).pushPage('add-card-merchant-payment-page.html',{data:formData,animation:'lift-md'});}},/**
+$('#app-main-navigator').get(0).pushPage('add-card-merchant-payment-page.html',{data:formData,animation:'lift-md'});},/**
+         *
+         * @param receiptObj {Object} a single receipt object to be serialized into objects within an array
+         * @returns {Array} the array containing componets of the receipt object to
+         * be displayed in the Grid component
+         */serializeReceiptData:function serializeReceiptData(receiptObj){var receiptItemsArray=[];// create the receipt items array
+receiptItemsArray.push({paymentReceiptDesc:'Payment Reference',paymentReceiptValue:receiptObj.refid},{paymentReceiptDesc:'Payment Date',paymentReceiptValue:receiptObj.date},{paymentReceiptDesc:'Transaction Type',paymentReceiptValue:"Merchant Payment"},{paymentReceiptDesc:'Payment From',paymentReceiptValue:utopiasoftware.ally.model.appUserDetails.firstname+" "+utopiasoftware.ally.model.appUserDetails.lastname},{paymentReceiptDesc:'Payment To',paymentReceiptValue:receiptObj.merchantname},{paymentReceiptDesc:'Amount Paid',paymentReceiptValue:receiptObj.amount});return receiptItemsArray;// return the receipt array
+}},/**
      * object is view-model for change-pin page
      */changePinPageViewModel:{/**
          * used to hold the parsley form validation object for the page

@@ -471,6 +471,10 @@
 #payments-ally-direct-page #payments-ally-direct-merchant-name:focus {
     border-bottom: 2px green solid;
 }
+.payment-receipt-item-desc {
+    font-size: 1em;
+    font-weight: bold;
+}
 /** STYLE FOR THE PAYMENTS ALLY-SCAN PAGE ENDS **/
 
 
