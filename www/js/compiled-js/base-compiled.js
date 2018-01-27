@@ -28,6 +28,8 @@ var utopiasoftware = {
 
             var smsWatcherTimer = null; // holds the timer used to stop the sms watcher
 
+            var resolvePromise = null; // holds the resolve function of the main Promise object
+
             var rejectPromise = null; // holds the reject function of the main Promise object
 
             if (phoneNumber.startsWith("0")) {
@@ -40,6 +42,7 @@ var utopiasoftware = {
 
             // create the Promise object which will indicate if a phone was verified or not
             var phoneNumberVerifiedPromise = new Promise(function (resolve, reject) {
+                resolvePromise = resolve;
                 rejectPromise = reject;
                 var randomNumber = ""; //holds the random number to be sent in the sms
 
@@ -56,7 +59,7 @@ var utopiasoftware = {
                     // add listener for new arriving sms
                     document.addEventListener('onSMSArrive', function (smsEvent) {
                         var sms = smsEvent.data;
-                        if (sms.address == phoneNumber && sms.body == "ALLY " + randomNumber) {
+                        if (sms.address == phoneNumber && sms.body == "ALLY-" + randomNumber) {
                             clearTimeout(smsWatcherTimer); // stop the set timer
                             SMS.stopWatch(function () {}, function () {}); // stop sms watch
                             SMS.enableIntercept(false, function () {}, function () {}); // stop sms intercept
@@ -74,7 +77,7 @@ var utopiasoftware = {
                         for (var i = 0; i < 6; i++) {
                             randomNumber += "" + randomGen.integer(0, 9);
                         }
-                        SMS.sendSMS(phoneNumber, "ALLY " + randomNumber, resolve3, function () {
+                        SMS.sendSMS(phoneNumber, "ALLY-" + randomNumber, resolve3, function () {
                             reject3("SMS sending failed. Please ensure you have sufficient airtime on the specified phone number"); // flag an error that sms verification code could not be sent
                         });
                     });
@@ -91,11 +94,24 @@ var utopiasoftware = {
                             return ons.notification.prompt({ title: "Phone Number Verification",
                                 id: 'phone-verification-code-check',
                                 messageHTML: "<div><ons-icon icon=\"ion-lock-combination\" size=\"24px\"\n                    style=\"color: #30a401; float: left; width: 26px;\"></ons-icon>\n                    <span style=\"float: right; width: calc(100% - 26px);\">\n                    Your phone number could not be verified automatically.<br>\n                    Please enter the verification code that was sent to your phone</span></div>",
-                                cancelable: false, placeholder: "ALLY-CODE", inputType: "number", defaultValue: "", autofocus: false,
+                                cancelable: false, placeholder: "ALLY-CODE", inputType: "text", defaultValue: "", autofocus: false,
                                 submitOnEnter: true
                             });
-                        }).catch();
-                        rejectPromise("phone number verification failed"); // reject the promise i.e. verification failed
+                        }).then(function (userInput) {
+                            // retrieve the user input and compare to thr verification code produced
+                            userInput = (userInput + "").toUpperCase().trim();
+
+                            // check if user input == to produced verification code
+                            if (userInput == "ALLY-" + randomNumber) {
+                                // user input matches verification code
+                                resolvePromise(); // resolve the Promise to complete phone verification
+                            } else {
+                                // user input did not match verification code
+                                throw "error";
+                            }
+                        }).catch(function () {
+                            rejectPromise("phone number verification failed"); // reject the promise i.e. verification failed
+                        });
                     }, 31000);
                 }).catch(function (error) {
                     try {
