@@ -279,3 +279,13 @@
 
   content: '\e90a';
 }
+.zmdi-ally-icon-code-equal:before {
+  display: inline-block;
+  font: normal normal normal 14px/1 'ally-font-icons';
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  content: '\e90b';
+}

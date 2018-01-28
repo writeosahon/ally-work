@@ -88,7 +88,7 @@ var utopiasoftware = {
                         document.removeEventListener('onSMSArrive');
                         // hide loader
                         $('#hour-glass-loader-modal').get(0).hide().then(function () {
-                            // automatic verification could not be performed, verify phone manually
+                            // automatic verification could not be performed, so verify phone manually
 
                             // verify the phone number verification code manually entered by user
                             return ons.notification.prompt({ title: "Phone Number Verification",

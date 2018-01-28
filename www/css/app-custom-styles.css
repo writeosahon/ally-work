@@ -77,6 +77,11 @@
     -webkit-text-security: disc;
 }
 
+/** STYLE FOR PHONE NUMBER VERIFICATION PROMPT DIALOG **/
+#phone-verification-code-check input {
+    text-transform: uppercase;
+}
+
 /** STYLE FOR THE ONBOARDING PAGE BEGINS **/
 #onboarding-carousel ons-carousel-item.first { /* style for onboarding slides/carousel item 1 */
     background-image: linear-gradient(45deg, rgba(61,180,112,0.3) 0%, rgba(15,255,255,0.2) 100%),

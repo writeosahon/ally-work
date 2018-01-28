@@ -1225,12 +1225,22 @@ $('#wallet-transfer-form',$thisPage).css('display',"block");});}},/**
          * method is triggered when page is shown
          *
          * @param event
-         */pageShow:function pageShow(event){},/**
+         */pageShow:function pageShow(event){// check if the financial cards dropdown has been initialised
+if(utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.cardDropDownList){// repopulate the financial cards dropdown list
+// create the form data to be sent
+var formData={phone:utopiasoftware.ally.model.appUserDetails.phone};// start a promise chain to setup the page
+Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/get-my-cards.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
+processData:true,data:formData// data to submit to server
+})).then(function(serverResponse){serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// get the response object
+// initialise the card DropDown widget
+utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.dataSource=serverResponse;// bind the new update to the dropdown list
+utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.dataBind();}).catch(function(){});}},/**
          * method is triggered when the page is hidden
          * @param event
          */pageHide:function pageHide(event){try{// remove any tooltip being displayed on all forms on the page
 $('#wallet-transfer-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#wallet-transfer-page [title]').removeAttr("title");$('#wallet-transfer-page [data-hint]').removeAttr("data-hint");// reset the form validator object on the page
-utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.reset();}catch(err){}},/**
+utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.reset();// reset the transfer mode dropdown to the default value
+utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.value="wallet transfer";utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.dataBind();}catch(err){}},/**
          * method is triggered when the page is destroyed
          * @param event
          */pageDestroy:function pageDestroy(event){try{// remove any tooltip being displayed on all forms on the page
@@ -1333,7 +1343,8 @@ return"registered recipient";}}).then(function(result){if(result==="registered r
 hockeyapp.trackEvent(function(){},function(){},"FUND TRANSFERRED");// track fund transfer
 // reset the form for the wallet transfer page
 $('#wallet-transfer-page #wallet-transfer-form').get(0).reset();// reset the form validator object on the page
-utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.reset();// send push notification to the recipient of the transfer
+utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.reset();// reset the transfer mode dropdown to the default value
+utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.value="wallet transfer";utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.dataBind();// send push notification to the recipient of the transfer
 var pushNotification={// create the push notification object
 "app_id":"d5d2bdba-eec0-46b1-836e-c5b8e318e928","filters":[{"field":"tag","key":"phone","relation":"=","value":formData.phone_receiver}],"contents":{"en":"You received funds into your ALLY WALLET from "+utopiasoftware.ally.model.appUserDetails.firstname+" "+utopiasoftware.ally.model.appUserDetails.lastname},"headings":{"en":"Funds Received"},"android_channel_id":"66dfeddf-12d7-4194-b3d9-38325042d258","android_visibility":0,"priority":5};Promise.resolve($.ajax({url:"https://onesignal.com/api/v1/notifications",type:"post",contentType:"application/json",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("Authorization","Basic MmQ3ODcwZGUtYmIyYS00NzY5LWIwZWQtMTk5ZGRjNzU2M2Q3");},dataType:"json",timeout:240000,// wait for 4 minutes before timeout of request
 processData:false,data:JSON.stringify(pushNotification)}));return Promise.all([ons.notification.toast("Wallet Transfer Successful!",{timeout:4000})]);// conclude wallet transfer process
@@ -1780,7 +1791,8 @@ return new Promise(function(resolve,reject){// return the FileWriter object used
 file.createWriter(resolve,reject);});}).then(function(fileWriter){// get the FileWriter object
 return new Promise(function(resolve,reject){fileWriter.onwriteend=resolve;fileWriter.onerror=reject;fileWriter.write(pdfExportBlob);// write the content of the blob to the file
 });}).then(function(){// notify that export completed
-ons.notification.toast("Receipt Saved to Root Folder!",{timeout:4000});}).catch(function(err){console.log("EXPORT FAILED",err);});}});//append the newly created grid
+window.plugins.toast.showWithOptions({message:"Receipt Saved to Root Folder!",duration:4000,position:"bottom",styling:{opacity:1,backgroundColor:'#008000',textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
+window.plugins.toast.hide();}});}).catch(function(err){console.log("EXPORT FAILED",err);});}});//append the newly created grid
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.appendTo('#merchant-payment-receipt-grid');// append the listener for the toolbar 'Export PDF' button click
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.toolbarClick=function(args){console.log("ID ",args.item.id);if(args.item.id==='merchant-payment-receipt-grid_pdfexport'){// the toolbar button being clicked is the 'PDF Export'
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.pdfExport({pageOrientation:'landscape',includeHiddenColumn:true,pageSize:'a4',header:{fromTop:0,height:130,contents:[{type:'text',value:"ALLY Payment Receipt",position:{x:60,y:50},style:{textBrushColor:'#30a401',fontSize:14,hAlign:'center',bold:true}}]}},null,null,true);}};// initialise form tooltips
@@ -1813,14 +1825,24 @@ $('#loader-modal').get(0).hide();});};},/**
          * method is triggered when page is shown
          *
          * @param event
-         */pageShow:function pageShow(event){},/**
+         */pageShow:function pageShow(event){// check if the financial cards dropdown has been initialised
+if(utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.cardDropDownList){// if yes, repopulate the dropdown with the updated lists of cards
+// create the form data to be sent
+var formData={phone:utopiasoftware.ally.model.appUserDetails.phone};// start a promise chain to setup the page
+Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/get-my-cards.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
+processData:true,data:formData// data to submit to server
+})).then(function(serverResponse){serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// get the response object
+// initialise the card DropDown widget
+utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.cardDropDownList.dataSource=serverResponse;// bind the new update to the dropdown list
+utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.cardDropDownList.dataBind();}).catch(function(){});}},/**
          * method is triggered when the page is hidden
          * @param event
          */pageHide:function pageHide(event){try{// flag that no active payment is taking place
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment=false;// remove any tooltip being displayed on all forms on the page
 $('#payments-ally-direct-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-direct-page [title]').removeAttr("title");$('#payments-ally-direct-page [data-hint]').removeAttr("data-hint");// reset the form validator object on the page
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.formValidator.reset();// reset the form
-$('#payments-ally-direct-page #payments-ally-direct-form').get(0).reset();$('#payments-ally-direct-page #payments-ally-direct-add-card').css("transform","scale(1)");// reset the page scroll position to the top
+$('#payments-ally-direct-page #payments-ally-direct-form').get(0).reset();$('#payments-ally-direct-page #payments-ally-direct-add-card').css("transform","scale(1)");// reset the payment mode dropdown to the default value
+utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown.value="wallet payment";utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown.dataBind();// reset the page scroll position to the top
 $('#payments-ally-direct-page .page__content').scrollTop(0);}catch(err){}},/**
          * method is triggered when the page is destroyed
          * @param event
@@ -1860,7 +1882,8 @@ utopiasoftware.ally.model.appUserDetails=dataArray[0];// flag that no active pay
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment=false;// remove any tooltip being displayed on all forms on the page
 $('#payments-ally-direct-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#payments-ally-direct-page [title]').removeAttr("title");$('#payments-ally-direct-page [data-hint]').removeAttr("data-hint");// reset the form validator object on the page
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.formValidator.reset();// reset the form
-$('#payments-ally-direct-page #payments-ally-direct-form').get(0).reset();// reset the page scroll position to the top
+$('#payments-ally-direct-page #payments-ally-direct-form').get(0).reset();// reset the payment mode dropdown to the default value
+utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown.value="wallet payment";utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown.dataBind();// reset the page scroll position to the top
 $('#payments-ally-direct-page .page__content').scrollTop(0);// serialize the receipt data & bind it to the receipt grid component in preparation for user display
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.dataSource=utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.serializeReceiptData(dataArray[1]);utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.dataBind();// send push notification to the recipient of the transfer
 var pushNotification={// create the push notification object
@@ -2308,12 +2331,13 @@ throw serverResponseArray[0].message;// throw the error message attached to this
 }).then(function(dataArray){//todo
 console.log("PAY COMPLETE",dataArray);// forward details of the save the user details to encrypted storage; also forward details of payment
 return Promise.all([utopiasoftware.ally.saveUserAppDetails(dataArray[0]),dataArray[1]]);}).then(function(dataArray){// update local copy of user app details
-utopiasoftware.ally.model.appUserDetails=dataArray[0];// send push notification to the recipient of the transfer
+utopiasoftware.ally.model.appUserDetails=dataArray[0];// serialize the receipt data & bind it to the receipt grid component in preparation for user display
+utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.dataSource=utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.serializeReceiptData(dataArray[1]);utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.dataBind();// send push notification to the recipient of the transfer
 var pushNotification={// create the push notification object
 "app_id":"d5d2bdba-eec0-46b1-836e-c5b8e318e928","filters":[{"field":"tag","key":"phone","relation":"=","value":formData.phone_receiver}],"contents":{"en":"You received payment into your ALLY WALLET from "+utopiasoftware.ally.model.appUserDetails.firstname+" "+utopiasoftware.ally.model.appUserDetails.lastname},"headings":{"en":"Payment Received"},"android_channel_id":"81baf9bc-d068-4f4c-9bae-1a3dc8488491","android_visibility":0,"priority":5};Promise.resolve($.ajax({url:"https://onesignal.com/api/v1/notifications",type:"post",contentType:"application/json",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("Authorization","Basic MmQ3ODcwZGUtYmIyYS00NzY5LWIwZWQtMTk5ZGRjNzU2M2Q3");},dataType:"json",timeout:240000,// wait for 4 minutes before timeout of request
 processData:false,data:JSON.stringify(pushNotification)}));hockeyapp.trackEvent(function(){},function(){},"MERCHANT PAYMENT");// track merchant payments
 // forward details of the wallet-transfer and the user details
-return Promise.all([$('#hour-glass-loader-modal').get(0).hide(),$('#app-main-navigator').get(0).popPage({}),$('#payments-page #payments-tabbar').get(0).setActiveTab(0),ons.notification.toast("Merchant Payment Successful!",{timeout:4000})]);}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
+return Promise.all([$('#hour-glass-loader-modal').get(0).hide(),$('#app-main-navigator').get(0).popPage({}),$('#payments-page #payments-tabbar').get(0).setActiveTab(0),ons.notification.toast("Merchant Payment Successful!",{timeout:4000}),$('#merchant-payment-receipt-modal').get(0).show()]);}).catch(function(err){if(typeof err!=="string"){// if err is NOT a String
 err='Sorry, merchant payment could not be made.<br> '+'You can try again OR scan the QR Code to pay merchant';}$('#hour-glass-loader-modal').get(0).hide();// hide loader
 ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+'style="color: red;"></ons-icon> ALLY Payment Error',messageHTML:'<span>'+err+'</span>',cancelable:false});});},/**
          * method is triggered when back button or device back button is clicked

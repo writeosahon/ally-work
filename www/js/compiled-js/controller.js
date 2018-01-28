@@ -4522,6 +4522,39 @@ utopiasoftware.ally.controller = {
          * @param event
          */
         pageShow: (event) => {
+            // check if the financial cards dropdown has been initialised
+            if(utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.cardDropDownList){
+                // repopulate the financial cards dropdown list
+                // create the form data to be sent
+                var formData = {phone: utopiasoftware.ally.model.appUserDetails.phone};
+
+                // start a promise chain to setup the page
+                Promise.resolve($.ajax(
+                    {
+                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/get-my-cards.php",
+                        type: "post",
+                        contentType: "application/x-www-form-urlencoded",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                        },
+                        dataType: "text",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: true,
+                        data: formData // data to submit to server
+                    }
+                )).
+                then(function(serverResponse){
+                    serverResponse +=  "";
+                    serverResponse = JSON.parse(serverResponse.trim()); // get the response object
+
+                    // initialise the card DropDown widget
+                    utopiasoftware.ally.controller.walletTransferPageViewModel.
+                        cardDropDownList.dataSource = serverResponse;
+
+                    // bind the new update to the dropdown list
+                    utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.dataBind();
+                }).catch(function(){});
+            }
         },
 
         /**
@@ -4536,6 +4569,10 @@ utopiasoftware.ally.controller = {
                 $('#wallet-transfer-page [data-hint]').removeAttr("data-hint");
                 // reset the form validator object on the page
                 utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.reset();
+
+                // reset the transfer mode dropdown to the default value
+                utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.value = "wallet transfer";
+                utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.dataBind();
             }
             catch(err){}
         },
@@ -4972,6 +5009,10 @@ utopiasoftware.ally.controller = {
                     $('#wallet-transfer-page #wallet-transfer-form').get(0).reset();
                     // reset the form validator object on the page
                     utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.reset();
+
+                    // reset the transfer mode dropdown to the default value
+                    utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.value = "wallet transfer";
+                    utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.dataBind();
 
                     // send push notification to the recipient of the transfer
                     let pushNotification = { // create the push notification object
@@ -6571,7 +6612,22 @@ utopiasoftware.ally.controller = {
                                     fileWriter.write(pdfExportBlob); // write the content of the blob to the file
                                 });
                             }).then(function(){ // notify that export completed
-                                ons.notification.toast("Receipt Saved to Root Folder!", {timeout:4000});
+                                window.plugins.toast.showWithOptions({
+                                    message: "Receipt Saved to Root Folder!",
+                                    duration: 4000,
+                                    position: "bottom",
+                                    styling: {
+                                        opacity: 1,
+                                        backgroundColor: '#008000',
+                                        textColor: '#FFFFFF',
+                                        textSize: 14
+                                    }
+                                }, function(toastEvent){
+                                    if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                                        window.plugins.toast.hide();
+                                    }
+                                });
+
                             }).
                             catch(function(err){console.log("EXPORT FAILED", err)});
                         }
@@ -6722,7 +6778,43 @@ utopiasoftware.ally.controller = {
          *
          * @param event
          */
-        pageShow: (event) => {},
+        pageShow: (event) => {
+
+            // check if the financial cards dropdown has been initialised
+            if(utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.cardDropDownList){
+                // if yes, repopulate the dropdown with the updated lists of cards
+                // create the form data to be sent
+                var formData = {phone: utopiasoftware.ally.model.appUserDetails.phone};
+
+                // start a promise chain to setup the page
+                Promise.resolve($.ajax(
+                    {
+                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/get-my-cards.php",
+                        type: "post",
+                        contentType: "application/x-www-form-urlencoded",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                        },
+                        dataType: "text",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: true,
+                        data: formData // data to submit to server
+                    }
+                )).
+                then(function(serverResponse){
+                    serverResponse +=  "";
+                    serverResponse = JSON.parse(serverResponse.trim()); // get the response object
+
+                    // initialise the card DropDown widget
+                    utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.
+                        cardDropDownList.dataSource = serverResponse;
+
+                    // bind the new update to the dropdown list
+                    utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.cardDropDownList.dataBind();
+                }).
+                catch(function(){});
+            }
+        },
 
         /**
          * method is triggered when the page is hidden
@@ -6743,6 +6835,10 @@ utopiasoftware.ally.controller = {
                 // reset the form
                 $('#payments-ally-direct-page #payments-ally-direct-form').get(0).reset();
                 $('#payments-ally-direct-page #payments-ally-direct-add-card').css("transform", "scale(1)");
+
+                // reset the payment mode dropdown to the default value
+                utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown.value = "wallet payment";
+                utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown.dataBind();
 
                 // reset the page scroll position to the top
                 $('#payments-ally-direct-page .page__content').scrollTop(0);
@@ -6895,6 +6991,10 @@ utopiasoftware.ally.controller = {
                 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.formValidator.reset();
                 // reset the form
                 $('#payments-ally-direct-page #payments-ally-direct-form').get(0).reset();
+
+                // reset the payment mode dropdown to the default value
+                utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown.value = "wallet payment";
+                utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.paymentModeDropdown.dataBind();
 
                 // reset the page scroll position to the top
                 $('#payments-ally-direct-page .page__content').scrollTop(0);
@@ -8616,6 +8716,11 @@ utopiasoftware.ally.controller = {
                 // update local copy of user app details
                 utopiasoftware.ally.model.appUserDetails = dataArray[0];
 
+                // serialize the receipt data & bind it to the receipt grid component in preparation for user display
+                utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.dataSource =
+                    utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.serializeReceiptData(dataArray[1]);
+                utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.merchantPaymentReceiptGrid.dataBind();
+
                 // send push notification to the recipient of the transfer
                 let pushNotification = { // create the push notification object
                     "app_id": "d5d2bdba-eec0-46b1-836e-c5b8e318e928",
@@ -8650,7 +8755,8 @@ utopiasoftware.ally.controller = {
                 return Promise.all([$('#hour-glass-loader-modal').get(0).hide(),
                     $('#app-main-navigator').get(0).popPage({}),
                     $('#payments-page #payments-tabbar').get(0).setActiveTab(0),
-                    ons.notification.toast("Merchant Payment Successful!", {timeout:4000})]);
+                    ons.notification.toast("Merchant Payment Successful!", {timeout:4000}),
+                    $('#merchant-payment-receipt-modal').get(0).show()]);
             }).
             catch(function(err){
                 if(typeof err !== "string"){ // if err is NOT a String

@@ -86,12 +86,12 @@ var utopiasoftware = {
                         document.removeEventListener('onSMSArrive');
                         // hide loader
                         $('#hour-glass-loader-modal').get(0).hide().
-                        then(function(){ // automatic verification could not be performed, verify phone manually
+                        then(function(){ // automatic verification could not be performed, so verify phone manually
 
                             // verify the phone number verification code manually entered by user
                             return ons.notification.prompt({title: "Phone Number Verification",
                                 id: 'phone-verification-code-check',
-                                messageHTML: `<div><ons-icon icon="ion-lock-combination" size="24px"
+                                messageHTML: `<div><ons-icon icon="md-ally-icon-code-equal" size="24px"
                     style="color: #30a401; float: left; width: 26px;"></ons-icon>
                     <span style="float: right; width: calc(100% - 26px);">
                     Your phone number could not be verified automatically.<br>
