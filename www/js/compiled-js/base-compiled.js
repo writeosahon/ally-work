@@ -93,7 +93,7 @@ var utopiasoftware = {
                             // verify the phone number verification code manually entered by user
                             return ons.notification.prompt({ title: "Phone Number Verification",
                                 id: 'phone-verification-code-check',
-                                messageHTML: "<div><ons-icon icon=\"ion-lock-combination\" size=\"24px\"\n                    style=\"color: #30a401; float: left; width: 26px;\"></ons-icon>\n                    <span style=\"float: right; width: calc(100% - 26px);\">\n                    Your phone number could not be verified automatically.<br>\n                    Please enter the verification code that was sent to your phone</span></div>",
+                                messageHTML: "<div><ons-icon icon=\"md-ally-icon-code-equal\" size=\"24px\"\n                    style=\"color: #30a401; float: left; width: 26px;\"></ons-icon>\n                    <span style=\"float: right; width: calc(100% - 26px);\">\n                    Your phone number could not be verified automatically.<br>\n                    Please enter the verification code that was sent to your phone</span></div>",
                                 cancelable: false, placeholder: "ALLY-CODE", inputType: "text", defaultValue: "", autofocus: false,
                                 submitOnEnter: true
                             });
