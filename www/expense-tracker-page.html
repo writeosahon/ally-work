@@ -1,0 +1,30 @@
+
+<!-- the expense-tracker page -->
+<ons-page id="expense-tracker-page">
+
+    <ons-toolbar>
+        <div class="left">
+            <ons-toolbar-button onclick="utopiasoftware.ally.controller.dashboardPageViewModel.backButtonClicked()">
+                <ons-icon icon="md-long-arrow-left"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+        <div class="center">Expense Tracker</div>
+        <div class="right">
+            <ons-toolbar-button onclick="$('#side-menu').get(0).toggle()">
+                <ons-icon icon="md-menu"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+    </ons-toolbar>
+
+    <ons-row valign="bottom" style="margin-top: 0; padding-top: 0;">
+        <ons-col width="50%" style="margin-top: 0; padding-top: 0;"></ons-col>
+        <ons-col width="50%" class="dashboard-period-select-col" style="margin-top: 0; padding-top: 0;">
+            <select id="dashboard-period-select">
+                <option value="today" selected>Today</option>
+                <option value="weekly">Last 7 Days</option>
+                <option value="monthly">Last 30 Days</option>
+            </select>
+        </ons-col>
+    </ons-row>
+
+</ons-page>

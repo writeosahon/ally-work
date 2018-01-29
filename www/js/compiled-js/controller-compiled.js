@@ -76,6 +76,9 @@ position:"bottom",styling:{opacity:1,backgroundColor:'#000000',textColor:'#FFFFF
          */sideMenuListClicked:function sideMenuListClicked(label){if(label=="change pin"){// 'change pin' list item was clicked
 // close the side menu
 $('ons-splitter').get(0).right.close().then(function(){$('#app-main-navigator').get(0).bringPageTop("change-pin-page.html",{});// navigate to the specified page
+}).catch(function(){});return;}if(label=="my account"){// 'my account' list item was clicked
+// close the side menu
+$('ons-splitter').get(0).right.close().then(function(){$('#app-main-navigator').get(0).bringPageTop("account-page.html",{});// navigate to the specified page
 }).catch(function(){});return;}if(label=="transaction history"){// 'transaction history' list item was clicked
 // close the side menu
 $('ons-splitter').get(0).right.close().then(function(){$('#app-main-navigator').get(0).bringPageTop("transaction-history-page.html",{});// navigate to the specified page
@@ -181,7 +184,7 @@ $(event.originalEvent.tabItem).attr("label","Wallet");// update the label of the
 break;case 3:$('#menu-tabbar ons-tab').removeAttr("label");// remove all displaced labels
 $(event.originalEvent.tabItem).attr("label","Transfers");// update the label of the to-be displayed tab
 break;case 4:$('#menu-tabbar ons-tab').removeAttr("label");// remove all displaced labels
-$(event.originalEvent.tabItem).attr("label","Account");// update the label of the to-be displayed tab
+$(event.originalEvent.tabItem).attr("label","Expense Tracker");// update the label of the to-be displayed tab
 break;}}},/**
      * object is view-model for onboarding page
      */onboardingPageViewModel:{/**
@@ -771,13 +774,12 @@ utopiasoftware.ally.controller.accountPageViewModel.formValidator.reset();}catch
 $('#account-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");$('#account-page [data-hint]').removeAttr("data-hint");// destroy the form validator objects on the page
 utopiasoftware.ally.controller.accountPageViewModel.formValidator.destroy();}catch(err){}},/**
          * method is triggered when back button or device back button is clicked
-         */backButtonClicked:function backButtonClicked(){// check if the side menu is open
+         */backButtonClicked:function backButtonClicked(){//todo
+// check if the side menu is open
 if($('ons-splitter').get(0).right.isOpen){// side menu open, so close it
 $('ons-splitter').get(0).right.close();return;// exit the method
-}// check if the menu tabbar exists
-if($('#menu-tabbar').get(0)){// the menu tabbar object exists
-// move to the previous tab
-$('#menu-tabbar').get(0).setActiveTab(3);}},/**
+}// go back to previous page in the main-navigator stack
+$('#app-main-navigator').get(0).popPage({});},/**
          * method is triggered when the Edit Account fab button is clicked
          */editAccountButtonClicked:function editAccountButtonClicked(){// remove the the readonly attributes, so the form  elements can be editable
 $('#account-page [data-ally-readonly-field]').removeAttr('readonly');// hide the edit account button

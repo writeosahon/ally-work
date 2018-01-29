@@ -244,6 +244,17 @@ utopiasoftware.ally.controller = {
                 return;
             }
 
+            if(label == "my account"){ // 'my account' list item was clicked
+
+                // close the side menu
+                $('ons-splitter').get(0).right.close().
+                then(function(){
+                    $('#app-main-navigator').get(0).bringPageTop("account-page.html", {}); // navigate to the specified page
+                }).catch(function(){});
+
+                return;
+            }
+
             if(label == "transaction history"){ // 'transaction history' list item was clicked
 
                 // close the side menu
@@ -542,7 +553,7 @@ utopiasoftware.ally.controller = {
                 case 4:
                     $('#menu-tabbar ons-tab').removeAttr("label"); // remove all displaced labels
 
-                    $(event.originalEvent.tabItem).attr("label", "Account"); // update the label of the to-be displayed tab
+                    $(event.originalEvent.tabItem).attr("label", "Expense Tracker"); // update the label of the to-be displayed tab
 
                     break;
             }
@@ -2898,7 +2909,7 @@ utopiasoftware.ally.controller = {
         /**
          * method is triggered when back button or device back button is clicked
          */
-        backButtonClicked: function(){
+        backButtonClicked: function(){ //todo
 
             // check if the side menu is open
             if($('ons-splitter').get(0).right.isOpen){ // side menu open, so close it
@@ -2906,11 +2917,8 @@ utopiasoftware.ally.controller = {
                 return; // exit the method
             }
 
-            // check if the menu tabbar exists
-            if($('#menu-tabbar').get(0)){ // the menu tabbar object exists
-                // move to the previous tab
-                $('#menu-tabbar').get(0).setActiveTab(3);
-            }
+            // go back to previous page in the main-navigator stack
+            $('#app-main-navigator').get(0).popPage({});
         },
 
 
