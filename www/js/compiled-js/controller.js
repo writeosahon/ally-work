@@ -49,6 +49,11 @@ utopiasoftware.ally.controller = {
             $('#lock-screen-modal').get(0).onDeviceBackButton = utopiasoftware.ally.controller.
                 lockScreenModalViewModel.exitButtonClicked;
 
+            // listen to when the device back button is clicked when the lock screen modal is shown
+            $('#merchant-payment-receipt-modal').get(0).onDeviceBackButton = function(){
+                $('#merchant-payment-receipt-modal').get(0).hide();
+            };
+
             // listen for "HOLD" events that are triggered in the app
             document.addEventListener('hold', function(event) {
                 // check if the backspace button in the 'lock-screen-modal' is held

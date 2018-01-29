@@ -22,7 +22,8 @@ if(window.localStorage.getItem("app-status")&&window.localStorage.getItem("app-s
 $('ons-splitter').get(0).content.load("login-template");}else{// user has NOT been logged in
 // set the first page to be displayed to be the onboarding page
 $('ons-splitter').get(0).content.load("onboarding-template");}// listen to when the device back button is clicked when the lock screen modal is shown
-$('#lock-screen-modal').get(0).onDeviceBackButton=utopiasoftware.ally.controller.lockScreenModalViewModel.exitButtonClicked;// listen for "HOLD" events that are triggered in the app
+$('#lock-screen-modal').get(0).onDeviceBackButton=utopiasoftware.ally.controller.lockScreenModalViewModel.exitButtonClicked;// listen to when the device back button is clicked when the lock screen modal is shown
+$('#merchant-payment-receipt-modal').get(0).onDeviceBackButton=function(){$('#merchant-payment-receipt-modal').get(0).hide();};// listen for "HOLD" events that are triggered in the app
 document.addEventListener('hold',function(event){// check if the backspace button in the 'lock-screen-modal' is held
 if($(event.target).closest('#lock-screen-backspace-col','#lock-screen-modal').is('#lock-screen-backspace-col')){//backspace button has been held
 // remove the entire contents of the input field
