@@ -299,3 +299,15 @@ $(document).on("hide", "#add-card-merchant-payment-page", utopiasoftware.ally.co
 
 // listen for when the Add-Card-Merchant-Payment page is destroyed
 $(document).on("destroy", "#add-card-merchant-payment-page", utopiasoftware.ally.controller.addCardMerchantPaymentPageViewModel.pageDestroy);
+
+// listen for the initialisation of the Expense-Tracker page
+$(document).on("init", "#expense-tracker-page", utopiasoftware.ally.controller.expenseTrackerPageViewModel.pageInit);
+
+// listen for when the Expense-Tracker page is shown
+$(document).on("show", "#expense-tracker-page", utopiasoftware.ally.controller.expenseTrackerPageViewModel.pageShow);
+
+// listen for when the Expense-Tracker page is hidden
+$(document).on("hide", "#expense-tracker-page", utopiasoftware.ally.controller.expenseTrackerPageViewModel.pageHide);
+
+// listen for when the Expense-Tracker page is destroyed
+$(document).on("destroy", "#expense-tracker-page", utopiasoftware.ally.controller.expenseTrackerPageViewModel.pageDestroy);

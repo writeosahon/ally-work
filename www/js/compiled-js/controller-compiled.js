@@ -2348,6 +2348,64 @@ ons.notification.alert({title:'<ons-icon icon="md-close-circle-o" size="32px" '+
 if($('ons-splitter').get(0).right.isOpen){// side menu open, so close it
 $('ons-splitter').get(0).right.close();return;// exit the method
 }// remove this page form the main navigator stack
-$('#app-main-navigator').get(0).popPage();}}};
+$('#app-main-navigator').get(0).popPage();}},/**
+     * object is view-model for expense-tracker page
+     */expenseTrackerPageViewModel:{/**
+         * property is used to hold the "Period Select" dropdown list
+         */periodDropDownListObject:null,/**
+         * property is used to hold the "Transfers In" Chart
+         */walletIncomingChart:null,/**
+         * property is used to hold the "Transfers Out" Chart
+         */walletOutgoingChart:null,/**
+         * property is used to hold the "Payments Out" Chart
+         */paymentsOutChart:null,/**
+         * property is used to hold the "Payments In" Chart
+         */paymentsInChart:null,/**
+         * event is triggered when page is initialised
+         */pageInit:function pageInit(event){var $thisPage=$(event.target);// get the current page shown
+// disable the swipeable feature for the app splitter
+$('ons-splitter-side').removeAttr("swipeable");// call the function used to initialise the app page if the app is fully loaded
+loadPageOnAppReady();//function is used to initialise the page if the app is fully ready for execution
+function loadPageOnAppReady(){// check to see if onsen is ready and if all app loading has been completed
+if(!ons.isReady()||utopiasoftware.ally.model.isAppReady===false){setTimeout(loadPageOnAppReady,500);// call this function again after half a second
+return;}// listen for the back button event
+$thisPage.get(0).onDeviceBackButton=utopiasoftware.ally.controller.expenseTrackerPageViewModel.backButtonClicked;// inject the the modules required to create the transaction history grid
+ej.grids.Grid.Inject(ej.grids.Page,ej.grids.Selection,ej.grids.Scroll,ej.grids.Search,ej.grids.Toolbar,ej.grids.PdfExport,ej.grids.ExcelExport,ej.grids.Group);// update the Transaction History Grid
+//utopiasoftware.ally.controller.transactionHistoryPageViewModel.updateTransactionHistoryGrid();
+// initialise the DropDownList
+utopiasoftware.ally.controller.expenseTrackerPageViewModel.periodDropDownListObject=new ej.dropdowns.DropDownList({placeholder:"Select Period",floatLabelType:'Auto'});// add listener for when the value of the period dropdown list is changed
+utopiasoftware.ally.controller.expenseTrackerPageViewModel.periodDropDownListObject.addEventListener("change",function(){// call the method used to ujpdate all charts on the dashboard.
+// Provide the currently selected value of the eriod dropdown list
+//utopiasoftware.ally.controller.dashboardPageViewModel.refreshDashboardCharts(this.value);
+});// render initialized DropDownList
+utopiasoftware.ally.controller.expenseTrackerPageViewModel.periodDropDownListObject.appendTo('#expense-tracker-period-select');// update the wallet balance dashboard
+//utopiasoftware.ally.controller.expenseTrackerPageViewModel.updateWalletDashboard();
+// hide the loader
+$('#loader-modal').get(0).hide();}},/**
+         * method is triggered when page is shown
+         */pageShow:function pageShow(){// disable the swipeable feature for the app splitter
+$('ons-splitter-side').removeAttr("swipeable");},/**
+         * method is triggered when page is hidden
+         */pageHide:function pageHide(){// stop the rotating animation on main menu page
+//$('.rotating-infinite-ease-in-1').addClass('rotating-infinite-ease-in-1-paused');
+},/**
+         * method is triggered when page is destroyed
+         */pageDestroy:function pageDestroy(){},/**
+         * method is triggered when back button or device back button is clicked
+         */backButtonClicked:function backButtonClicked(){// check if the side menu is open
+if($('ons-splitter').get(0).right.isOpen){// side menu open, so close it
+$('ons-splitter').get(0).right.close();return;// exit the method
+}// check if the menu tabbar exists
+if($('#menu-tabbar').get(0)){// the menu tabbar object exists
+// move to the previous tab
+$('#menu-tabbar').get(0).setActiveTab(3);}},/**
+         * method is used to request a refresh of all chars on the dashboard page
+         *
+         * @param periodType {String} the time period for which the chars sghould be refreshed
+         */refreshDashboardCharts:function refreshDashboardCharts(periodType){// update the wallet-incoming chart using the value of the select Period dropdown list
+utopiasoftware.ally.controller.dashboardPageViewModel.updateWalletIncomingDashboard(periodType);// update the wallet-outgoing chart using the value of the select Period dropdown list
+utopiasoftware.ally.controller.dashboardPageViewModel.updateWalletOutgoingDashboard(periodType);// update the payments-out chart using the value of the select Period dropdown list
+utopiasoftware.ally.controller.dashboardPageViewModel.updatePaymentOutDashboard(periodType);// update the payments-in chart using the value of the select Period dropdown list
+utopiasoftware.ally.controller.dashboardPageViewModel.updatePaymentInDashboard(periodType);}}};
 
 //# sourceMappingURL=controller-compiled.js.map
