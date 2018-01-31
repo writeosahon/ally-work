@@ -1,3 +1,13 @@
 [
-  {"SENDER":"AA+2348067416862","RECEIVER":"AA+2348067416862","TRANSFERTYPE":"Wallet To Wallet","AMOUNT":"2500",
-    "TRANSACTIONREF":"NILL","DDATE":"2017-12-18 09:25:46"}]
+  {"category":"Merchant Payment", "desc":"Payment made to Utopia Software", "amount":"2500",
+    "date":"2017-12-18 09:25:46"},
+  {"category":"Merchant Payment", "desc":"Payment made to Utopia Software", "amount":"2500",
+    "date":"2017-12-18 09:25:46"},
+  {"category":"Merchant Payment", "desc":"Payment made to Utopia Software", "amount":"2500",
+    "date":"2017-12-18 09:25:46"},
+  {"category":"Merchant Payment", "desc":"Payment made to Utopia Software", "amount":"2500",
+    "date":"2017-12-18 09:25:46"},
+  {"category":"Family Needs", "desc":"Payment made to Utopia Software", "amount":"49830",
+    "date":"2017-12-18 09:25:46"},
+  {"category":"Family Needs", "desc":"Payment made to Utopia Software", "amount":"2500",
+    "date":"2017-12-18 09:25:46"}]

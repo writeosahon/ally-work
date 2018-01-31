@@ -16,6 +16,18 @@
         </div>
     </ons-toolbar>
 
+    <ons-fab id="expense-tracker-viz-switch-fab" modifier="mini"
+             style="color: #ffffff; background-color: #30a401; position: fixed; margin-left: 1.1em; bottom: 2px !important;"
+             onclick=""> <!-- viz-switch button -->
+        <ons-icon icon="md-chart" ></ons-icon>
+    </ons-fab>
+
+    <ons-fab id="expense-tracker-add-expense-fab" modifier="mini"
+             style="color: #ffffff; background-color: #30a401; position: fixed; margin-left: 43vw; bottom: 2px !important;"
+             onclick=""> <!-- add expense button -->
+        <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+
     <div style="position: fixed; top: 58px; display: block; width: 100%;">
     <!-- section holds the period select row -->
     <ons-row valign="bottom">
@@ -50,6 +62,8 @@
     </ons-row>
     </div>
 
-    <div class="content" style="background-color: red !important; position: absolute; top: 9em"></div>
+    <div class="content" style="position: absolute; top: 9em">
+        <div id="expense-tracker-grid"></div>
+    </div>
 
 </ons-page>
