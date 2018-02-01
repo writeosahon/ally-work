@@ -8884,9 +8884,18 @@ utopiasoftware.ally.controller = {
                 // add listener for when the value of the period dropdown list is changed
                 utopiasoftware.ally.controller.expenseTrackerPageViewModel.periodDropDownListObject.
                 addEventListener("change", function(){
-                    // call the method used to ujpdate all charts on the dashboard.
-                    // Provide the currently selected value of the eriod dropdown list
-                    //utopiasoftware.ally.controller.dashboardPageViewModel.refreshDashboardCharts(this.value);
+                    // check if the custom date selector needs to be shown
+                    if(utopiasoftware.ally.controller.expenseTrackerPageViewModel.periodDropDownListObject.value ==
+                    "custom"){ // custom date selector needs to be displayed
+                        $('#expense-tracker-custom-date-container', $thisPage).css("visibility", "visible");
+                    }
+                    else{ // hide the custom date selector
+                        $('#expense-tracker-custom-date-container', $thisPage).css("visibility", "collapse");
+
+                        // call the method used to update all charts on the dashboard.
+                        // Provide the currently selected value of the period dropdown list
+                        //utopiasoftware.ally.controller.dashboardPageViewModel.refreshDashboardCharts(this.value);
+                    }
                 });
 
                 // render initialized DropDownList
@@ -9264,6 +9273,85 @@ utopiasoftware.ally.controller = {
                         "yyyy-MM-dd; h:mmtt"); // convert to date object
                     return dataObject; // return the modified object
                 });
+            }
+        },
+
+        /**
+         * method is used to switch between the different types of expense visualisation
+         * i.e. between Grid and Chart type
+         *
+         * @param buttonElem
+         */
+        switchVizTypeButtonClicked: function(buttonElem){
+            var buttonVizTypeState = $(buttonElem).attr('data-ally-viz-type'); // get the visualisation type state of the button
+
+            // handle the differnet buttonVizTypeState values
+            switch(buttonVizTypeState){
+                case "grid": // current state is 'grid'. so, display charts now
+                    // move the carousel to the 1st chart item
+                    $('#expense-tracker-page #expense-tracker-carousel').get(0).setActiveIndex(1).
+                    then(function(){
+                        // change the button icon from chart to grid
+                        $('ons-icon', buttonElem).attr("icon", "md-grid");
+                        // update the button visualisation state attribute of the button
+                        $(buttonElem).attr("data-ally-viz-type", "chart");
+                        // display the chart visualisation mover button
+                        $('#expense-tracker-page #expense-tracker-viz-mover-fab').css("display", "inline-block");
+                        // set the icon for the mover button
+                        $('#expense-tracker-page #expense-tracker-viz-mover-fab ons-icon').attr("icon", "md-chevron-up");
+                        // set the visualisation mover value for the mover button
+                        $('#expense-tracker-page #expense-tracker-viz-mover-fab').attr("data-ally-viz-mover", "up");
+                    });
+                    break;
+
+                case "chart": // current state is 'chart'. so display grids
+                    // move the carousel to the grid item
+                    $('#expense-tracker-page #expense-tracker-carousel').get(0).setActiveIndex(2).
+                    then(function(){
+                        // change the button icon from grid to chart
+                        $('ons-icon', buttonElem).attr("icon", "md-chart");
+                        // update the button visualisation state attribute of the button
+                        $(buttonElem).attr("data-ally-viz-type", "grid");
+                        // hide the chart visualisation mover button
+                        $('#expense-tracker-page #expense-tracker-viz-mover-fab').css("display", "none");
+                        // set the icon for the mover button
+                        $('#expense-tracker-page #expense-tracker-viz-mover-fab ons-icon').attr("icon", "md-chevron-up");
+                        // set the visualisation mover value for the mover button
+                        $('#expense-tracker-page #expense-tracker-viz-mover-fab').attr("data-ally-viz-mover", "up");
+                    });
+                    break;
+            }
+        },
+
+        /**
+         * method is used to move between the available chart types
+         *
+         * @param buttonElem
+         */
+        moveVizButtonClicked: function(buttonElem){
+            var vizMoverPosition = $(buttonElem).attr('data-ally-viz-mover'); // get the visualisation mover state of the button
+
+            // handle the different vizMoverPosition values
+            switch(vizMoverPosition){
+                case "up": // current position is 'up'. so, move the carousel to the next higher item
+                    $('#expense-tracker-page #expense-tracker-carousel').get(0).setActiveIndex(0).
+                    then(function(){
+                        // change the button icon from up to down
+                        $('ons-icon', buttonElem).attr("icon", "md-chevron-down");
+                        // update the button visualisation mover state attribute of the button
+                        $(buttonElem).attr("data-ally-viz-mover", "down");
+                    });
+                    break;
+
+                case "down": // current position is 'down'. so, move the carousel to the next lower item
+                    $('#expense-tracker-page #expense-tracker-carousel').get(0).setActiveIndex(1).
+                    then(function(){
+                        // change the button icon from down to up
+                        $('ons-icon', buttonElem).attr("icon", "md-chevron-up");
+                        // update the button visualisation mover state attribute of the button
+                        $(buttonElem).attr("data-ally-viz-mover", "up");
+                    });
+                    break;
             }
         }
 
