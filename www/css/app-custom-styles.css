@@ -574,3 +574,43 @@
     text-transform: uppercase;
 }
 /** STYLE FOR THE ADD-CARD MERCHANT PAYMENT PAGE ENDS **/
+
+
+/** STYLE FOR THE BUTTON SEGMENT OF THE EXPENSE TRACKER PAGE BEGINS **/
+#expense-tracker-page .segment--material {
+    border-radius: 2px;
+    overflow: hidden;
+    box-shadow: 0 0 2px 0 rgba(0, 0, 0, .12), 0 2px 2px 0 rgba(0, 0, 0, .24);
+}
+#expense-tracker-page .segment--material__button {
+    font-family: 'Roboto', 'Noto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-weight: 400;
+    font-size: 14px;
+    height: 36px;
+    line-height: 36px;
+    border-width: 0;
+    color: #30A401;
+    border-radius: 0;
+    background-color: #C8C8C8;
+}
+#expense-tracker-page :active + .segment--material__button {
+    background-color: #C8C8C8;
+    border-radius: 0;
+    border-width: 0;
+    font-size: 14px;
+    transition: none;
+    color: #30A401;
+}
+#expense-tracker-page :checked + .segment--material__button {
+    background-color: #30A401;
+    color: #FFFFFF;
+    border-radius: 0;
+    border-width: 0;
+}
+#expense-tracker-page .segment--material__item:first-child > .segment--material__button,
+#expense-tracker-page .segment--material__item:last-child > .segment--material__button {
+    border-radius: 0;
+    border-width: 0;
+}
+/** STYLE FOR THE BUTTON SEGMENT OF THE EXPENSE TRACKER PAGE ENDS **/

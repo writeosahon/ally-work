@@ -17,16 +17,18 @@
     </ons-toolbar>
 
     <!-- viz-switch button -->
-    <ons-fab id="expense-tracker-viz-switch-fab" modifier="mini"
+    <!--<ons-fab id="expense-tracker-viz-switch-fab" modifier="mini"
              data-ally-viz-type="grid"
              style="color: #ffffff; background-color: #30a401; position: fixed; margin-left: 1.1em; bottom: 2px !important;"
              onclick="utopiasoftware.ally.controller.expenseTrackerPageViewModel.switchVizTypeButtonClicked(this)">
         <ons-icon icon="md-chart" ></ons-icon>
-    </ons-fab>
+    </ons-fab> -->
 
+    <!-- add expense button -->
     <ons-fab id="expense-tracker-add-expense-fab" modifier="mini"
-             style="color: #ffffff; background-color: #30a401; position: fixed; margin-left: 43vw; bottom: 2px !important;"
-             onclick=""> <!-- add expense button -->
+             style="color: #ffffff; background-color: #30a401; position: fixed; margin-left: 43vw;
+             bottom: 0px !important;"
+             onclick="$('#app-main-navigator').get(0).pushPage('add-expense-page.html', {});">
         <ons-icon icon="md-plus"></ons-icon>
     </ons-fab>
 
@@ -40,7 +42,7 @@
         <ons-icon icon="md-chevron-up"></ons-icon>
     </ons-fab>
 
-    <div style="position: fixed; top: 58px; display: block; width: 100%; background-color: #ffffff !important;">
+    <div style="position: fixed; top: 58px; display: block; width: 100%;">
     <!-- section holds the period select row -->
     <ons-row valign="bottom">
         <ons-col width="50%"></ons-col>
@@ -72,9 +74,24 @@
                        class="hint--bottom"></ons-input>
         </ons-col>
     </ons-row>
+    <!-- holds button segment to move between grid and charts -->
+     <ons-row>
+         <ons-col width="100%" style="text-align: center;">
+             <ons-segment style="width: 80%">
+                 <ons-button
+                         onclick="utopiasoftware.ally.controller.expenseTrackerPageViewModel.switchVizTypeButtonClicked('grid')">
+                     <ons-icon icon="md-grid"></ons-icon> Grid
+                 </ons-button>
+                 <ons-button
+                         onclick="utopiasoftware.ally.controller.expenseTrackerPageViewModel.switchVizTypeButtonClicked('chart')">
+                     <ons-icon icon="md-chart"></ons-icon> Chart
+                 </ons-button>
+             </ons-segment>
+         </ons-col>
+     </ons-row>
     </div>
 
-    <div class="content" style="position: absolute; top: 9em"> <!-- content of the page begins -->
+    <div class="content" style="position: absolute; top: 11em"> <!-- content of the page begins -->
         <!-- carousel holds the combination of expense grid and expense charts -->
         <ons-carousel id="expense-tracker-carousel" direction="vertical" initial-index="2" item-height="100%" style="height: 100%;">
 

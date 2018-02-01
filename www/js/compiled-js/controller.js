@@ -9282,19 +9282,14 @@ utopiasoftware.ally.controller = {
          *
          * @param buttonElem
          */
-        switchVizTypeButtonClicked: function(buttonElem){
-            var buttonVizTypeState = $(buttonElem).attr('data-ally-viz-type'); // get the visualisation type state of the button
+        switchVizTypeButtonClicked: function(buttonVizTypeState){
 
-            // handle the differnet buttonVizTypeState values
+            // handle the different buttonVizTypeState values
             switch(buttonVizTypeState){
-                case "grid": // current state is 'grid'. so, display charts now
+                case "chart": // current state is 'chart'. so, display chart now
                     // move the carousel to the 1st chart item
                     $('#expense-tracker-page #expense-tracker-carousel').get(0).setActiveIndex(1).
                     then(function(){
-                        // change the button icon from chart to grid
-                        $('ons-icon', buttonElem).attr("icon", "md-grid");
-                        // update the button visualisation state attribute of the button
-                        $(buttonElem).attr("data-ally-viz-type", "chart");
                         // display the chart visualisation mover button
                         $('#expense-tracker-page #expense-tracker-viz-mover-fab').css("display", "inline-block");
                         // set the icon for the mover button
@@ -9304,14 +9299,10 @@ utopiasoftware.ally.controller = {
                     });
                     break;
 
-                case "chart": // current state is 'chart'. so display grids
+                case "grid": // current state is 'grid'. so display grid
                     // move the carousel to the grid item
                     $('#expense-tracker-page #expense-tracker-carousel').get(0).setActiveIndex(2).
                     then(function(){
-                        // change the button icon from grid to chart
-                        $('ons-icon', buttonElem).attr("icon", "md-chart");
-                        // update the button visualisation state attribute of the button
-                        $(buttonElem).attr("data-ally-viz-type", "grid");
                         // hide the chart visualisation mover button
                         $('#expense-tracker-page #expense-tracker-viz-mover-fab').css("display", "none");
                         // set the icon for the mover button
