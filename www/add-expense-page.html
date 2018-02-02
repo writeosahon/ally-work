@@ -1,0 +1,101 @@
+<ons-page id="wallet-transfer-page">
+    <ons-toolbar>
+        <div class="left">
+            <ons-toolbar-button onclick="utopiasoftware.ally.controller.walletTransferPageViewModel.backButtonClicked()">
+                <ons-icon icon="md-long-arrow-left"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+        <div class="center">Add Expense</div>
+        <div class="right">
+            <ons-toolbar-button onclick="$('#side-menu').get(0).toggle()">
+                <ons-icon icon="md-menu"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+    </ons-toolbar>
+    <ons-progress-bar class="page-preloader" indeterminate style="display: block;"></ons-progress-bar>
+
+
+    <form id="add-expense-form" autocomplete="off" data-parsley-inputs="ons-input,input,textarea,select"
+          data-parsley-excluded="input[type=button], input[type=submit],
+                              input[type=reset], input[type=hidden], [disabled], :hidden" style="display: block;">
+
+        <ons-list>
+
+            <ons-list-title>Expense Details</ons-list-title>
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-comment-alt-text" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <div style="width: 90%; display: inline-block">
+                        <ons-input id="add-expense-description" type="text" placeholder="Expense Description"
+                                   modifier="transparent"
+                                   required float
+                                   data-parsley-required-message="description is required"
+                                   style="width: 100%" class="hint--bottom"></ons-input>
+                    </div>
+                </div>
+            </ons-list-item>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-calendar" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <div style="width: 90%; display: inline-block">
+                        <ons-input id="add-expense-date" type="text" placeholder="Expense Date"
+                                   modifier="transparent"
+                                   required float
+                                   data-parsley-required-message="description is required"
+                                   style="width: 100%" class="hint--bottom"></ons-input>
+                    </div>
+                </div>
+            </ons-list-item>
+
+            <ons-list-title>Expense Amount</ons-list-title>
+
+            <ons-list-item modifier="nodivider">
+                <div class="left">
+                    <ons-icon icon="md-ally-icon-cash" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <ons-input id="add-expense-amount" required placeholder="Amount (NGN)"
+                               data-parsley-type="number" type="tel"
+                               data-parsley-min="1"
+                               data-parsley-required-message="enter amount"
+                               data-parsley-type-message="provide a valid cash amount"
+                               data-parsley-min-message="minimum amount allowed is 1"
+                               onchange="$(this).val(kendo.toString(kendo.parseFloat($(this).val()), 'n2'));"
+                               class="hint--bottom"></ons-input>
+                </div>
+            </ons-list-item>
+
+            <ons-list-title>Expense Categories</ons-list-title>
+
+            <ons-list-item modifier="nodivider" style="margin-bottom: 3em;">
+                <div class="left">
+                    <ons-icon icon="md-swap" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <div style="width: 80%">
+                        <input id="add-expense-categories" type="text" required
+                               data-parsley-required-message="select an expense category"
+                        class="ally-input-tooltip">
+                    </div>
+                </div>
+            </ons-list-item>
+
+        </ons-list>
+    </form>
+
+    <ons-bottom-toolbar style="height: 56px; !important;">
+        <div style="width: 100%; padding-top: 6px; padding-bottom: 6px; text-align: center">
+            <ons-button id="add-card-wallet-transfer-cancel-button" disable-auto-styling
+                        style="background-color: #dd0000; color: #ffffff; width: 45%; border-radius: 21px;"
+                        onclick="utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.backButtonClicked();">Cancel</ons-button>
+
+            <ons-button id="add-card-wallet-transfer-transfer-button" disable-auto-styling
+                        style="background-color: #30a401; color: #ffffff; width: 45%; border-radius: 21px;">Transfer</ons-button>
+        </div>
+    </ons-bottom-toolbar>
+</ons-page>
