@@ -312,4 +312,16 @@ $(document).on("hide", "#expense-tracker-page", utopiasoftware.ally.controller.e
 // listen for when the Expense-Tracker page is destroyed
 $(document).on("destroy", "#expense-tracker-page", utopiasoftware.ally.controller.expenseTrackerPageViewModel.pageDestroy);
 
+// listen for the initialisation of the Add Expense page
+$(document).on("init", "#add-expense-page", utopiasoftware.ally.controller.addExpensePageViewModel.pageInit);
+
+// listen for when the Add Expense page is shown
+$(document).on("show", "#add-expense-page", utopiasoftware.ally.controller.addExpensePageViewModel.pageShow);
+
+// listen for when the Add Expense page is hidden
+$(document).on("hide", "#add-expense-page", utopiasoftware.ally.controller.addExpensePageViewModel.pageHide);
+
+// listen for when the Add Expense page is destroyed
+$(document).on("destroy", "#add-expense-page", utopiasoftware.ally.controller.addExpensePageViewModel.pageDestroy);
+
 //# sourceMappingURL=model-compiled.js.map

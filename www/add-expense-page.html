@@ -1,7 +1,7 @@
-<ons-page id="wallet-transfer-page">
+<ons-page id="add-expense-page">
     <ons-toolbar>
         <div class="left">
-            <ons-toolbar-button onclick="utopiasoftware.ally.controller.walletTransferPageViewModel.backButtonClicked()">
+            <ons-toolbar-button onclick="utopiasoftware.ally.controller.addExpensePageViewModel.backButtonClicked()">
                 <ons-icon icon="md-long-arrow-left"></ons-icon>
             </ons-toolbar-button>
         </div>
@@ -19,7 +19,7 @@
           data-parsley-excluded="input[type=button], input[type=submit],
                               input[type=reset], input[type=hidden], [disabled], :hidden" style="display: block;">
 
-        <ons-list>
+        <ons-list style="min-height: 100vh !important;">
 
             <ons-list-title>Expense Details</ons-list-title>
             <ons-list-item modifier="nodivider">
@@ -42,12 +42,10 @@
                     <ons-icon icon="md-calendar" class="list-item__icon" fixed-width size="28px"></ons-icon>
                 </div>
                 <div class="center">
-                    <div style="width: 90%; display: inline-block">
-                        <ons-input id="add-expense-date" type="text" placeholder="Expense Date"
-                                   modifier="transparent"
-                                   required float
-                                   data-parsley-required-message="description is required"
-                                   style="width: 100%" class="hint--bottom"></ons-input>
+                    <div style="width: 75%; display: inline-block">
+                        <input id="add-expense-date" type="text" placeholder="Expense Date"
+                                   required
+                                   data-parsley-required-message="expense date is required">
                     </div>
                 </div>
             </ons-list-item>
@@ -72,9 +70,9 @@
 
             <ons-list-title>Expense Categories</ons-list-title>
 
-            <ons-list-item modifier="nodivider" style="margin-bottom: 3em;">
+            <ons-list-item modifier="nodivider">
                 <div class="left">
-                    <ons-icon icon="md-swap" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                    <ons-icon icon="md-view-list" class="list-item__icon" fixed-width size="28px"></ons-icon>
                 </div>
                 <div class="center">
                     <div style="width: 80%">
@@ -90,12 +88,12 @@
 
     <ons-bottom-toolbar style="height: 56px; !important;">
         <div style="width: 100%; padding-top: 6px; padding-bottom: 6px; text-align: center">
-            <ons-button id="add-card-wallet-transfer-cancel-button" disable-auto-styling
+            <ons-button id="add-expense-cancel-button" disable-auto-styling
                         style="background-color: #dd0000; color: #ffffff; width: 45%; border-radius: 21px;"
-                        onclick="utopiasoftware.ally.controller.addCardWalletTransferPageViewModel.backButtonClicked();">Cancel</ons-button>
+                        onclick="utopiasoftware.ally.controller.addExpensePageViewModel.backButtonClicked();">Cancel</ons-button>
 
-            <ons-button id="add-card-wallet-transfer-transfer-button" disable-auto-styling
-                        style="background-color: #30a401; color: #ffffff; width: 45%; border-radius: 21px;">Transfer</ons-button>
+            <ons-button id="add-expense-add-button" disable-auto-styling
+                        style="background-color: #30a401; color: #ffffff; width: 45%; border-radius: 21px;">Add</ons-button>
         </div>
     </ons-bottom-toolbar>
 </ons-page>

@@ -2909,7 +2909,7 @@ utopiasoftware.ally.controller = {
         /**
          * method is triggered when back button or device back button is clicked
          */
-        backButtonClicked: function(){ //todo
+        backButtonClicked: function(){
 
             // check if the side menu is open
             if($('ons-splitter').get(0).right.isOpen){ // side menu open, so close it
@@ -6984,7 +6984,7 @@ utopiasoftware.ally.controller = {
 
                 return serverResponse; // forward the serverResponse i.e the array containing user details & receipt objects
             }).
-            then(function(responseDetailsArray){ //todo adjust result
+            then(function(responseDetailsArray){
                 // forward details of the save the user details to encrypted storage; also forward details of payment
                 return Promise.all([utopiasoftware.ally.saveUserAppDetails(responseDetailsArray[0]),
                     responseDetailsArray[1]]);
@@ -8720,7 +8720,7 @@ utopiasoftware.ally.controller = {
 
                 return Promise.all([...serverResponseArray, $('#hour-glass-loader-modal').get(0).hide()]); // hide loader
             }).
-            then(function(dataArray){ //todo
+            then(function(dataArray){
                 console.log("PAY COMPLETE", dataArray);
                 // forward details of the save the user details to encrypted storage; also forward details of payment
                 return Promise.all([utopiasoftware.ally.saveUserAppDetails(dataArray[0]), dataArray[1]]);
@@ -9297,7 +9297,7 @@ utopiasoftware.ally.controller = {
                         // set the visualisation mover value for the mover button
                         $('#expense-tracker-page #expense-tracker-viz-mover-fab').attr("data-ally-viz-mover", "up");
                         // move the expense tracker add button to the corner of the screen
-                        $('#expense-tracker-page #xpense-tracker-add-expense-fab').css("margin-left", "calc(100vw - 48px)");
+                        $('#expense-tracker-page #expense-tracker-add-expense-fab').css("margin-left", "calc(100vw - 48px)");
                     });
                     break;
 
@@ -9312,7 +9312,7 @@ utopiasoftware.ally.controller = {
                         // set the visualisation mover value for the mover button
                         $('#expense-tracker-page #expense-tracker-viz-mover-fab').attr("data-ally-viz-mover", "up");
                         // move the expense tracker add button close to the middle of the screen
-                        $('#expense-tracker-page #xpense-tracker-add-expense-fab').css("margin-left", "43vw");
+                        $('#expense-tracker-page #expense-tracker-add-expense-fab').css("margin-left", "43vw");
                     });
                     break;
             }
@@ -9380,6 +9380,11 @@ utopiasoftware.ally.controller = {
         expenseCategoryDropdown: null,
 
         /**
+         * used to hold the expense DatePicker component
+         */
+        expenseDatePicker: null,
+
+        /**
          * event is triggered when page is initialised
          */
         pageInit: function(event){
@@ -9407,8 +9412,33 @@ utopiasoftware.ally.controller = {
                 // hide the form
                 $('#add-expense-form', $thisPage).css('display', "none");
 
+                // initialise the expense DatePicker
+                utopiasoftware.ally.controller.addExpensePageViewModel.expenseDatePicker =
+                    new ej.calendars.DatePicker({
+                        placeholder: 'Pick Expense Date',
+                        floatLabelType: 'Auto',
+                        readonly: true,
+                        // sets the min date
+                        //min: new Date(),
+                        //sets the max date
+                        max: new Date(),
+                        format: 'yyyy-MM-dd',
+                        // sets the value.
+                        value: new Date(),
+                        focus: function(){ // listen for when component has focus
+                            // open the date picker
+                            utopiasoftware.ally.controller.addExpensePageViewModel.expenseDatePicker.show();
+                        }
+                    });
+
+                // render initialized expense DatePicker
+                utopiasoftware.ally.controller.addExpensePageViewModel.expenseDatePicker.
+                appendTo('#add-expense-date');
+
+
                 // initialise the expense category widget
-                utopiasoftware.ally.controller.addExpensePageViewModel.expenseCategoryDropdown =  new ej.dropdowns.DropDownList({
+                utopiasoftware.ally.controller.addExpensePageViewModel.expenseCategoryDropdown =
+                    new ej.dropdowns.DropDownList({
                     //set the data to dataSource property
                     dataSource: [],
                     fields: {text: 'CATEGORYNAME', value: 'CATEGORYNAME'},
@@ -9447,9 +9477,9 @@ utopiasoftware.ally.controller = {
                 utopiasoftware.ally.controller.addExpensePageViewModel.formValidator = $('#add-expense-form').parsley();
 
                 // attach listener for the wallet-transfer button on the page
-                $('#wallet-transfer-transfer-button').get(0).onclick = function(){
+                $('#add-expense-add-button').get(0).onclick = function(){
                     // run the validation method for the form
-                    utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.whenValidate();
+                    utopiasoftware.ally.controller.addExpensePageViewModel.formValidator.whenValidate();
                 };
 
                 // listen for the form field validation failure event
@@ -9522,6 +9552,23 @@ utopiasoftware.ally.controller = {
                     // display the form
                     $('#add-expense-form', $thisPage).css('display', "block");
 
+                    // inform the user that they cannot proceed without Internet
+                    window.plugins.toast.showWithOptions({
+                        message: "some content could be loaded without an Internet Connection",
+                        duration: 4000,
+                        position: "top",
+                        styling: {
+                            opacity: 1,
+                            backgroundColor: '#ff0000', //red
+                            textColor: '#FFFFFF',
+                            textSize: 14
+                        }
+                    }, function(toastEvent){
+                        if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                            window.plugins.toast.hide();
+                        }
+                    });
+
                 });
 
 
@@ -9535,7 +9582,7 @@ utopiasoftware.ally.controller = {
          *
          * @param event
          */
-        pageShow: (event) => { //todo
+        pageShow: (event) => {
             // check if the expense category dropdown has been initialised
             if(utopiasoftware.ally.controller.addExpensePageViewModel.expenseCategoryDropdown){
                 // repopulate the expense category dropdown list
@@ -9615,7 +9662,7 @@ utopiasoftware.ally.controller = {
             if(navigator.connection.type === Connection.NONE){ // no Internet Connection
                 // inform the user that they cannot proceed without Internet
                 window.plugins.toast.showWithOptions({
-                    message: "ALLY wallet transfer cannot be performed without an Internet Connection",
+                    message: "New expense cannot be added without an Internet Connection",
                     duration: 4000,
                     position: "top",
                     styling: {
@@ -9635,37 +9682,24 @@ utopiasoftware.ally.controller = {
 
             // create the form data to be submitted
             var formData = {
-                phone_sender: utopiasoftware.ally.model.appUserDetails.phone,
-                phone_receiver: $('#wallet-transfer-page #wallet-transfer-receiver-phone-number').val(),
-                amount: kendo.parseFloat($('#wallet-transfer-page #wallet-transfer-amount').val())
+                phone: utopiasoftware.ally.model.appUserDetails.phone,
+                description: $('#add-expense-page #add-expense-description').val().trim(),
+                amount: kendo.parseFloat($('#add-expense-page #add-expense-amount').val()),
+                category: utopiasoftware.ally.controller.addExpensePageViewModel.expenseCategoryDropdown.value,
+                date: kendo.toString(utopiasoftware.ally.controller.addExpensePageViewModel.expenseDatePicker.value,
+                "yyyy-MM-dd")
             };
 
-            // check if the phone_receiver parameter is properly formatted for sending
-            if(formData.phone_receiver.startsWith("0")){ // the phone number starts with 0, replace it with international dialing code
-                formData.phone_receiver = formData.phone_receiver.replace("0", "+234");
-            }
-
-            // check the transfer mode for the wallet transfer
-            if(utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.value == "wallet transfer"){
-                // add the specified transfer mode to the form data
-                formData.transfer_mode = "wallet transfer";
-            }
-            // check the transfer mode for the wallet transfer
-            if(utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.value == "card transfer"){
-                // add the specified transfer mode and card number to the form data
-                formData.transfer_mode = "card transfer";
-                formData.cardno = utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.value;
-            }
 
             // display the loader message to indicate that account is being created;
-            $('#hour-glass-loader-modal .modal-message').html("Completing Wallet Transfer...");
+            $('#hour-glass-loader-modal .modal-message').html("Adding New Expense...");
             // forward the form data & show loader
             Promise.all([formData, Promise.resolve($('#hour-glass-loader-modal').get(0).show())]).
             then(function(dataArray){
                 // submit the form data
                 return Promise.resolve($.ajax(
                     {
-                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/transfer-wallet-to-wallet.php",
+                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/save-expense.php",
                         type: "post",
                         contentType: "application/x-www-form-urlencoded",
                         beforeSend: function(jqxhr) {
@@ -9684,7 +9718,7 @@ utopiasoftware.ally.controller = {
 
                 // check if any error occurred
                 if(serverResponse.status != "success"){ // an error occured
-                    throw serverResponse.message || serverResponse.data.message; // throw the error message attached to this error
+                    throw serverResponse.message; // throw the error message attached to this error
                 }
 
                 return serverResponse; // forward the server response
@@ -9693,141 +9727,40 @@ utopiasoftware.ally.controller = {
                 // hide the loader
                 return Promise.all([serverResponse, $('#hour-glass-loader-modal').get(0).hide()]);
             }).
-            then(function(responseArray){
-                // ask user for transaction otp
-                return Promise.all([responseArray[0], ons.notification.prompt({title: "ALLY Secure PIN Confirmation",
-                    id: 'pin-security-check2',
-                    messageHTML: `<div><ons-icon icon="ion-lock-combination" size="24px"
-                    style="color: #30a401; float: left; width: 26px;"></ons-icon>
-                    <span style="float: right; width: calc(100% - 26px);">
-                    ${responseArray[0].fullname.length > 1 ?
-                    'RECIPIENT: ' +  responseArray[0].fullname + '<br>' :  ''}
-                    TRANSFER FEE: ${kendo.toString(kendo.parseFloat(responseArray[0].appfee), 'n2')}<br>
-                    AMOUNT TO CHARGE: ${kendo.toString(kendo.parseFloat(responseArray[0].total), 'n2')}<br>
-                    Confirm wallet transfer by providing your ALLY Secure PIN</span></div>`,
-                    cancelable: false, placeholder: "Secure PIN", inputType: "number", defaultValue: "", autofocus: false,
-                    submitOnEnter: true
-                })]);
-            }).
-            then(function(responseArray){
-                // display the loader message to indicate that account is being created;
-                $('#hour-glass-loader-modal .modal-message').html("Authorizing Wallet Transfer...");
-                return Promise.all([...responseArray, $('#hour-glass-loader-modal').get(0).show()])
-            }).
-            then(function(responseArray){
-                // create the data to be sent for confirm of wallet transfer
-                var confirmationData = responseArray[0];
-                confirmationData.lock = responseArray[1];
-                confirmationData.cardno = utopiasoftware.ally.controller.walletTransferPageViewModel.cardDropDownList.value;
-                confirmationData.transfer_mode = formData.transfer_mode;
+            then(function(){
 
-                // submit the data
-                return Promise.all([Promise.resolve($.ajax(
-                    {
-                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/transfer-wallet-to-wallet-confirm.php",
-                        type: "post",
-                        contentType: "application/x-www-form-urlencoded",
-                        beforeSend: function(jqxhr) {
-                            jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
-                        },
-                        dataType: "text",
-                        timeout: 240000, // wait for 4 minutes before timeout of request
-                        processData: true,
-                        data: confirmationData // data to submit to server
-                    }
-                )), responseArray[0]]);
-            }).
-            then(function(serverResponse){ // NOTE: serverResponse is an array
-                serverResponse[0] = JSON.parse((serverResponse[0] +"").trim()); // get the new user object
-
-                // check if any error occurred
-                if(serverResponse[0].status == "error"){ // an error occured
-                    throw serverResponse.message; // throw the error message attached to this error
-                }
-
-                return serverResponse; // forward the serverResponse i.e the user details object
-            }).
-            then(function(responseDetailsArray){ // the parameter contains 2 items. item 1 - userDetails; item 2- details of the wallet transfer
-                // forward details of the wallet-transfer; also save the user details to encrypted storage;
-                return Promise.all([responseDetailsArray[1], utopiasoftware.ally.saveUserAppDetails(responseDetailsArray[0])]);
-            }).
-            then(function(dataArray){
-                // update local copy of user app details
-                utopiasoftware.ally.model.appUserDetails = dataArray[1];
-                // update the transfers-out chart
-                //utopiasoftware.ally.controller.walletTransferPageViewModel.updateTransfersOutChart('today');
                 // reset the page scroll position to the top
-                $('#wallet-transfer-page .page__content').scrollTop(0);
-                // forward details of the wallet-transfer and the user details
-                return Promise.all([...dataArray, $('#hour-glass-loader-modal').get(0).hide()]);
+                $('#add-expense-page .page__content').scrollTop(0);
+                // hide the loader
+                return Promise.all([$('#hour-glass-loader-modal').get(0).hide()]);
             }).
-            then(function(dataArray){
-                // check if the recipient of the wallet transfer is a registered user
-                if(dataArray[0].isregistereduser != "yes") {
-                    // append the json details for the wallet-transfer to the wallet-transfer-sms-confirm-modal confirmation button
-                    $($('#wallet-transfer-sms-confirm-modal #wallet-transfer-sms-confirm-button').get(0)).
-                    attr("data-wallet-transfer", JSON.stringify(dataArray[0]));
-                    // show the wallet-transfer-sms-confirm-modal to the user
-                    return $('#wallet-transfer-sms-confirm-modal').get(0).show();
-                }
-                else{ // recipient is registered
-                    return "registered recipient";
-                }
-            }).
-            then(function(result){
-                if(result === "registered recipient"){ // the recipient of the wallet transfer is already registered
+            then(function(){
 
-                    hockeyapp.trackEvent(function(){}, function(){}, "FUND TRANSFERRED"); // track fund transfer
+                // reset the form for the add expense page
+                $('#add-expense-page #add-expense-form').get(0).reset();
+                // reset the form validator object on the page
+                utopiasoftware.ally.controller.addExpensePageViewModel.formValidator.reset();
 
-                    // reset the form for the wallet transfer page
-                    $('#wallet-transfer-page #wallet-transfer-form').get(0).reset();
-                    // reset the form validator object on the page
-                    utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.reset();
+                // reset the date picker dropdown to the default value
+                utopiasoftware.ally.controller.addExpensePageViewModel.expenseDatePicker.value =
+                    utopiasoftware.ally.controller.addExpensePageViewModel.expenseDatePicker.max;
+               utopiasoftware.ally.controller.addExpensePageViewModel.expenseDatePicker.dataBind();
 
-                    // reset the transfer mode dropdown to the default value
-                    utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.value = "wallet transfer";
-                    utopiasoftware.ally.controller.walletTransferPageViewModel.transferModeDropdown.dataBind();
+                // reset the expense category dropdown to default value
+                utopiasoftware.ally.controller.addExpensePageViewModel.expenseCategoryDropdown.value = null;
+                utopiasoftware.ally.controller.addExpensePageViewModel.expenseCategoryDropdown.dataBind();
 
-                    // send push notification to the recipient of the transfer
-                    let pushNotification = { // create the push notification object
-                        "app_id": "d5d2bdba-eec0-46b1-836e-c5b8e318e928",
-                        "filters": [{"field": "tag", "key": "phone", "relation": "=", "value":
-                        formData.phone_receiver}],
-                        "contents": {"en": "You received funds into your ALLY WALLET from " +
-                        utopiasoftware.ally.model.appUserDetails.firstname + " " + utopiasoftware.ally.model.appUserDetails.lastname},
-                        "headings": {"en": "Funds Received"},
-                        "android_channel_id": "66dfeddf-12d7-4194-b3d9-38325042d258",
-                        "android_visibility": 0,
-                        "priority": 5
-                    };
-
-                    Promise.resolve($.ajax(
-                        {
-                            url: "https://onesignal.com/api/v1/notifications",
-                            type: "post",
-                            contentType: "application/json",
-                            beforeSend: function(jqxhr) {
-                                jqxhr.setRequestHeader("Authorization", "Basic MmQ3ODcwZGUtYmIyYS00NzY5LWIwZWQtMTk5ZGRjNzU2M2Q3");
-                            },
-                            dataType: "json",
-                            timeout: 240000, // wait for 4 minutes before timeout of request
-                            processData: false,
-                            data: JSON.stringify(pushNotification)
-                        }
-                    ));
-
-                    return Promise.all([ons.notification.toast("Wallet Transfer Successful!", {timeout:4000})]); // conclude wallet transfer process
-                }
+                return Promise.all([ons.notification.toast("Expense Successfully Added!", {timeout:4000})]); // conclude expense added process
 
             }).
             catch(function(err){
                 if(typeof err !== "string"){ // if err is NOT a String
-                    err = "Sorry. Your ALLY wallet transfer could not be completed. Please retry"
+                    err = "Sorry. New expense could not be added. Please retry"
                 }
 
                 $('#hour-glass-loader-modal').get(0).hide(); // hide loader
                 ons.notification.alert({title: '<ons-icon icon="md-close-circle-o" size="32px" ' +
-                'style="color: red;"></ons-icon> Wallet Transfer Failed',
+                'style="color: red;"></ons-icon> Expense Addition Failed',
                     messageHTML: '<span>' + err + '</span>',
                     cancelable: false
                 });
@@ -9846,6 +9779,10 @@ utopiasoftware.ally.controller = {
                 return; // exit the method
             }
 
+            // close the date picker if it is open
+            utopiasoftware.ally.controller.addExpensePageViewModel.expenseDatePicker.hide();
+
+            // move to the previous page on the app main navigator stack
             $('#app-main-navigator').get(0).popPage();
         }
 
