@@ -8823,6 +8823,12 @@ utopiasoftware.ally.controller = {
         expenseTrackerGrid: null,
 
         /**
+         * property is used to hold the date range picker for the
+         * custom expense date range
+         */
+        expenseTrackerDateRangerPicker: null,
+
+        /**
          * property is used to hold the "Transfers In" Chart
          */
         walletIncomingChart: null,
@@ -8871,8 +8877,39 @@ utopiasoftware.ally.controller = {
                 ej.grids.Grid.Inject(ej.grids.Page, ej.grids.Selection, ej.grids.Scroll, ej.grids.Search, ej.grids.Toolbar, ej.grids.PdfExport,
                     ej.grids.ExcelExport, ej.grids.Group, ej.grids.Aggregate);
 
-                // update the Transaction History Grid
-                //utopiasoftware.ally.controller.transactionHistoryPageViewModel.updateTransactionHistoryGrid();
+                // initialise the expense DateRangePicker
+                utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerDateRangerPicker =
+                    new ej.calendars.DateRangePicker({
+                        placeholder: 'Pick Date Range',
+                        floatLabelType: 'Auto',
+                        separator: '-',
+                        readonly: true,
+                        //sets the start date in the range
+                        //startDate: new Date(),
+                        //sets the end date in the range
+                        //endDate: new Date(),
+                        //sets the min date in the range
+                        min: new Date('2008-01-01'),
+                        //sets the max.
+                        max: new Date(),
+                        format: 'yyyy/MM/dd',
+                        change: function(){ // listener is triggered when date range values are successfully changed
+                            // create the arguments that will be passed to the appropriate method
+                            var argumentArray = [];
+                            argumentArray[0] = 'custom';
+                            argumentArray[1] = utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                                expenseTrackerDateRangerPicker.startDate;
+                            argumentArray[2] = utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                                expenseTrackerDateRangerPicker.endDate;
+                            // refresh the expense tracker displays
+                            utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                            refreshExpenseTrackerDisplays(...argumentArray);
+                        }
+                    });
+
+                // render initialized expense DatePicker
+                utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerDateRangerPicker.
+                appendTo('#expense-tracker-custom-date');
 
                 // initialise the DropDownList
                 utopiasoftware.ally.controller.expenseTrackerPageViewModel.periodDropDownListObject =
@@ -8891,10 +8928,11 @@ utopiasoftware.ally.controller = {
                     }
                     else{ // hide the custom date selector
                         $('#expense-tracker-custom-date-container', $thisPage).css("visibility", "collapse");
-
-                        // call the method used to update all charts on the dashboard.
+                        // refresh the expense tracker displays
                         // Provide the currently selected value of the period dropdown list
-                        //utopiasoftware.ally.controller.dashboardPageViewModel.refreshDashboardCharts(this.value);
+                        utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                            refreshExpenseTrackerDisplays(utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                            periodDropDownListObject.value);
                     }
                 });
 
@@ -8902,8 +8940,8 @@ utopiasoftware.ally.controller = {
                 utopiasoftware.ally.controller.expenseTrackerPageViewModel.periodDropDownListObject.
                 appendTo('#expense-tracker-period-select');
 
-                // update expense tracker grid
-                utopiasoftware.ally.controller.expenseTrackerPageViewModel.updateExpenseTrackerGrid();
+                // refresh expense tracker grid
+                utopiasoftware.ally.controller.expenseTrackerPageViewModel.refreshExpenseTrackerDisplays();
 
                 // hide the loader
                 $('#loader-modal').get(0).hide();
@@ -8949,6 +8987,9 @@ utopiasoftware.ally.controller = {
                 return; // exit the method
             }
 
+            // hide date range picker
+            utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerDateRangerPicker.hide();
+
             // check if the menu tabbar exists
             if($('#menu-tabbar').get(0)){ // the menu tabbar object exists
                 // move to the previous tab
@@ -8957,42 +8998,51 @@ utopiasoftware.ally.controller = {
         },
 
         /**
-         * method is used to request a refresh of all chars on the dashboard page
+         * /**
+         * method is used to request a refresh of all charts nad the grid on the expense page
          *
-         * @param periodType {String} the time period for which the chars sghould be refreshed
+         * @param periodType {String} the time period for which the chars should be refreshed
+         * @param customStartDate {Date}
+         * @param customEndDate {Date}
          */
-        refreshDashboardCharts: function(periodType){
+        refreshExpenseTrackerDisplays: function(periodType = 'today', customStartDate, customEndDate){
 
+            // update the expense tracker grid
+            utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+            updateExpenseTrackerGrid(periodType, customStartDate, customEndDate);
             // update the wallet-incoming chart using the value of the select Period dropdown list
-            utopiasoftware.ally.controller.dashboardPageViewModel.
-            updateWalletIncomingDashboard(periodType);
-
-            // update the wallet-outgoing chart using the value of the select Period dropdown list
-            utopiasoftware.ally.controller.dashboardPageViewModel.
-            updateWalletOutgoingDashboard(periodType);
-
-            // update the payments-out chart using the value of the select Period dropdown list
-            utopiasoftware.ally.controller.dashboardPageViewModel.
-            updatePaymentOutDashboard(periodType);
-
-            // update the payments-in chart using the value of the select Period dropdown list
-            utopiasoftware.ally.controller.dashboardPageViewModel.
-            updatePaymentInDashboard(periodType);
+            //utopiasoftware.ally.controller.dashboardPageViewModel.
+            //updateWalletIncomingDashboard(periodType);
+            //
+            //// update the wallet-outgoing chart using the value of the select Period dropdown list
+            //utopiasoftware.ally.controller.dashboardPageViewModel.
+            //updateWalletOutgoingDashboard(periodType);
+            //
+            //// update the payments-out chart using the value of the select Period dropdown list
+            //utopiasoftware.ally.controller.dashboardPageViewModel.
+            //updatePaymentOutDashboard(periodType);
+            //
+            //// update the payments-in chart using the value of the select Period dropdown list
+            //utopiasoftware.ally.controller.dashboardPageViewModel.
+            //updatePaymentInDashboard(periodType);
         },
 
 
         /**
          * update the expense tracker grid. Either using cached data or remote data
          *
+         * @param periodType
+         * @param customStartDate
+         * @param customEndDate
          */
-        updateExpenseTrackerGrid: function(){
+        updateExpenseTrackerGrid: function(periodType = 'today', customStartDate, customEndDate){
 
             var pdfExportBlob = null; // holds the blob for the pdf content being exported
 
             // check if the Expense Tracker Grid has been created before, if so, show spinner
             if(utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid){ // grid has previously been created
-                // destroy the grid object
-                utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.destroy();
+                // show spinner for the grid object
+                utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.showSpinner();
             }
 
 
@@ -9121,11 +9171,21 @@ utopiasoftware.ally.controller = {
                 return; // exit method
             }
 
+            // create the data to be sent to server
+            var formData = {phone: utopiasoftware.ally.model.appUserDetails.phone,
+                duration: periodType};
+            // check if the periodType == custom . if so append the custom date ranges
+            if(periodType == 'custom'){
+                formData.from_date = kendo.toString(utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                    expenseTrackerDateRangerPicker.startDate, "yyyy-MM-dd");
+                formData.to_date = kendo.toString(utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                    expenseTrackerDateRangerPicker.endDate, "yyyy-MM-dd");
+            }
             //THERE IS AN INTERNET CONNECTION
             // request for the user wallet transfer-in data for the provided time period
             Promise.resolve($.ajax(
                 {
-                    url:  "dummy-grid.json", //utopiasoftware.ally.model.ally_base_url + "/mobile/transaction-report.php",
+                    url:  utopiasoftware.ally.model.ally_base_url + "/mobile/get-my-expenses.php",
                     type: "post",
                     contentType: "application/x-www-form-urlencoded",
                     beforeSend: function(jqxhr) {
@@ -9134,26 +9194,32 @@ utopiasoftware.ally.controller = {
                     dataType: "text",
                     timeout: 240000, // wait for 4 minutes before timeout of request
                     processData: true,
-                    data: {phone: utopiasoftware.ally.model.appUserDetails.phone} // data to submit to server
+                    data: formData // data to submit to server
                 }
             )).
             then(function(serverResponse){// retrieve the server response
                 serverResponse +=  "";
                 serverResponse = JSON.parse(serverResponse.trim()); // return the server response as an object
-                return Promise.all([serverResponse, utopiasoftware.ally.transactionHistoryCharts.loadTransactionHistoryData()]);
+                return Promise.all([serverResponse, utopiasoftware.ally.expenseTrackerGrid.loadExpenseTrackerData()]);
             }).
             then(function(dataArray){ // save the grid array data to cache
                 dataArray[1] = dataArray[1];
-                dataArray[1] = dataArray[0];
-                //return utopiasoftware.ally.transactionHistoryCharts.saveTransactionHistoryData(dataArray[1]);
-                return dataArray[1];
+                dataArray[1][periodType] = dataArray[0];
+                return utopiasoftware.ally.expenseTrackerGrid.saveExpenseTrackerData(dataArray[1]);
             }).
             then(function(dataArray){ // get the data array to be used by grid
                 // format the chart data array so it can be properly used
-                return gridDataMapping(dataArray);
+                return gridDataMapping(dataArray[periodType]);
             }).
             then(function(dataArray){
                 console.log(dataArray);
+                // check if the Expense Tracker Grid has been created before, if so, destroy it
+                if(utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid){ // grid has previously been created
+                    // hide spinner
+                    utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.hideSpinner();
+                    // destroy the grid object
+                    utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.destroy();
+                }
                 utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid =
                     new ej.grids.Grid({
                         // Width for grid
@@ -9165,21 +9231,21 @@ utopiasoftware.ally.controller = {
                         allowPdfExport: true,
                         allowExcelExport: true,
                         allowGrouping: true,
-                        groupSettings: {showDropArea: false, columns: ['category']},
+                        groupSettings: {showDropArea: false, columns: ['CATEGORY']},
                         toolbar: ['search', 'columnchooser', 'pdfexport'],
                         columns: [
-                            { field: 'category', headerText: 'Category', width: "25%", clipMode: 'ellipsiswithtooltip' },
-                            { field: 'desc', headerText: 'Desc.', width: "25%", clipMode: 'ellipsiswithtooltip',
+                            { field: 'CATEGORY', headerText: 'Category', width: "25%", clipMode: 'ellipsiswithtooltip' },
+                            { field: 'DESCRIPTION', headerText: 'Desc.', width: "25%", clipMode: 'ellipsiswithtooltip',
                                 allowGrouping: false},
-                            { field: 'amount', headerText: 'Amount', width: "25%", textAlign: 'right',
+                            { field: 'AMOUNT', headerText: 'Amount', width: "25%", textAlign: 'right',
                                 clipMode: 'ellipsiswithtooltip', allowGrouping: false},
-                            { field: 'date', headerText: 'Date', width: "25%",
+                            { field: 'DDATE', headerText: 'Date', width: "25%",
                                 clipMode: 'ellipsiswithtooltip', visible: false, allowGrouping: false}
                         ],
                         aggregates: [{
                             columns: [{
                                 type: 'sum',
-                                field: 'amount',
+                                field: 'AMOUNT',
                                 groupFooterTemplate: 'Sub-total: ${sum}',
                                 footerTemplate: 'Total: ${sum}'
                             }]
@@ -9199,7 +9265,7 @@ utopiasoftware.ally.controller = {
                                 });
                             }).then(function(directory){
                                 return new Promise(function(resolve, reject){ // return the created file which holds the pdf document
-                                    directory.getFile('ALLY-Transactions-' + Date.now() + '.pdf', {create:true, exclusive: false},
+                                    directory.getFile('ALLY-Expense-Tracker-' + Date.now() + '.pdf', {create:true, exclusive: false},
                                         resolve, reject);
                                 });
                             }).
@@ -9218,9 +9284,13 @@ utopiasoftware.ally.controller = {
                                     fileWriter.write(pdfExportBlob); // write the content of the blob to the file
                                 });
                             }).then(function(){ // notify that export completed
+                                // hide the spinner
+                                utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.hideSpinner();
                                 ons.notification.toast("PDF Exported to Root Folder!", {timeout:4000});
                             }).
-                            catch(function(err){console.log("EXPORT FAILED", err)});
+                            catch(function(err){
+                                utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.hideSpinner();
+                            });
                         }
                     });
 
@@ -9233,7 +9303,8 @@ utopiasoftware.ally.controller = {
                     toolbarClick = function (args) {
                     console.log("ID ", args.item.id);
                     if (args.item.id === 'expense-tracker-grid_pdfexport') { // the toolbar button being clicked is the 'PDF Export'
-                        console.log("DATASOURCE ", utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.dataSource);
+                        utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.showSpinner();
+
                         utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.
                         pdfExport({
                             includeHiddenColumn: true,
@@ -9261,16 +9332,15 @@ utopiasoftware.ally.controller = {
 
 
             /**
-             * function is used to map the grid data into an appropriate form that can be displayed by the chart
+             * function is used to map the grid data into an appropriate form that can be displayed by the grid
              * @param gridDataArray {Array} array containing grid data objects to be mapped
              *
              * @return {Array} an array containing properly formatted objects that can be used by the grid
              */
             function gridDataMapping(gridDataArray){
                 return gridDataArray.map(function(dataObject){
-                    dataObject.AMOUNT = kendo.toString(kendo.parseFloat(dataObject.AMOUNT), "n2"); // convert to currency format
-                    dataObject.DDATE = kendo.toString(kendo.parseDate(dataObject.DDATE, "yyyy-MM-dd HH:mm:ss"),
-                        "yyyy-MM-dd; h:mmtt"); // convert to date object
+                    dataObject.DDATE = kendo.toString(kendo.parseDate(dataObject.DDATE, "yyyy-MM-dd"),
+                        "yyyy-MM-dd"); // convert to date object
                     return dataObject; // return the modified object
                 });
             }
@@ -9357,8 +9427,6 @@ utopiasoftware.ally.controller = {
      */
     addExpensePageViewModel: {
 
-
-
         /**
          * used to hold the parsley form validation object for the page
          */
@@ -9418,13 +9486,13 @@ utopiasoftware.ally.controller = {
                         placeholder: 'Pick Expense Date',
                         floatLabelType: 'Auto',
                         readonly: true,
+                        // sets the value.
+                        value: new Date(),
                         // sets the min date
                         //min: new Date(),
                         //sets the max date
                         max: new Date(),
                         format: 'yyyy-MM-dd',
-                        // sets the value.
-                        value: new Date(),
                         focus: function(){ // listen for when component has focus
                             // open the date picker
                             utopiasoftware.ally.controller.addExpensePageViewModel.expenseDatePicker.show();

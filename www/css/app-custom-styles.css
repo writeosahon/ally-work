@@ -614,3 +614,11 @@
     border-width: 0;
 }
 /** STYLE FOR THE BUTTON SEGMENT OF THE EXPENSE TRACKER PAGE ENDS **/
+
+
+/** STYLE FOR THE DATE RANGE PICKER OF THE EXPENSE TRACKER PAGE BEGINS **/
+#expense-tracker-custom-date_popup {
+    left: 10% !important;
+    top: 12em !important;
+}
+/** STYLE FOR THE BUTTON SEGMENT OF THE EXPENSE TRACKER PAGE ENDS **/

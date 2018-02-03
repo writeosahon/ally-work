@@ -58,20 +58,13 @@
 
     <!-- section holds the period select row -->
     <ons-row id="expense-tracker-custom-date-container" valign="middle" style="visibility: collapse; margin-top: 0; padding-top: 0;">
-        <ons-col width="40%" style="margin-top: 0; padding-top: 0; margin-left: 3.5%; margin-right: 3.5%">
-            <ons-input id="expense-tracker-from-date" required readonly float placeholder="From Date"
-                       type="text"
-                       data-parsley-required-message="enter date"
-                       class="hint--bottom"></ons-input>
+        <ons-col width="10%" style="margin-top: 0; padding-top: 0;">
         </ons-col>
-        <ons-col width="5%" style="margin-top: 0; padding-top: 0; text-align: center">
-            <ons-icon icon="md-minus" size="28px" style="color: gray"></ons-icon>
+        <ons-col width="80%" style="margin-top: 0; padding-top: 0; text-align: center">
+            <input id="expense-tracker-custom-date" type="text"
+            onfocus="utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerDateRangerPicker.show();">
         </ons-col>
-        <ons-col width="41%" style="margin-top: 0; padding-top: 0; margin-left: 3.5%; margin-right: 2.5%">
-            <ons-input id="expense-tracker-to-date" required readonly float placeholder="To Date"
-                       type="text"
-                       data-parsley-required-message="enter date"
-                       class="hint--bottom"></ons-input>
+        <ons-col width="10%" style="margin-top: 0; padding-top: 0;">
         </ons-col>
     </ons-row>
     <!-- holds button segment to move between grid and charts -->
@@ -98,12 +91,28 @@
             <ons-carousel-item> <!-- item holds the expense radial gauge -->
                 <ons-card id="expense-tracker-radial-gauge"
                           style="width: 100%; height: 20em; padding: 0 !important; background-color: #ffffff">
+                    <div class="title" style="font-size: 0.85em; padding: 0.5em;">
+                        ALLY Expense Tracker (Gauge)
+                    </div>
+                    <div class="content" style="padding: 0.5em;">
+
+                        <ons-icon icon="md-settings" size="28px" style="color: #30a401;" spin>
+                        </ons-icon>
+                    </div>
                 </ons-card>
             </ons-carousel-item>
 
             <ons-carousel-item> <!-- item holds the expense bar chart -->
                 <ons-card id="expense-tracker-barchart"
                           style="width: 100%; height: 20em; padding: 0 !important; background-color: #ffffff">
+                    <div class="title" style="font-size: 0.85em; padding: 0.5em;">
+                        ALLY Expense Tracker (Bar Chart)
+                    </div>
+                    <div class="content" style="padding: 0.5em;">
+
+                        <ons-icon icon="md-settings" size="28px" style="color: #30a401;" spin>
+                        </ons-icon>
+                    </div>
                 </ons-card>
             </ons-carousel-item>
 
