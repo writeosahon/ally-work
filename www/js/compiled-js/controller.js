@@ -9166,16 +9166,14 @@ utopiasoftware.ally.controller = {
                                     });
                                 }).then(function(){ // notify that export completed
                                     utopiasoftware.ally.controller.expenseTrackerPageViewModel.
-                                        expenseTrackerGrid.allowGrouping = true;
-                                    utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.dataBind();
+                                        expenseTrackerGrid.groupColumn("CATEGORY");
                                     // hide the spinner
                                     utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.hideSpinner();
                                     ons.notification.toast("PDF Exported to Root Folder!", {timeout:4000});
                                 }).
                                 catch(function(err){
                                     utopiasoftware.ally.controller.expenseTrackerPageViewModel.
-                                        expenseTrackerGrid.allowGrouping = true;
-                                    utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.dataBind();
+                                    expenseTrackerGrid.groupColumn("CATEGORY");
                                     utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.hideSpinner();
                                 });
                             }
@@ -9192,8 +9190,7 @@ utopiasoftware.ally.controller = {
                         if (args.item.id === 'expense-tracker-grid_pdfexport') { // the toolbar button being clicked is the 'PDF Export'
                             utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.showSpinner();
                             utopiasoftware.ally.controller.expenseTrackerPageViewModel.
-                                expenseTrackerGrid.allowGrouping = false;
-                            utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.dataBind();
+                            expenseTrackerGrid.ungroupColumn("CATEGORY");
 
                             utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.
                             pdfExport({
@@ -9338,16 +9335,14 @@ utopiasoftware.ally.controller = {
                                 });
                             }).then(function(){ // notify that export completed
                                 utopiasoftware.ally.controller.expenseTrackerPageViewModel.
-                                    expenseTrackerGrid.allowGrouping = true;
-                                utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.dataBind();
+                                expenseTrackerGrid.groupColumn("CATEGORY");
                                 // hide the spinner
                                 utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.hideSpinner();
                                 ons.notification.toast("PDF Exported to Root Folder!", {timeout:4000});
                             }).
                             catch(function(err){
                                 utopiasoftware.ally.controller.expenseTrackerPageViewModel.
-                                    expenseTrackerGrid.allowGrouping = true;
-                                utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.dataBind();
+                                expenseTrackerGrid.groupColumn("CATEGORY");
                                 utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.hideSpinner();
                             });
                         }
@@ -9364,8 +9359,7 @@ utopiasoftware.ally.controller = {
                     if (args.item.id === 'expense-tracker-grid_pdfexport') { // the toolbar button being clicked is the 'PDF Export'
                         utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.showSpinner();
                         utopiasoftware.ally.controller.expenseTrackerPageViewModel.
-                            expenseTrackerGrid.allowGrouping = false;
-                        utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.dataBind();
+                        expenseTrackerGrid.ungroupColumn("CATEGORY");
 
                         utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.
                         pdfExport({
