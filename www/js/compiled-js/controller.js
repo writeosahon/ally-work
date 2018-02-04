@@ -914,12 +914,13 @@ utopiasoftware.ally.controller = {
                 promisesArray.push(promiseObject);
                 // if the previously logged in user is NOT the same user trying to log in
                 if(window.localStorage.getItem("app-status") != formData.phone){ // a different user from the stored user is loggin in
-                    // add the promise object used to delete the cached chart data
+                    // add the promise object used to delete all other cached data
                     promisesArray.push(utopiasoftware.ally.dashboardCharts.deleteWalletTransferInData(),
                         utopiasoftware.ally.dashboardCharts.deleteWalletTransferOutData(),
                         utopiasoftware.ally.dashboardCharts.deletePaymentOutData(),
                         utopiasoftware.ally.dashboardCharts.deletePaymentInData(),
-                        utopiasoftware.ally.transactionHistoryCharts.deleteTransactionHistoryData());
+                        utopiasoftware.ally.transactionHistoryCharts.deleteTransactionHistoryData(),
+                        utopiasoftware.ally.expenseTrackerGrid.deleteExpenseTrackerData());
                 }
 
                 // return promise when all operations have completed
@@ -1423,7 +1424,8 @@ utopiasoftware.ally.controller = {
                     utopiasoftware.ally.dashboardCharts.deleteWalletTransferOutData(),
                     utopiasoftware.ally.dashboardCharts.deletePaymentOutData(),
                     utopiasoftware.ally.dashboardCharts.deletePaymentInData(),
-                    utopiasoftware.ally.transactionHistoryCharts.deleteTransactionHistoryData());
+                    utopiasoftware.ally.transactionHistoryCharts.deleteTransactionHistoryData(),
+                    utopiasoftware.ally.expenseTrackerGrid.deleteExpenseTrackerData());
 
                 // return promise when all operations have completed
                 return Promise.all(promisesArray);
@@ -8812,6 +8814,11 @@ utopiasoftware.ally.controller = {
     expenseTrackerPageViewModel: {
 
         /**
+         * object is used to hold the tooltip for the expense tracker date range picker
+         */
+        dateRangePickerToolTip: null,
+
+        /**
          * property is used to hold the "Period Select" dropdown list
          */
         periodDropDownListObject: null,
@@ -8874,8 +8881,8 @@ utopiasoftware.ally.controller = {
                 $thisPage.get(0).onDeviceBackButton = utopiasoftware.ally.controller.expenseTrackerPageViewModel.backButtonClicked;
 
                 // inject the the modules required to create the transaction history grid
-                ej.grids.Grid.Inject(ej.grids.Page, ej.grids.Selection, ej.grids.Scroll, ej.grids.Search, ej.grids.Toolbar, ej.grids.PdfExport,
-                    ej.grids.ExcelExport, ej.grids.Group, ej.grids.Aggregate);
+                ej.grids.Grid.Inject(ej.grids.Page, ej.grids.Selection, ej.grids.Scroll, ej.grids.Search, ej.grids.Toolbar,
+                    ej.grids.PdfExport, ej.grids.ExcelExport, ej.grids.Group, ej.grids.Aggregate);
 
                 // initialise the expense DateRangePicker
                 utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerDateRangerPicker =
@@ -8939,6 +8946,19 @@ utopiasoftware.ally.controller = {
                 // render initialized DropDownList
                 utopiasoftware.ally.controller.expenseTrackerPageViewModel.periodDropDownListObject.
                 appendTo('#expense-tracker-period-select');
+
+                // initialise date range picker tooltio
+                utopiasoftware.ally.controller.expenseTrackerPageViewModel.dateRangePickerToolTip =
+                new ej.popups.Tooltip({
+                    target: '.ally-input-tooltip',
+                    position: 'bottom right',
+                    cssClass: 'ally-input-tooltip',
+                    opensOn: 'focus'
+                });
+
+                // render date range picker tooltip
+                utopiasoftware.ally.controller.expenseTrackerPageViewModel.dateRangePickerToolTip.
+                appendTo('#expense-tracker-custom-date-container');
 
                 // refresh expense tracker grid
                 utopiasoftware.ally.controller.expenseTrackerPageViewModel.refreshExpenseTrackerDisplays();
@@ -9066,32 +9086,51 @@ utopiasoftware.ally.controller = {
                 });
 
                 // load the previously cached data
-                utopiasoftware.ally.transactionHistoryCharts.loadTransactionHistoryData().
-                then(function(dataArray){ // get the data array to be used by grid
+                utopiasoftware.ally.expenseTrackerGrid.loadExpenseTrackerData().
+                then(function(data){ // get the data to be used by grid
                     // format the data array so it can be properly used
-                    return gridDataMapping(dataArray);
+                    return gridDataMapping(data[periodType]);
                 }).
                 then(function(dataArray){
-                    utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid =
+                    console.log(dataArray);
+                    // check if the Expense Tracker Grid has been created before, if so, destroy it
+                    if(utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid){ // grid has previously been created
+                        // hide spinner
+                        utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.hideSpinner();
+                        // destroy the grid object
+                        utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.destroy();
+                    }
+                    utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid =
                         new ej.grids.Grid({
                             // Width for grid
                             width: '100%',
                             allowTextWrap: true,
                             showColumnChooser: true,
+                            allowTextWrap: true,
+                            showColumnChooser: true,
                             allowPdfExport: true,
+                            allowExcelExport: true,
+                            allowGrouping: true,
+                            groupSettings: {showDropArea: false, columns: ['CATEGORY']},
                             toolbar: ['search', 'columnchooser', 'pdfexport'],
                             columns: [
-                                { field: 'SENDER', headerText: 'Sender', width: "25%", clipMode: 'ellipsiswithtooltip' },
-                                { field: 'RECEIVER', headerText: 'Recipient', width: "25%", clipMode: 'ellipsiswithtooltip' },
-                                { field: 'AMOUNT', headerText: 'Amount', width: "25%", textAlign: 'right',
-                                    clipMode: 'ellipsiswithtooltip'},
+                                { field: 'CATEGORY', headerText: 'Category', width: "25%", clipMode: 'ellipsiswithtooltip' },
+                                { field: 'DESCRIPTION', headerText: 'Desc.', width: "25%", clipMode: 'ellipsiswithtooltip',
+                                    allowGrouping: false},
                                 { field: 'DDATE', headerText: 'Date', width: "25%",
-                                    clipMode: 'ellipsiswithtooltip'},
-                                { field: 'TRANSFERTYPE', headerText: 'Type', width: "25%",
-                                    clipMode: 'ellipsiswithtooltip', visible: false},
-                                { field: 'TRANSACTIONREF', headerText: 'Ref', width: "25%", clipMode: 'ellipsiswithtooltip',
-                                    visible: false}
+                                    clipMode: 'ellipsiswithtooltip', visible: false, allowGrouping: false},
+                                { field: 'AMOUNT', headerText: 'Amount', width: "25%", textAlign: 'right', format: 'N2',
+                                    clipMode: 'ellipsiswithtooltip', allowGrouping: false}
                             ],
+                            aggregates: [{
+                                columns: [{
+                                    type: 'sum',
+                                    field: 'AMOUNT',
+                                    format: 'N2',
+                                    groupFooterTemplate: 'Sub-total: ${sum}',
+                                    footerTemplate: 'Total: ${sum}'
+                                }]
+                            }],
                             dataSource: dataArray,
                             pdfExportComplete: function(pdfExportCompleteArgs){
                                 console.log("ARGUMENTS", pdfExportCompleteArgs);
@@ -9107,7 +9146,7 @@ utopiasoftware.ally.controller = {
                                     });
                                 }).then(function(directory){
                                     return new Promise(function(resolve, reject){ // return the created file which holds the pdf document
-                                        directory.getFile('ALLY-Transactions-' + Date.now() + '.pdf', {create:true, exclusive: false},
+                                        directory.getFile('ALLY-Expense-Tracker-' + Date.now() + '.pdf', {create:true, exclusive: false},
                                             resolve, reject);
                                     });
                                 }).
@@ -9126,36 +9165,48 @@ utopiasoftware.ally.controller = {
                                         fileWriter.write(pdfExportBlob); // write the content of the blob to the file
                                     });
                                 }).then(function(){ // notify that export completed
+                                    utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                                        expenseTrackerGrid.allowGrouping = true;
+                                    utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.dataBind();
+                                    // hide the spinner
+                                    utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.hideSpinner();
                                     ons.notification.toast("PDF Exported to Root Folder!", {timeout:4000});
                                 }).
-                                catch(function(err){console.log("EXPORT FAILED", err)});
+                                catch(function(err){
+                                    utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                                        expenseTrackerGrid.allowGrouping = true;
+                                    utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.dataBind();
+                                    utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.hideSpinner();
+                                });
                             }
                         });
 
-                    // remove the loader content
-                    $('#transaction-history-page #transaction-history-transaction-grid').html("");
                     //append the newly created grid
-                    utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.
-                    appendTo('#transaction-history-transaction-grid');
+                    utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.
+                    appendTo('#expense-tracker-grid');
 
                     // append the listener for the toolbar 'Export PDF' button click
-                    utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.
+                    utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.
                         toolbarClick = function (args) {
                         console.log("ID ", args.item.id);
-                        if (args.item.id === 'transaction-history-transaction-grid_pdfexport') { // the toolbar button being clicked is the 'PDF Export'
-                            console.log("DATASOURCE ", utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.dataSource);
-                            utopiasoftware.ally.controller.transactionHistoryPageViewModel.transactionHistoryGrid.
+                        if (args.item.id === 'expense-tracker-grid_pdfexport') { // the toolbar button being clicked is the 'PDF Export'
+                            utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.showSpinner();
+                            utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                                expenseTrackerGrid.allowGrouping = false;
+                            utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.dataBind();
+
+                            utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.
                             pdfExport({
-                                pageOrientation: 'landscape',
                                 includeHiddenColumn: true,
                                 pageSize: 'a4',
+                                pageOrientation: 'landscape',
                                 header: {
                                     fromTop: 0,
                                     height: 130,
                                     contents: [
                                         {
                                             type: 'text',
-                                            value: "ALLY Transaction History",
+                                            value: "ALLY Expense Report",
                                             position: { x: 30, y: 50 },
                                             style: { textBrushColor: '#000000', fontSize: 14, hAlign: 'center', bold: true}
                                         }
@@ -9166,6 +9217,7 @@ utopiasoftware.ally.controller = {
 
                         }
                     };
+
                 });
 
                 return; // exit method
@@ -9237,15 +9289,16 @@ utopiasoftware.ally.controller = {
                             { field: 'CATEGORY', headerText: 'Category', width: "25%", clipMode: 'ellipsiswithtooltip' },
                             { field: 'DESCRIPTION', headerText: 'Desc.', width: "25%", clipMode: 'ellipsiswithtooltip',
                                 allowGrouping: false},
-                            { field: 'AMOUNT', headerText: 'Amount', width: "25%", textAlign: 'right',
-                                clipMode: 'ellipsiswithtooltip', allowGrouping: false},
                             { field: 'DDATE', headerText: 'Date', width: "25%",
-                                clipMode: 'ellipsiswithtooltip', visible: false, allowGrouping: false}
+                                clipMode: 'ellipsiswithtooltip', visible: false, allowGrouping: false},
+                            { field: 'AMOUNT', headerText: 'Amount', width: "25%", textAlign: 'right', format: 'N2',
+                                clipMode: 'ellipsiswithtooltip', allowGrouping: false}
                         ],
                         aggregates: [{
                             columns: [{
                                 type: 'sum',
                                 field: 'AMOUNT',
+                                format: 'N2',
                                 groupFooterTemplate: 'Sub-total: ${sum}',
                                 footerTemplate: 'Total: ${sum}'
                             }]
@@ -9284,11 +9337,17 @@ utopiasoftware.ally.controller = {
                                     fileWriter.write(pdfExportBlob); // write the content of the blob to the file
                                 });
                             }).then(function(){ // notify that export completed
+                                utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                                    expenseTrackerGrid.allowGrouping = true;
+                                utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.dataBind();
                                 // hide the spinner
                                 utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.hideSpinner();
                                 ons.notification.toast("PDF Exported to Root Folder!", {timeout:4000});
                             }).
                             catch(function(err){
+                                utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                                    expenseTrackerGrid.allowGrouping = true;
+                                utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.dataBind();
                                 utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.hideSpinner();
                             });
                         }
@@ -9304,6 +9363,9 @@ utopiasoftware.ally.controller = {
                     console.log("ID ", args.item.id);
                     if (args.item.id === 'expense-tracker-grid_pdfexport') { // the toolbar button being clicked is the 'PDF Export'
                         utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.showSpinner();
+                        utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                            expenseTrackerGrid.allowGrouping = false;
+                        utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.dataBind();
 
                         utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.
                         pdfExport({
@@ -9337,10 +9399,11 @@ utopiasoftware.ally.controller = {
              *
              * @return {Array} an array containing properly formatted objects that can be used by the grid
              */
-            function gridDataMapping(gridDataArray){
+            function gridDataMapping(gridDataArray = []){
                 return gridDataArray.map(function(dataObject){
                     dataObject.DDATE = kendo.toString(kendo.parseDate(dataObject.DDATE, "yyyy-MM-dd"),
                         "yyyy-MM-dd"); // convert to date object
+                    dataObject.AMOUNT = kendo.parseFloat(dataObject.AMOUNT); // convert the amount from string to number
                     return dataObject; // return the modified object
                 });
             }
