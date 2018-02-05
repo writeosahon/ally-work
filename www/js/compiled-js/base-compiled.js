@@ -494,6 +494,74 @@ var utopiasoftware = {
                         resolve();
                     }); // ALWAYS resolve the promise
                 });
+            },
+
+            /**
+             * method is used to save/cache the data for the expense tracker chart
+             *
+             * @param chartDataArray {Array} the chart data to be saved
+             *
+             * @return {Promise} returns a promise that resolves to the data being saved
+             */
+            saveExpenseTrackerData: function saveExpenseTrackerData(chartDataArray) {
+
+                return new Promise(function (resolve, reject) {
+
+                    // check if a timestamp has been appended to the data being saved
+                    if (!chartDataArray._lastUpdatedDate) {
+                        // no timestamp, so attach one
+                        chartDataArray._lastUpdatedDate = Date.now(); // attach timestamp
+                    }
+
+                    // write the provided chart data to encrypted storage
+                    Promise.resolve(intel.security.secureData.createFromData({ "data": JSON.stringify(chartDataArray) })).then(function (instanceId) {
+
+                        return Promise.resolve(intel.security.secureStorage.write({ "id": "ally-dashboard-chart-expense-tracker", "instanceID": instanceId }));
+                    }).then(function () {
+                        resolve(chartDataArray); // return the provided chartDataArray parameter back to the caller and resolve the Promise
+                    }).catch(function (err) {
+                        reject(err); // reject the Promise with the provided error
+                    });
+                });
+            },
+
+            /**
+             * method returns a Promise which contains the cached expense tracker chart data OR
+             * the Promise rejects with an error object
+             *
+             * @returns {Promise}
+             */
+            loadExpenseTrackerData: function loadExpenseTrackerData() {
+
+                return new Promise(function (resolve, reject) {
+
+                    // read the cached data from encrypted storage
+                    Promise.resolve(intel.security.secureStorage.read({ 'id': 'ally-dashboard-chart-expense-tracker' })).then(function (instanceId) {
+
+                        return Promise.resolve(intel.security.secureData.getData(instanceId));
+                    }).then(function (chartDataArray) {
+                        resolve(JSON.parse(chartDataArray)); // return the cached app chart data and resolve the Promise
+                    }).catch(function (err) {
+                        resolve({}); // resolve the Promise with an empty object
+                    });
+                });
+            },
+
+            /**
+             * method returns a Promise which deletes the cached expense tracker chart data from the device
+             *
+             * @returns {Promise}
+             */
+            deleteExpenseTrackerData: function deleteExpenseTrackerData() {
+
+                return new Promise(function (resolve, reject) {
+                    // delete the user app details from secure storage if it exists
+                    Promise.resolve(intel.security.secureStorage.delete({ 'id': 'ally-dashboard-chart-expense-tracker' })).then(function () {
+                        resolve();
+                    }, function () {
+                        resolve();
+                    }); // ALWAYS resolve the promise
+                });
             }
         },
 

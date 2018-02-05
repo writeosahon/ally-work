@@ -917,10 +917,12 @@ utopiasoftware.ally.controller = {
                     // add the promise object used to delete all other cached data
                     promisesArray.push(utopiasoftware.ally.dashboardCharts.deleteWalletTransferInData(),
                         utopiasoftware.ally.dashboardCharts.deleteWalletTransferOutData(),
+                        utopiasoftware.ally.dashboardCharts.deleteExpenseTrackerData(),
                         utopiasoftware.ally.dashboardCharts.deletePaymentOutData(),
                         utopiasoftware.ally.dashboardCharts.deletePaymentInData(),
                         utopiasoftware.ally.transactionHistoryCharts.deleteTransactionHistoryData(),
-                        utopiasoftware.ally.expenseTrackerGrid.deleteExpenseTrackerData());
+                        utopiasoftware.ally.expenseTrackerGrid.deleteExpenseTrackerData(),
+                        utopiasoftware.ally.expenseTrackerChart.deleteExpenseTrackerData());
                 }
 
                 // return promise when all operations have completed
@@ -1422,10 +1424,12 @@ utopiasoftware.ally.controller = {
                 // add the promise object used to delete the cached chart data
                 promisesArray.push(utopiasoftware.ally.dashboardCharts.deleteWalletTransferInData(),
                     utopiasoftware.ally.dashboardCharts.deleteWalletTransferOutData(),
+                    utopiasoftware.ally.dashboardCharts.deleteExpenseTrackerData(),
                     utopiasoftware.ally.dashboardCharts.deletePaymentOutData(),
                     utopiasoftware.ally.dashboardCharts.deletePaymentInData(),
                     utopiasoftware.ally.transactionHistoryCharts.deleteTransactionHistoryData(),
-                    utopiasoftware.ally.expenseTrackerGrid.deleteExpenseTrackerData());
+                    utopiasoftware.ally.expenseTrackerGrid.deleteExpenseTrackerData(),
+                    utopiasoftware.ally.expenseTrackerChart.deleteExpenseTrackerData());
 
                 // return promise when all operations have completed
                 return Promise.all(promisesArray);
@@ -1589,6 +1593,11 @@ utopiasoftware.ally.controller = {
          */
         paymentsInChart: null,
 
+        /**
+         * property is used to hold the "Expense Tracker" Chart
+         */
+        expenseTrackerChart: null,
+
 
         /**
          * event is triggered when page is initialised
@@ -1616,6 +1625,8 @@ utopiasoftware.ally.controller = {
                 // inject the the modules required to create various charts for the dashboard page
                 ej.charts.Chart.Inject(ej.charts.Legend, ej.charts.LineSeries, ej.charts.AreaSeries, ej.charts.DateTime,
                 ej.charts.Tooltip);
+                ej.charts.AccumulationChart.Inject(ej.charts.Legend, ej.charts.PieSeries,
+                    ej.charts.AccumulationDataLabel, ej.charts.Tooltip);
 
                 // initialise the DropDownList
                 utopiasoftware.ally.controller.dashboardPageViewModel.periodDropDownListObject =
@@ -1646,6 +1657,10 @@ utopiasoftware.ally.controller = {
                 // update the wallet-outgoing chart using the value of the select Period dropdown list
                 utopiasoftware.ally.controller.dashboardPageViewModel.
                 updateWalletOutgoingDashboard(utopiasoftware.ally.controller.dashboardPageViewModel.periodDropDownListObject.value);
+
+                // update the expense tracker chart using the value of the select Period dropdown list
+                utopiasoftware.ally.controller.dashboardPageViewModel.
+                updateExpenseTrackerDashboard(utopiasoftware.ally.controller.dashboardPageViewModel.periodDropDownListObject.value);
 
                 // update the payments-out chart using the value of the select Period dropdown list
                 utopiasoftware.ally.controller.dashboardPageViewModel.
@@ -2263,6 +2278,232 @@ utopiasoftware.ally.controller = {
 
 
         /**
+         * update the expense tracker dashboard. Eithe using cached data or remote data
+         *
+         * @param periodType
+         */
+        updateExpenseTrackerDashboard: function(periodType){
+
+            // variable holds the object that contains the customisable settings for the chart created based on the 'periodType' parameter
+            var chartCustomisableSettings = null;
+
+            switch(periodType){ // check the periodType parameter and format chartCutomisableSetting accordingly
+
+                case "today":
+                    chartCustomisableSettings = {chartTitle: "ALLY Expense Tracker (Today)",
+                        labelFormat: 'ha',
+                        intervalType: 'Hours'};
+                    break;
+
+                case "weekly":
+                    chartCustomisableSettings = {chartTitle: "ALLY Expense Tracker (Last 7 Days)",
+                        labelFormat: 'dMMM',
+                        intervalType: 'Days'};
+                    break;
+
+                case "monthly":
+                    chartCustomisableSettings = {chartTitle: "ALLY Expense Tracker (Last 30 Days)",
+                        labelFormat: 'dMMM',
+                        intervalType: 'Days'};
+                    break;
+            }
+
+            // check if the Doughnut Chart has been created before, of so destroy it
+            if(utopiasoftware.ally.controller.dashboardPageViewModel.expenseTrackerChart){ // chart has previously been created
+                // destroy the chart object
+                utopiasoftware.ally.controller.dashboardPageViewModel.expenseTrackerChart.destroy();
+            }
+
+            // display chart loading indicator
+            $('#dashboard-page #dashboard-expense-tracker-chart').
+            html(`<div class="title" style="font-size: 0.85em; padding: 0.5em;">
+                    ALLY Expense Tracker
+                </div>
+                <div class="content" style="padding: 0.5em;">
+                    <ons-icon icon="md-settings" size="28px" style="color: #30a401;" spin>
+                    </ons-icon>
+                </div>`);
+
+
+            // check if there is internet connection or not
+            if(navigator.connection.type === Connection.NONE){ // there is no internet connection
+                // inform the user that cached data will be displayed in the absence of internet
+                window.plugins.toast.showWithOptions({
+                    message: "No Internet Connection. Previously cached data will be displayed",
+                    duration: 4000,
+                    position: "top",
+                    styling: {
+                        opacity: 1,
+                        backgroundColor: '#008000',
+                        textColor: '#FFFFFF',
+                        textSize: 14
+                    }
+                }, function(toastEvent){
+                    if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                        window.plugins.toast.hide();
+                    }
+                });
+
+                // load the previously cached data
+                utopiasoftware.ally.dashboardCharts.loadExpenseTrackerData().
+                then(function(chartDataArray){ // get the chart data array to be used by chart
+                    // format the chart data array so it can be properly used
+                    return chartDataMapping(chartDataArray[periodType]);
+                }).
+                then(function(chartDataArray){
+                    utopiasoftware.ally.controller.dashboardPageViewModel.expenseTrackerChart =
+                        new ej.charts.AccumulationChart({
+                            // Width and height for chart in pixel
+                            width: '100%',
+                            height: '100%',
+                            margin: { left: 0, right: 15, top: 0, bottom: 0 },
+                            //palettes: ["#0FD0D0"],
+                            title: chartCustomisableSettings.chartTitle,
+                            titleStyle: {
+                                size: '1em'
+                            },
+                            tooltip: { enable: true,
+                                format: 'Category: ${point.x} <br> Amount: ${point.y}'
+                            },
+                            // Legend for chart
+                            legendSettings: {
+                                visible: true
+                            },
+                            enableSmartLabels: true,
+                            series: [{
+                                dataSource: chartDataArray,
+                                xName: 'CATEGORY', yName: 'SUM',
+                                name: 'Expenses',
+                                dataLabel: {
+                                    visible: true,
+                                    name: 'LABELTEXT',
+                                    position: 'Outside',
+                                    font: {
+                                        color: '#000000'
+                                    }
+                                },
+                                innerRadius: '0%',
+                                //Series type as Column
+                                type: 'Pie'
+                            }]
+                        });
+
+                    // remove the loader content
+                    $('#dashboard-page #dashboard-expense-tracker-chart').html("");
+                    //append the newly created chart
+                    utopiasoftware.ally.controller.dashboardPageViewModel.expenseTrackerChart.
+                    appendTo('#dashboard-expense-tracker-chart');
+                });
+
+                return; // exit method
+            }
+
+            // create the data to be sent to server
+            var formData = {phone: utopiasoftware.ally.model.appUserDetails.phone,
+                duration: periodType};
+
+            //THERE IS AN INTERNET CONNECTION
+            // request for the user wallet payments-in data for the provided time period
+            Promise.resolve($.ajax(
+                {
+                    url: utopiasoftware.ally.model.ally_base_url + "/mobile/get-my-expenses-group.php",
+                    //url: "in-wallet-chart-dummy.json",
+                    type: "post",
+                    contentType: "application/x-www-form-urlencoded",
+                    beforeSend: function(jqxhr) {
+                        jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                    },
+                    dataType: "text",
+                    timeout: 240000, // wait for 4 minutes before timeout of request
+                    processData: true,
+                    data: formData // data to submit to server
+                }
+            )).
+            then(function(serverResponse){// retrieve the server response
+                serverResponse +=  "";
+                serverResponse = JSON.parse(serverResponse.trim()); // return the server response as an object
+                return Promise.all([serverResponse, utopiasoftware.ally.dashboardCharts.loadExpenseTrackerData()]);
+            }).
+            then(function(chartDataArray){ // save the chart array data to cache
+                chartDataArray[1] = chartDataArray[1];
+                chartDataArray[1][periodType] = chartDataArray[0];
+
+                return utopiasoftware.ally.dashboardCharts.saveExpenseTrackerData(chartDataArray[1]);
+            }).
+            then(function(chartDataArray){ // get the chart data array to be used by chart
+                // format the chart data array so it can be properly used
+                return chartDataMapping(chartDataArray[periodType]);
+            }).
+            then(function(chartDataArray){
+                utopiasoftware.ally.controller.dashboardPageViewModel.expenseTrackerChart =
+                    new ej.charts.AccumulationChart({
+                        // Width and height for chart in pixel
+                        width: '100%',
+                        height: '100%',
+                        margin: { left: 0, right: 15, top: 0, bottom: 0 },
+                        //palettes: ["#0FD0D0"],
+                        title: chartCustomisableSettings.chartTitle,
+                        titleStyle: {
+                            size: '1em'
+                        },
+                        tooltip: { enable: true,
+                            format: 'Category: ${point.x} <br> Amount: ${point.y}'
+                        },
+                        // Legend for chart
+                        legendSettings: {
+                            visible: true
+                        },
+                        enableSmartLabels: true,
+                        series: [{
+                            dataSource: chartDataArray,
+                            xName: 'CATEGORY', yName: 'SUM',
+                            name: 'Expenses',
+                            dataLabel: {
+                                visible: true,
+                                name: 'LABELTEXT',
+                                position: 'Outside',
+                                font: {
+                                    color: '#000000'
+                                }
+                            },
+                            innerRadius: '0%',
+                            //Series type as Column
+                            type: 'Pie'
+                        }]
+                    });
+
+                // remove the loader content
+                $('#dashboard-page #dashboard-expense-tracker-chart').html("");
+                //append the newly created chart
+                utopiasoftware.ally.controller.dashboardPageViewModel.expenseTrackerChart.
+                appendTo('#dashboard-expense-tracker-chart');
+            });
+
+
+            /**
+             * function is used to map the chart data into an appropriate forma that can be displayed inby the chart
+             * @param chartDataArray {Array} array containing chart data objects to be mapped
+             *
+             * @return {Array} an array containing properly formatted objects that can be used by the chart
+             */
+            function chartDataMapping(chartDataArray = []){
+                var totalSum = 0; // the variable holds the grand total of all category summation
+
+                // get the grand total
+                totalSum = chartDataArray.reduce(function(accumulator, currentValue){
+                    accumulator += kendo.parseFloat(currentValue.SUM);
+                    return accumulator;
+                }, totalSum);
+
+                return chartDataArray.map(function(dataObject){
+                    dataObject.SUM = (kendo.parseFloat(dataObject.SUM));
+                    dataObject.LABELTEXT = kendo.toString((dataObject.SUM / totalSum), "p");
+                    return dataObject; // return the modified object
+                });
+            }
+        },
+
+        /**
          * update the wallet payment-out dashboard. Either using cached data or remote data
          *
          * @param periodType
@@ -2742,6 +2983,10 @@ utopiasoftware.ally.controller = {
             // update the wallet-outgoing chart using the value of the select Period dropdown list
             utopiasoftware.ally.controller.dashboardPageViewModel.
             updateWalletOutgoingDashboard(periodType);
+
+            // update the expense tracker chart using the value of the select Period dropdown list
+            utopiasoftware.ally.controller.dashboardPageViewModel.
+                updateExpenseTrackerDashboard(periodType)
 
             // update the payments-out chart using the value of the select Period dropdown list
             utopiasoftware.ally.controller.dashboardPageViewModel.
@@ -8845,7 +9090,7 @@ utopiasoftware.ally.controller = {
         /**
          * property is used to hold the "Expense Tracker Doughnut Chart"
          */
-        expenseTrackerDoughChart: null,
+        expenseTrackerDoughnutChart: null,
 
         /**
          * event is triggered when page is initialised
@@ -8875,8 +9120,10 @@ utopiasoftware.ally.controller = {
                     ej.grids.PdfExport, ej.grids.ExcelExport, ej.grids.Group, ej.grids.Aggregate);
 
                 // inject the the modules required to create various charts for the page
-                ej.charts.Chart.Inject(ej.charts.Legend, ej.charts.BarSeries, ej.charts.ColumnSeries, ej.charts.Category,
+                ej.charts.Chart.Inject(ej.charts.Legend, ej.charts.ColumnSeries, ej.charts.Category,
                     ej.charts.Tooltip);
+                ej.charts.AccumulationChart.Inject(ej.charts.Legend, ej.charts.PieSeries,
+                    ej.charts.AccumulationDataLabel, ej.charts.Tooltip);
 
 
                 // initialise the expense DateRangePicker
@@ -9028,18 +9275,40 @@ utopiasoftware.ally.controller = {
             // update the expense tracker barchart
             utopiasoftware.ally.controller.expenseTrackerPageViewModel.
             updateExpenseTrackerBarChart(periodType, customStartDate, customEndDate);
-            //
-            //// update the wallet-outgoing chart using the value of the select Period dropdown list
-            //utopiasoftware.ally.controller.dashboardPageViewModel.
-            //updateWalletOutgoingDashboard(periodType);
-            //
-            //// update the payments-out chart using the value of the select Period dropdown list
-            //utopiasoftware.ally.controller.dashboardPageViewModel.
-            //updatePaymentOutDashboard(periodType);
-            //
-            //// update the payments-in chart using the value of the select Period dropdown list
-            //utopiasoftware.ally.controller.dashboardPageViewModel.
-            //updatePaymentInDashboard(periodType);
+            // update the expense tracker doughnut chart
+            utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+            updateExpenseTrackerDoughnutChart(periodType, customStartDate, customEndDate);
+        },
+
+
+        /**
+         * method is triggered when the "Refresh" toolbar button is clicked
+         */
+        refreshButtonClicked: function(){
+
+            // get the value of the period dropdown and perform refresh actions as appropriate
+            if(utopiasoftware.ally.controller.expenseTrackerPageViewModel.periodDropDownListObject.value ==
+            "custom"){ // "custom" value was selected from dropdown
+
+                // create the arguments that will be passed to the appropriate method
+                var argumentArray = [];
+                argumentArray[0] = 'custom';
+                argumentArray[1] = utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                    expenseTrackerDateRangerPicker.startDate;
+                argumentArray[2] = utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                    expenseTrackerDateRangerPicker.endDate;
+                // refresh the expense tracker displays
+                utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                refreshExpenseTrackerDisplays(...argumentArray);
+
+            }
+            else{ // any other value was selected
+                // refresh the expense tracker displays
+                utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                refreshExpenseTrackerDisplays(utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                    periodDropDownListObject.value);
+
+            }
         },
 
 
@@ -9654,6 +9923,253 @@ utopiasoftware.ally.controller = {
                 });
             }
         },
+
+
+        /**
+         * update the expense track doughnut chart. Either using cached data or remote data
+         *
+         * @param periodType
+         * @param customStartDate
+         * @param customEndDate
+         */
+        updateExpenseTrackerDoughnutChart: function(periodType = 'today', customStartDate, customEndDate){
+
+            // variable holds the object that contains the customisable settings for the chart created based on the 'periodType' parameter
+            var chartCustomisableSettings = null;
+
+            switch(periodType){ // check the periodType parameter and format chartCutomisableSetting accordingly
+
+                case "today":
+                    chartCustomisableSettings = {chartTitle: "ALLY Expense Tracker -Doughnut Chart (Today)",
+                        labelFormat: 'ha',
+                        intervalType: 'Hours'};
+                    break;
+
+                case "weekly":
+                    chartCustomisableSettings = {chartTitle: "ALLY Expense Tracker -Doughnut Chart (Last 7 Days)",
+                        labelFormat: 'dMMM',
+                        intervalType: 'Days'};
+                    break;
+
+                case "monthly":
+                    chartCustomisableSettings = {chartTitle: "ALLY Expense Tracker -Doughnut Chart (Last 30 Days)",
+                        labelFormat: 'dMMM',
+                        intervalType: 'Days'};
+                    break;
+
+                case "custom":
+                    chartCustomisableSettings = {chartTitle: "ALLY Expense Tracker -Doughnut Chart (Custom)",
+                        labelFormat: 'dMMM',
+                        intervalType: 'Days'};
+                    break;
+            }
+
+            // check if the Doughnut Chart has been created before, of so destroy it
+            if(utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerDoughnutChart){ // chart has previously been created
+                // destroy the chart object
+                utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerDoughnutChart.destroy();
+            }
+
+            // display chart loading indicator
+            $('#expense-tracker-page #expense-tracker-doughnut-chart').
+            html(`<div class="title" style="font-size: 0.85em; padding: 0.5em;">
+                        ALLY Expense Tracker -Doughnut Chart
+                    </div>
+                    <div class="content" style="padding: 0.5em;">
+
+                        <ons-icon icon="md-settings" size="28px" style="color: #30a401;" spin>
+                        </ons-icon>
+                    </div>`);
+
+
+            // check if there is internet connection or not
+            if(navigator.connection.type === Connection.NONE){ // there is no internet connection
+                // inform the user that cached data will be displayed in the absence of internet
+                window.plugins.toast.showWithOptions({
+                    message: "No Internet Connection. Previously cached data will be displayed",
+                    duration: 4000,
+                    position: "top",
+                    styling: {
+                        opacity: 1,
+                        backgroundColor: '#008000',
+                        textColor: '#FFFFFF',
+                        textSize: 14
+                    }
+                }, function(toastEvent){
+                    if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                        window.plugins.toast.hide();
+                    }
+                });
+
+                // load the previously cached data
+                utopiasoftware.ally.expenseTrackerChart.loadExpenseTrackerData().
+                then(function(chartDataArray){ // get the chart data array to be used by chart
+                    // format the chart data array so it can be properly used
+                    return chartDataMapping(chartDataArray[periodType]);
+                }).
+                then(function(chartDataArray){
+                    utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerDoughnutChart =
+                        new ej.charts.AccumulationChart({
+                            // Width and height for chart in pixel
+                            width: '100%',
+                            height: '100%',
+                            margin: { left: 0, right: 15, top: 0, bottom: 0 },
+                            //palettes: ["#0FD0D0"],
+                            title: chartCustomisableSettings.chartTitle,
+                            titleStyle: {
+                                size: '1em'
+                            },
+                            tooltip: { enable: false,
+                                format: 'Category: ${point.x} | Amount: ${point.y}'
+                            },
+                            // Legend for chart
+                            legendSettings: {
+                                visible: true
+                            },
+                            enableSmartLabels: true,
+                            series: [{
+                                dataSource: chartDataArray,
+                                xName: 'CATEGORY', yName: 'SUM',
+                                name: 'Expenses',
+                                dataLabel: {
+                                    visible: true,
+                                    name: 'LABELTEXT',
+                                    position: 'Outside',
+                                    font: {
+                                        color: '#000000'
+                                    }
+                                },
+                                innerRadius: '40%',
+                                //Series type as Column
+                                type: 'Pie'
+                            }]
+                        });
+
+                    // remove the loader content
+                    $('#expense-tracker-page #expense-tracker-doughnut-chart').html("");
+                    //append the newly created chart
+                    utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerDoughnutChart.
+                    appendTo('#expense-tracker-doughnut-chart');
+                });
+
+                return; // exit method
+            }
+
+            // create the data to be sent to server
+            var formData = {phone: utopiasoftware.ally.model.appUserDetails.phone,
+                duration: periodType};
+            // check if the periodType == custom . if so append the custom date ranges
+            if(periodType == 'custom'){
+                formData.from_date = kendo.toString(utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                    expenseTrackerDateRangerPicker.startDate, "yyyy-MM-dd");
+                formData.to_date = kendo.toString(utopiasoftware.ally.controller.expenseTrackerPageViewModel.
+                    expenseTrackerDateRangerPicker.endDate, "yyyy-MM-dd");
+            }
+
+            //THERE IS AN INTERNET CONNECTION
+            // request for the user wallet payments-in data for the provided time period
+            Promise.resolve($.ajax(
+                {
+                    url: utopiasoftware.ally.model.ally_base_url + "/mobile/get-my-expenses-group.php",
+                    //url: "in-wallet-chart-dummy.json",
+                    type: "post",
+                    contentType: "application/x-www-form-urlencoded",
+                    beforeSend: function(jqxhr) {
+                        jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                    },
+                    dataType: "text",
+                    timeout: 240000, // wait for 4 minutes before timeout of request
+                    processData: true,
+                    data: formData // data to submit to server
+                }
+            )).
+            then(function(serverResponse){// retrieve the server response
+                serverResponse +=  "";
+                serverResponse = JSON.parse(serverResponse.trim()); // return the server response as an object
+                return Promise.all([serverResponse, utopiasoftware.ally.expenseTrackerChart.loadExpenseTrackerData()]);
+            }).
+            then(function(chartDataArray){ // save the chart array data to cache
+                chartDataArray[1] = chartDataArray[1];
+                chartDataArray[1][periodType] = chartDataArray[0];
+                /****
+                 * NOTE: IN THIS CASE, THERE IS NO NEED TO SAVE THE DATA AGAIN TO PERSISTENT STORAGE.
+                 * THIS HAVE ALREADY BEEN DONE BEFORE BY THE BARCHART CREATION METHOD
+                 *****/
+                return chartDataArray[1];
+            }).
+            then(function(chartDataArray){ // get the chart data array to be used by chart
+                // format the chart data array so it can be properly used
+                return chartDataMapping(chartDataArray[periodType]);
+            }).
+            then(function(chartDataArray){
+                utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerDoughnutChart =
+                    new ej.charts.AccumulationChart({
+                        // Width and height for chart in pixel
+                        width: '100%',
+                        height: '100%',
+                        margin: { left: 0, right: 15, top: 0, bottom: 0 },
+                        //palettes: ["#0FD0D0"],
+                        title: chartCustomisableSettings.chartTitle,
+                        titleStyle: {
+                            size: '1em'
+                        },
+                        tooltip: { enable: false,
+                            format: 'Category: ${point.x} | Amount: ${point.y}'
+                        },
+                        // Legend for chart
+                        legendSettings: {
+                            visible: true
+                        },
+                        enableSmartLabels: true,
+                        series: [{
+                            dataSource: chartDataArray,
+                            xName: 'CATEGORY', yName: 'SUM',
+                            name: 'Expenses',
+                            dataLabel: {
+                                visible: true,
+                                name: 'LABELTEXT',
+                                position: 'Outside',
+                                font: {
+                                    color: '#000000'
+                                }
+                            },
+                            innerRadius: '40%',
+                            //Series type as Column
+                            type: 'Pie'
+                        }]
+                    });
+
+                // remove the loader content
+                $('#expense-tracker-page #expense-tracker-doughnut-chart').html("");
+                //append the newly created chart
+                utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerDoughnutChart.
+                appendTo('#expense-tracker-doughnut-chart');
+            });
+
+
+            /**
+             * function is used to map the chart data into an appropriate forma that can be displayed inby the chart
+             * @param chartDataArray {Array} array containing chart data objects to be mapped
+             *
+             * @return {Array} an array containing properly formatted objects that can be used by the chart
+             */
+            function chartDataMapping(chartDataArray = []){
+                var totalSum = 0; // the variable holds the grand total of all category summation
+
+                // get the grand total
+                totalSum = chartDataArray.reduce(function(accumulator, currentValue){
+                    accumulator += kendo.parseFloat(currentValue.SUM);
+                    return accumulator;
+                }, totalSum);
+
+                return chartDataArray.map(function(dataObject){
+                    dataObject.SUM = (kendo.parseFloat(dataObject.SUM));
+                    dataObject.LABELTEXT = kendo.toString((dataObject.SUM / totalSum), "p");
+                    return dataObject; // return the modified object
+                });
+            }
+        },
+
 
         /**
          * method is used to switch between the different types of expense visualisation
