@@ -622,3 +622,28 @@
     top: 12em !important;
 }
 /** STYLE FOR THE BUTTON SEGMENT OF THE EXPENSE TRACKER PAGE ENDS **/
+
+/** STYLE TO POSITION THE DATE RANGE PICKER BUTTON OVER THE ENTIRE DATE-RANGE-PICKER INPUT BEGINS.
+    THIS AMENDMENT IS REQUIRED TO ENSURE THE DATE RANGE CALENDAR IS ALWAYS DISPLAYED;
+    WHETHER THE USER SELECTS THE PICKER BUTTON OR THE DATE RANGE INPUT **/
+#expense-tracker-custom-date-container .e-input-group.e-control-wrapper.e-date-range-wrapper { /** parent wrapper **/
+    position: relative !important;
+    display: block !important;
+}
+#expense-tracker-custom-date-container #expense-tracker-custom-date { /** date-range picker input **/
+    position: absolute !important;
+    top: 0 !important;;
+    left: 0 !important;
+    z-index: 24 !important;
+}
+#expense-tracker-custom-date-container .e-input-group.e-control-wrapper.e-date-range-wrapper >
+.e-input-group-icon.e-range-icon { /** date-range picker button/icon **/
+    width: 100% !important;
+    position: relative!important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 25 !important;
+    background-color: transparent !important;
+    padding-left: 50% !important;
+}
+/** STYLE TO POSITION THE DATE RANGE PICKER BUTTON OVER THE ENTIRE DATE-RANGE-PICKER INPUT ENDS. **/
