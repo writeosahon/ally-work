@@ -8404,10 +8404,12 @@ utopiasoftware.ally.controller = {
             then(function(responseArray){
 
                 // create the data object to be sent
-                var submitData = {raverefid: responseArray[0].raverefid, otp: responseArray[1],
-                    phone_sender: utopiasoftware.ally.model.appUserDetails.phone,
-                phone_receiver: formData.phone_receiver};
-                submitData.savecard = $('#add-card-wallet-transfer-page #add-card-wallet-transfer-save-card-details').get(0).checked;
+                var submitData = responseArray[0]; // send back previously received response
+                submitData.otp = responseArray[1];
+                submitData.phone_sender = utopiasoftware.ally.model.appUserDetails.phone;
+                submitData.phone_receiver = formData.phone_receiver;
+                submitData.savecard =
+                    $('#add-card-wallet-transfer-page #add-card-wallet-transfer-save-card-details').get(0).checked;
 
                 // submit the form data
                 return Promise.all([Promise.resolve($.ajax(
