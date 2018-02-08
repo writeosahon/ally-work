@@ -5228,7 +5228,7 @@ utopiasoftware.ally.controller = {
 
                 // check if any error occurred
                 if(serverResponse[0].status == "error"){ // an error occured
-                    throw serverResponse.message; // throw the error message attached to this error
+                    throw serverResponse[0].message; // throw the error message attached to this error
                 }
 
                 return serverResponse; // forward the serverResponse i.e the user details object

@@ -1381,7 +1381,7 @@ processData:true,data:confirmationData// data to submit to server
 serverResponse[0]=JSON.parse((serverResponse[0]+"").trim());// get the new user object
 // check if any error occurred
 if(serverResponse[0].status=="error"){// an error occured
-throw serverResponse.message;// throw the error message attached to this error
+throw serverResponse[0].message;// throw the error message attached to this error
 }return serverResponse;// forward the serverResponse i.e the user details object
 }).then(function(responseDetailsArray){// the parameter contains 2 items. item 1 - userDetails; item 2- details of the wallet transfer
 // forward details of the wallet-transfer; also save the user details to encrypted storage;
