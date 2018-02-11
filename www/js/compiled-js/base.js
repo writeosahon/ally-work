@@ -24,7 +24,7 @@ var utopiasoftware = {
 
             phoneNumber = "" + phoneNumber; // ensure phone number is seen as a string
 
-            var smsWatcherTimer = null; // holds the timer used to stop the sms watcher
+            var phoneVerificationAnimate = null; // holds the animation object for the verification code timer
 
             var resolvePromise = null; // holds the resolve function of the main Promise object
 
@@ -41,95 +41,117 @@ var utopiasoftware = {
             var phoneNumberVerifiedPromise = new Promise(function(resolve, reject){
                 resolvePromise = resolve;
                 rejectPromise = reject;
-                var randomNumber = ""; //holds the random number to be sent in the sms
 
-                // start listening to the user's sms inbox
-                new Promise(function(resolve2, reject2){
-                    SMS.startWatch(resolve2, reject2);
+                // sent message to twilio to verify provide phone number
+                Promise.resolve($.ajax(
+                    {
+                        url: 'https://api.authy.com/protected/json/phones/verification/start',
+                        type: "post",
+                        contentType: "application/x-www-form-urlencoded",
+                        beforeSend: function(jqxhr) {
+                            jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                        },
+                        dataType: "json",
+                        timeout: 240000, // wait for 4 minutes before timeout of request
+                        processData: true,
+                        data: {api_key: 'j8B13Xqi57LtUgDhZe4xclf7Km56FPhH',
+                            via: 'call',
+                            country_code: 234,
+                            phone_number: phoneNumber} // data to submit to server
+                    }
+                )).
+                then(function(verificationResponse){ // get the verification response
+                    if(verificationResponse.success !== true){ // the generating verification code failed
+                        throw verificationResponse; // throw an error containing the verification response
+                    }
+
+                    return verificationResponse; // return verification response
+
                 }).
-                then(function(){ // intercept any incoming sms
-                    return new Promise(function(res, rej){
-                        SMS.enableIntercept(true, res, rej);
-                    });
-                }).
-                then(function(){ // sms watch of the user's inbox has been started
-                    // add listener for new arriving sms
-                    document.addEventListener('onSMSArrive', function(smsEvent){
-                        var sms = smsEvent.data;
-                        if(sms.address == phoneNumber && sms.body == "ALLY-" + randomNumber){
-                            clearTimeout(smsWatcherTimer); // stop the set timer
-                            SMS.stopWatch(function(){}, function(){}); // stop sms watch
-                            SMS.enableIntercept(false, function(){}, function(){}); // stop sms intercept
-                            document.removeEventListener('onSMSArrive'); // remove sms arrival listener
+                then(function(verificationResponse){ // compare the generated code with the user input
+
+                    // instantiate the phoneVerificationAnimate object
+                    phoneVerificationAnimate = anime({
+                        targets: verificationResponse,
+                        seconds_to_expire: [{value: 0}],
+                        duration: verificationResponse.seconds_to_expire * 1000,
+                        easing: 'linear',
+                        round: true,
+                        direction: 'normal',
+                        autoplay: false,
+                        update: function() {
+                            $('#phone-verification-code-check .phone-verification-timer').
+                            html(verificationResponse.seconds_to_expire);
+                        },
+                        complete: function(){
+                            $('#phone-verification-code-check').get(0).hide();
+                            $('#phone-verification-code-check').remove();
                             $('#hour-glass-loader-modal').get(0).hide(); // hide loader
-                            resolve(); // resolve promise
+                            rejectPromise("phone verification code timed out");
                         }
                     });
-
-                    // return a Promise object which sends sms to the phoneNumber parameter
-                    return new Promise(function(resolve3, reject3){
-
-                        var randomGen = new Random(Random.engines.nativeMath); // random number generator
-
-                        for(var i = 0; i < 6; i++){
-                            randomNumber += "" + randomGen.integer(0, 9);
-                        }
-                        SMS.sendSMS(phoneNumber, "ALLY-" + randomNumber, resolve3, function(){
-                            reject3("SMS sending failed. Please ensure you have sufficient airtime on the specified phone number"); // flag an error that sms verification code could not be sent
-                        });
-                    });
-                }).
-                then(function(){
-                    smsWatcherTimer = setTimeout(function(){
-                        SMS.stopWatch(function(){}, function(){});
-                        SMS.enableIntercept(false, function(){}, function(){}); // stop sms intercept
-                        document.removeEventListener('onSMSArrive');
-                        // hide loader
-                        $('#hour-glass-loader-modal').get(0).hide().
-                        then(function(){ // automatic verification could not be performed, so verify phone manually
-
-                            // verify the phone number verification code manually entered by user
-                            return ons.notification.prompt({title: "Phone Number Verification",
-                                id: 'phone-verification-code-check',
-                                messageHTML: `<div><ons-icon icon="md-ally-icon-code-equal" size="24px"
+                    phoneVerificationAnimate.play(); // start the animated timer
+                    return ons.notification.prompt({title: "Phone Number Verification",
+                        id: 'phone-verification-code-check',
+                        messageHTML: `<div><ons-icon icon="md-ally-icon-code-equal" size="24px"
                     style="color: #30a401; float: left; width: 26px;"></ons-icon>
                     <span style="float: right; width: calc(100% - 26px);">
-                    Your phone number could not be verified automatically.<br>
-                    Please enter the verification code that was sent to your phone</span></div>`,
-                                cancelable: false, placeholder: "ALLY-CODE", inputType: "text", defaultValue: "", autofocus: false,
-                                submitOnEnter: true
-                            });
-                        }).
-                        then(function(userInput){ // retrieve the user input and compare to thr verification code produced
-                            userInput = (userInput + "").toUpperCase().trim();
+                    Please enter the verification code you received<br>
+                    Code Expires In: <span class="phone-verification-timer"
+                    style="display: inline-block; font-weight: bold; margin-top: 2em;">${verificationResponse.seconds_to_expire}</span> seconds</span></div>`,
+                        cancelable: false, placeholder: "CODE", inputType: "tel", defaultValue: "", autofocus: false,
+                        submitOnEnter: true
+                    });
+                }).then(function(userInput){ // get the verification code inputed by the user
+                    phoneVerificationAnimate.pause(); // pause the animated timer
+                    if(! userInput){ // user input is null or undefined
+                        throw "error";
+                    }
 
-                            // check if user input == to produced verification code
-                            if(userInput == "ALLY-" + randomNumber){ // user input matches verification code
-                                resolvePromise(); // resolve the Promise to complete phone verification
-                            }
-                            else { // user input did not match verification code
-                                throw "error"
-                            }
-                        }).
-                        catch(function(){
-                            rejectPromise("phone number verification failed"); // reject the promise i.e. verification failed
-                        });
-                    }, 31000);
+                    // call the code used to verify the inputed user verification code
+                    return Promise.resolve($.ajax(
+                        {
+                            url: 'https://api.authy.com/protected/json/phones/verification/check',
+                            type: "get",
+                            cache: false,
+                            //contentType: "application/x-www-form-urlencoded",
+                            beforeSend: function(jqxhr) {
+                                jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                            },
+                            dataType: "json",
+                            timeout: 240000, // wait for 4 minutes before timeout of request
+                            processData: true,
+                            data: {api_key: 'j8B13Xqi57LtUgDhZe4xclf7Km56FPhH',
+                                country_code: 234,
+                                phone_number: phoneNumber,
+                                verification_code: userInput.trim()} // data to submit to server
+                        }
+                    ));
                 }).
-                catch(function(error){
-                    try{
-                        clearTimeout(smsWatcherTimer);
+                then(function(verificationResponse){ // check if user verification code matched
+                    if(verificationResponse.success !== true){  // verification code failed
+                        throw verificationResponse;
                     }
-                    catch(err){}
-                    SMS.stopWatch(function(){}, function(){});
-                    SMS.enableIntercept(false, function(){}, function(){}); // stop sms intercept
-                    document.removeEventListener('onSMSArrive');
+
                     $('#hour-glass-loader-modal').get(0).hide(); // hide loader
-                    if(error && typeof error == "string"){
-                        reject(error);
+                    resolvePromise(); // phone verification code completed
+                }).
+                catch(function(err){
+                    phoneVerificationAnimate.pause(); // start the animated timer
+                    $('#hour-glass-loader-modal').get(0).hide(); // hide loader
+
+                    if(err && err.message){
+                        rejectPromise(err.message);
                     }
-                    reject("phone number verification failed");
+                    else if (err && err.responseText){
+                        err = JSON.parse(err.responseText);
+                        rejectPromise(err.message);
+                    }
+                    else{
+                        rejectPromise("phone number verification failed");
+                    }
                 });
+
             });
 
             return phoneNumberVerifiedPromise;

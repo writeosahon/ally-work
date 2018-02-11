@@ -420,7 +420,7 @@ textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent
 window.plugins.toast.hide();}});return;// exit method immediately
 }// create the form data to be submitted
 var createAcctFormData={firstName:$('#signup-page #signup-firstname').val().trim(),lastName:$('#signup-page #signup-lastname').val().trim(),lock:$('#signup-page #signup-secure-pin').val(),phone:$('#signup-page #signup-phone-number').val().startsWith("0")?$('#signup-page #signup-phone-number').val().replace("0","+234"):$('#signup-page #signup-phone-number').val()};// tell the user that phone number verification is necessary
-new Promise(function(resolve,reject){ons.notification.confirm('To complete sign up, your phone number must be verified. <br>'+'Usual SMS charge from your phone network provider will apply.<br> '+'Please ensure you have sufficient airtime to send/receive one SMS',{title:'Verify Phone Number',buttonLabels:['Cancel','Ok']})// Ask for confirmation
+new Promise(function(resolve,reject){ons.notification.confirm('To complete sign up, your phone number must be verified. <br>'+'You will receive a phone call with your verification code shortly.<br> '+"Tap 'OK' to proceed",{title:'Verify Phone Number',buttonLabels:['Cancel','Ok']})// Ask for confirmation
 .then(function(index){if(index===1){// OK button
 resolve();}else{reject("your phone number could not be verified");}});}).then(function(){// verify the user's phone number
 //return null;
