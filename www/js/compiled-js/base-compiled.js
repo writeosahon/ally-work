@@ -106,24 +106,20 @@ var utopiasoftware = {
                     }
 
                     // call the code used to verify the inputed user verification code
-                    return Promise.resolve($.ajax({
-                        url: 'https://api.authy.com/protected/json/phones/verification/check',
-                        type: "get",
-                        cache: false,
-                        //contentType: "application/x-www-form-urlencoded",
-                        beforeSend: function beforeSend(jqxhr) {
-                            jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
-                        },
-                        dataType: "json",
-                        timeout: 240000, // wait for 4 minutes before timeout of request
-                        processData: true,
-                        data: { api_key: 'j8B13Xqi57LtUgDhZe4xclf7Km56FPhH',
-                            country_code: 234,
-                            phone_number: phoneNumber,
-                            verification_code: userInput.trim() } // data to submit to server
-                    }));
+                    return new Promise(function (resolve3, reject3) {
+
+                        // make the request to validate user verification code using background http request
+                        cordovaHTTP.get("https://api.authy.com/protected/json/phones/verification/check", {
+                            api_key: window.encodeURIComponent('j8B13Xqi57LtUgDhZe4xclf7Km56FPhH'),
+                            country_code: window.encodeURIComponent('234'),
+                            phone_number: window.encodeURIComponent(phoneNumber),
+                            verification_code: window.encodeURIComponent(userInput.trim())
+                        }, {}, resolve3, reject3);
+                    });
                 }).then(function (verificationResponse) {
                     // check if user verification code matched
+                    console.log(verificationResponse);
+                    verificationResponse = JSON.parse(verificationResponse.data);
                     if (verificationResponse.success !== true) {
                         // verification code failed
                         throw verificationResponse;
@@ -139,6 +135,9 @@ var utopiasoftware = {
                         rejectPromise(err.message);
                     } else if (err && err.responseText) {
                         err = JSON.parse(err.responseText);
+                        rejectPromise(err.message);
+                    } else if (err && err.error) {
+                        err = JSON.parse(err.error);
                         rejectPromise(err.message);
                     } else {
                         rejectPromise("phone number verification failed");
