@@ -118,7 +118,6 @@ var utopiasoftware = {
                     });
                 }).then(function (verificationResponse) {
                     // check if user verification code matched
-                    console.log(verificationResponse);
                     verificationResponse = JSON.parse(verificationResponse.data);
                     if (verificationResponse.success !== true) {
                         // verification code failed
