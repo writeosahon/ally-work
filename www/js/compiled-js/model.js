@@ -26,7 +26,7 @@ utopiasoftware.ally._model = {
     /**
      * property is used to hold the base url for communicating with ALLY app server
      */
-    ally_base_url: "https://myallyapp.com/test",  // "https://myallyapp.com",
+    ally_base_url:  "https://myallyapp.com",  // "https://myallyapp.com/test",
 
 
     /**
