@@ -49,11 +49,11 @@
                                 <ons-input id="payments-ally-direct-amount" required placeholder="Amount (NGN)"
                                            style="font-size: 0.8em; width: 100%;"
                                            data-parsley-type="number" type="tel"
-                                           data-parsley-min="100"
+                                           data-parsley-min="10"
                                            data-parsley-max="50000"
                                            data-parsley-required-message="enter amount"
                                            data-parsley-type-message="provide a valid cash amount"
-                                           data-parsley-min-message="minimum amount allowed is 100"
+                                           data-parsley-min-message="minimum amount allowed is 10"
                                            data-parsley-max-message="maximum amount allowed is 50,000"
                                            onchange="$(this).val(kendo.toString(kendo.parseFloat($(this).val()), 'n2'));"
                                            class="hint--bottom"></ons-input>
