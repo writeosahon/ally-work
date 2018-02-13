@@ -114,11 +114,11 @@
                 <div class="center">
                     <ons-input id="add-card-merchant-payment-charge-amount" required placeholder="Amount (NGN)"
                                data-parsley-type="number" type="tel"
-                               data-parsley-min="100"
+                               data-parsley-min="10"
                                data-parsley-max="50000"
                                data-parsley-required-message="enter amount to charge"
                                data-parsley-type-message="provide a valid cash amount"
-                               data-parsley-min-message="minimum amount per charge is 100"
+                               data-parsley-min-message="minimum amount per charge is 10"
                                data-parsley-max-message="maximum amount per charge is 50,000"
                                onchange="$(this).val(kendo.toString(kendo.parseFloat($(this).val()), 'n2'));"
                                class="hint--bottom"></ons-input>
