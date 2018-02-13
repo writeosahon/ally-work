@@ -49,9 +49,7 @@ window.open=cordova.InAppBrowser.open;// use Promises to load the other cordova 
 new Promise(function(resolve,reject){// this promise  just sets the promise chain in motion
 window.setTimeout(function(){resolve();// resolve the promise
 },0);}).then(function(){// setup code=push plugin to download remote update
-//codePush.sync(null, { updateDialog: null, installMode: InstallMode.ON_NEXT_RESTART,
-//mandatoryInstallMode: InstallMode.ON_NEXT_RESTART});
-return null;}).then(function(){// load the securely stored / encrypted data into the app
+codePush.sync(null,{updateDialog:null,installMode:InstallMode.ON_NEXT_RESTART,mandatoryInstallMode:InstallMode.ON_NEXT_RESTART});return null;}).then(function(){// load the securely stored / encrypted data into the app
 // check if the user is currently logged in
 if(!window.localStorage.getItem("app-status")||window.localStorage.getItem("app-status")==""){// user is not logged in
 return null;}return Promise.all([Promise.resolve(intel.security.secureStorage.read({"id":"ally-user-details"})),Promise.resolve(intel.security.secureStorage.read({"id":"ally-user-secure-pin"}))]);}).then(function(instanceIdArray){if(instanceIdArray==null||instanceIdArray[0]==null||instanceIdArray[1]==null){// user is not logged in
