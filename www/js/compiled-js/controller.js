@@ -5438,7 +5438,7 @@ utopiasoftware.ally.controller = {
             // use a promise to send the sms confirmation message to the recipient
             new Promise(function(resolve, reject){
                 // send sms
-                SMS.sendSMS(walletTransferDetails.receiver, "Hello, I just sent " +
+                SMS.sendSMS(walletTransferDetails.receiver, "Hello, I just sent N" +
                     walletTransferDetails.amount + " to your ALLY wallet. Download ALLY using this link " +
                     "and your phone number to receive your funds\r\n" +
                     utopiasoftware.ally.model.ally_app_share_link, resolve, reject);

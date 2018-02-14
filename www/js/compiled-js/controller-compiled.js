@@ -1449,7 +1449,7 @@ $('#app-main-navigator').get(0).pushPage('add-card-wallet-transfer-page.html',{d
 // get the details of the wall transfer for which an sms confirmation is being sent
 var walletTransferDetails=JSON.parse($(buttonElem).attr('data-wallet-transfer'));// use a promise to send the sms confirmation message to the recipient
 new Promise(function(resolve,reject){// send sms
-SMS.sendSMS(walletTransferDetails.receiver,"Hello, I just sent "+walletTransferDetails.amount+" to your ALLY wallet. Download ALLY using this link "+"and your phone number to receive your funds\r\n"+utopiasoftware.ally.model.ally_app_share_link,resolve,reject);});// hide the sms confirmation modal
+SMS.sendSMS(walletTransferDetails.receiver,"Hello, I just sent N"+walletTransferDetails.amount+" to your ALLY wallet. Download ALLY using this link "+"and your phone number to receive your funds\r\n"+utopiasoftware.ally.model.ally_app_share_link,resolve,reject);});// hide the sms confirmation modal
 $('#wallet-transfer-sms-confirm-modal').get(0).hide();// reset the form for the wallet transfer page
 $('#wallet-transfer-page #wallet-transfer-form').get(0).reset();// reset the form validator object on the page
 utopiasoftware.ally.controller.walletTransferPageViewModel.formValidator.reset();return Promise.all([ons.notification.toast("Wallet Transfer Successful!",{timeout:4000})]);// conclude wallet transfer process
