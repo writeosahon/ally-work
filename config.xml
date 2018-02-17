@@ -31,7 +31,7 @@
 
     <!-- section required for devices 5+ -->
     <config-file platform="android" parent="/*" mode="merge">
-        <uses-sdk android:minSdkVersion="21"
+        <uses-sdk android:minSdkVersion="16"
                   android:targetSdkVersion="21" />
     </config-file>
 
@@ -48,7 +48,7 @@
     <plugin name="cordova-plugin-contact-number-picker" spec="0.1.1"/>
     <plugin name="cordova-plugin-qrscanner" spec="2.5.0"/>
     <plugin name="ionic-plugin-keyboard" spec="2.2.1"/>
-    <plugin name="cordova-plugin-file" spec="5.0.0"/>
+    <plugin name="cordova-plugin-file" spec="4.3.3"/>
     <plugin name="cordova-plugin-compat" spec="1.2.0"/>
     <plugin name="cordova-plugin-customurlscheme" spec="4.3.0">
         <variable name="URL_SCHEME" value="allyapp"/>
