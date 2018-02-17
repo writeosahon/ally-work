@@ -71,7 +71,7 @@
     <preference name="AndroidPersistentFileLocation" value="Internal" />
 
     <config-file platform="android" target="AndroidManifest.xml" parent="/*" mode="merge">
-        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+        <uses-permission android:maxSdkVersion="27" android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
         <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     </config-file>
 
