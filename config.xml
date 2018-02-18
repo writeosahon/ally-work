@@ -70,6 +70,10 @@
 
     <preference name="AndroidPersistentFileLocation" value="Internal" />
 
+    <config-file platform="android" target="AndroidManifest.xml" parent="/manifest" mode="delete">
+        <uses-permission android:maxSdkVersion="18" android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    </config-file>
+
     <config-file platform="android" target="AndroidManifest.xml" parent="/manifest" mode="merge">
         <uses-permission android:maxSdkVersion="27" android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     </config-file>
