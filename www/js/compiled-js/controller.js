@@ -1540,6 +1540,24 @@ utopiasoftware.ally.controller = {
             }
         },
 
+        /**
+         * method is triggered when the PIN visibility button is clicked.
+         * It toggles pin visibility
+         *
+         * @param buttonElement
+         */
+        confirmPinVisibilityButtonClicked: function(buttonElement){
+            if($(buttonElement).attr("data-ally-visible") === "no"){ // pin is not visible, make it visible
+                $('#signup-confirm-secure-pin input').css("-webkit-text-security", "none"); // change the text-security for the input field
+                $(buttonElement).find('ons-icon').attr("icon", "md-eye-off"); // change the icon associated with the input
+                $(buttonElement).attr("data-ally-visible", "yes"); // flag the pin is now visible
+            }
+            else{ // make the pin not visible
+                $('#signup-confirm-secure-pin input').css("-webkit-text-security", "disc"); // change the text-security for the input field
+                $(buttonElement).find('ons-icon').attr("icon", "md-eye"); // change the icon associated with the input
+                $(buttonElement).attr("data-ally-visible", "no"); // flag the pin is now invisible
+            }
+        },
 
         /**
          * method is used to change the value for the Verify Phone Number based on the checkbox state.

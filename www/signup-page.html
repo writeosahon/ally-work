@@ -94,6 +94,30 @@
             </div>
             </ons-list-item>
 
+            <ons-list-item modifier="nodivider" style="margin-bottom: 3.5em;">
+                <div class="left">
+                    <ons-icon icon="md-ally-icon-padlock-confirm" class="list-item__icon" fixed-width size="28px"></ons-icon>
+                </div>
+                <div class="center">
+                    <ons-input id="signup-confirm-secure-pin" type="number" placeholder="Confirm Secure PIN" required float modifier="transparent"
+                               data-parsley-type="digits"
+                               data-parsley-minlength="4"
+                               data-parsley-maxlength="8"
+                               data-parsley-equalto="#signup-secure-pin"
+                               data-parsley-required-message="confirm your PIN"
+                               data-parsley-type-message="your PIN must contain only numbers"
+                               data-parsley-minlength-message="your PIN must be at least 4 numbers"
+                               data-parsley-maxlength-message="your PIN cannot be more than 8 numbers"
+                               data-parsely-equalto-message="your PIN does not match"
+                               style="width: 65%" class="hint--bottom"></ons-input>
+                    <ons-button modifier="quiet" data-ally-visible="no"
+                                style="color: #30a401; margin-left: 1.5em;"
+                                onclick="utopiasoftware.ally.controller.signupPageViewModel.confirmPinVisibilityButtonClicked(this)">
+                        <ons-icon icon="md-eye" size="21px"></ons-icon>
+                    </ons-button>
+                </div>
+            </ons-list-item>
+
         </ons-list>
     </form>
 

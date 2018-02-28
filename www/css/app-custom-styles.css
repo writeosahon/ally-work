@@ -126,7 +126,7 @@
 #signup-page ons-list, #signup-page ons-list-item {
     background-color: transparent;
 }
-#signup-page #signup-secure-pin input {
+#signup-page #signup-secure-pin input, #signup-page #signup-confirm-secure-pin input {
     -webkit-text-security: disc;
 }
 /** STYLE FOR THE SIGNUP PAGE ENDS **/
