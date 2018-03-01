@@ -65,6 +65,19 @@ utopiasoftware.ally.model = new Proxy(utopiasoftware.ally._model, {
             $('#dashboard-page #dashboard-ally-wallet').html("&#8358;" + kendo.toString(kendo.parseFloat(value.balance), "n2"));
             $('#wallet-page #wallet-balance').html(kendo.toString(kendo.parseFloat(value.balance), "n2"));
             $('#account-page #account-wallet-balance').html(kendo.toString(kendo.parseFloat(value.balance), "n2"));
+
+            if(value.bonus && value.bonus > 0){ // check if the user has bonus & bonus is > 0
+                // update the wallet bonus on every page it is being displayed
+                $('#dashboard-page #dashboard-ally-bonus').html("ALLY Bonus &#8358;" + kendo.toString(kendo.parseFloat(value.bonus), "n2"));
+                $('#wallet-page #wallet-bonus-label').html('BONUS');
+                $('#wallet-page #wallet-bonus').html(kendo.toString(kendo.parseFloat(value.bonus), "n2"));
+            }
+            else{ // user has no bonus
+                // remove the wallet bonus on every page it was being displayed
+                $('#dashboard-page #dashboard-ally-bonus').html("");
+                $('#wallet-page #wallet-bonus-label').html("");
+                $('#wallet-page #wallet-bonus').html("");
+            }
         }
 
         return true; // return true to signal that proxy updating was successful
