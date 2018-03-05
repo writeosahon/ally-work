@@ -1376,7 +1376,7 @@ utopiasoftware.ally.controller = {
             // tell the user that phone number verification is necessary
             new Promise(function(resolve, reject){
                 ons.notification.confirm('To complete sign up, your phone number must be verified. <br>' +
-                        'You will receive a phone call with your verification code shortly.<br> ' +
+                        'You will receive an SMS with your verification code shortly.<br> ' +
                         "Tap 'OK' to proceed", {title: 'Verify Phone Number',
                         buttonLabels: ['Cancel', 'Ok']}) // Ask for confirmation
                     .then(function(index) {

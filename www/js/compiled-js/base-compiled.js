@@ -57,7 +57,7 @@ var utopiasoftware = {
                     timeout: 240000, // wait for 4 minutes before timeout of request
                     processData: true,
                     data: { api_key: 'j8B13Xqi57LtUgDhZe4xclf7Km56FPhH',
-                        via: 'call',
+                        via: 'sms',
                         country_code: 234,
                         phone_number: phoneNumber } // data to submit to server
                 })).then(function (verificationResponse) {
@@ -70,6 +70,12 @@ var utopiasoftware = {
                     return verificationResponse; // return verification response
                 }).then(function (verificationResponse) {
                     // compare the generated code with the user input
+
+                    // set a timer to enable phone call verification if SMS should fail
+                    window.setTimeout(function () {
+                        // display the 'make a call' button
+                        $('#phone-verification-code-check .phone-verification-make-call').css('display', "inline-block");
+                    }, Math.round(verificationResponse.seconds_to_expire * 1000 / 4));
 
                     // instantiate the phoneVerificationAnimate object
                     phoneVerificationAnimate = anime({
@@ -93,7 +99,7 @@ var utopiasoftware = {
                     phoneVerificationAnimate.play(); // start the animated timer
                     return ons.notification.prompt({ title: "Phone Number Verification",
                         id: 'phone-verification-code-check',
-                        messageHTML: "<div><ons-icon icon=\"md-ally-icon-code-equal\" size=\"24px\"\n                    style=\"color: #30a401; float: left; width: 26px;\"></ons-icon>\n                    <span style=\"float: right; width: calc(100% - 26px);\">\n                    Please enter the verification code you received<br>\n                    Code Expires In: <span class=\"phone-verification-timer\"\n                    style=\"display: inline-block; font-weight: bold; margin-top: 2em;\">" + verificationResponse.seconds_to_expire + "</span> seconds</span></div>",
+                        messageHTML: "<div><ons-icon icon=\"md-ally-icon-code-equal\" size=\"24px\"\n                    style=\"color: #30a401; float: left; width: 26px;\"></ons-icon>\n                    <span style=\"float: right; width: calc(100% - 26px);\">\n                    Please enter the verification code you received<br>\n                    Code Expires In: <span class=\"phone-verification-timer\"\n                    style=\"display: inline-block; font-weight: bold; margin-top: 1.5em;\">" + verificationResponse.seconds_to_expire + "</span> seconds<br>\n                    <span class=\"phone-verification-make-call\" style=\"display: none\">Haven't received your SMS?\n                    <ons-button modifier=\"quiet\" style=\"color: #30A401; min-height: 14px; line-height: 14px;\n                    padding: 0 1.2em; text-align: center; font-size: 14px;\"\n                    onclick=\"utopiasoftware.ally.makeACall('" + phoneNumber + "')\">make a call</ons-button></span></span></div>",
                         cancelable: false, placeholder: "CODE", inputType: "tel", defaultValue: "", autofocus: false,
                         submitOnEnter: true
                     });
@@ -146,6 +152,29 @@ var utopiasoftware = {
 
             return phoneNumberVerifiedPromise;
         },
+
+        /**
+         * this is a helper method which initiates phone number verification
+         * via twilio phone call
+         */
+        makeACall: function makeACall(phoneNumber) {
+            Promise.resolve($.ajax({
+                url: 'https://api.authy.com/protected/json/phones/verification/start',
+                type: "post",
+                contentType: "application/x-www-form-urlencoded",
+                beforeSend: function beforeSend(jqxhr) {
+                    jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                },
+                dataType: "json",
+                timeout: 240000, // wait for 4 minutes before timeout of request
+                processData: true,
+                data: { api_key: 'j8B13Xqi57LtUgDhZe4xclf7Km56FPhH',
+                    via: 'call',
+                    country_code: 234,
+                    phone_number: phoneNumber } // data to submit to server
+            }));
+        },
+
 
         /**
          * method returns a Promise which saves the app details of the current user (in encrypted persistent storage) OR
