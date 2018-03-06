@@ -1,0 +1,52 @@
+<!-- account settings page -->
+<ons-page id="account-settings-page">
+    <ons-toolbar>
+        <div class="left">
+            <ons-toolbar-button onclick="utopiasoftware.ally.controller.transactionHistoryPageViewModel.backButtonClicked()">
+                <ons-icon icon="md-long-arrow-left"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+        <div class="center">Account Settings</div>
+        <div class="right">
+            <ons-toolbar-button onclick="$('#side-menu').get(0).toggle()">
+                <ons-icon icon="md-menu"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+    </ons-toolbar>
+
+    <ons-list>
+        <ons-list-title>ALLY Account Settings</ons-list-title>
+
+        <ons-list-item modifier="longdivider" tappable lock-on-drag="true">
+            <div class="center">
+                <ons-row>
+                    <ons-col width="75%">
+                        <label for="account-settings-push-notification-alt">Allow Push Notifications</label>
+                    </ons-col>
+                    <ons-col width="25%">
+                        <ons-switch id="account-settings-push-notification"
+                                    input-id="account-settings-push-notification-alt" checked disable-auto-styling>
+                        </ons-switch>
+                    </ons-col>
+                </ons-row>
+            </div>
+        </ons-list-item>
+
+        <ons-list-item modifier="longdivider" tappable lock-on-drag="true">
+            <div class="center">
+                <ons-row>
+                    <ons-col width="75%">
+                        <label for="account-settings-ussd-alt">Allow USSD</label>
+                    </ons-col>
+                    <ons-col width="25%">
+                        <ons-switch id="account-settings-ussd"
+                                    input-id="account-settings-ussd-alt" checked disable-auto-styling>
+                        </ons-switch>
+                    </ons-col>
+                </ons-row>
+            </div>
+        </ons-list-item>
+    </ons-list>
+
+
+</ons-page>

@@ -79,6 +79,9 @@ $('ons-splitter').get(0).right.close().then(function(){$('#app-main-navigator').
 }).catch(function(){});return;}if(label=="my account"){// 'my account' list item was clicked
 // close the side menu
 $('ons-splitter').get(0).right.close().then(function(){$('#app-main-navigator').get(0).bringPageTop("account-page.html",{});// navigate to the specified page
+}).catch(function(){});return;}if(label=="account settings"){// 'account settings' list item was clicked
+// close the side menu
+$('ons-splitter').get(0).right.close().then(function(){$('#app-main-navigator').get(0).bringPageTop("account-settings-page.html",{});// navigate to the specified page
 }).catch(function(){});return;}if(label=="transaction history"){// 'transaction history' list item was clicked
 // close the side menu
 $('ons-splitter').get(0).right.close().then(function(){$('#app-main-navigator').get(0).bringPageTop("transaction-history-page.html",{});// navigate to the specified page

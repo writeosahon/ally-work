@@ -647,3 +647,12 @@
     padding-left: 50% !important;
 }
 /** STYLE TO POSITION THE DATE RANGE PICKER BUTTON OVER THE ENTIRE DATE-RANGE-PICKER INPUT ENDS. **/
+
+
+/** STYLE FOR THE ACCOUNT SETTINGS PAGE BEGINS **/
+#account-settings-page .page--material__content {
+    background-color: #ffffff;
+}
+#account-settings-page .page--material__background {
+    background-color: #ffffff;
+}
