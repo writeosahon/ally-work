@@ -340,3 +340,15 @@ $(document).on("hide", "#add-expense-page", utopiasoftware.ally.controller.addEx
 
 // listen for when the Add Expense page is destroyed
 $(document).on("destroy", "#add-expense-page", utopiasoftware.ally.controller.addExpensePageViewModel.pageDestroy);
+
+// listen for the initialisation of the Account Settings page
+$(document).on("init", "#account-settings-page", utopiasoftware.ally.controller.accountSettingsPageViewModel.pageInit);
+
+// listen for when the Account Settings page is shown
+$(document).on("show", "#account-settings-page", utopiasoftware.ally.controller.accountSettingsPageViewModel.pageShow);
+
+// listen for when the Account Settings page is hidden
+$(document).on("hide", "#account-settings-page", utopiasoftware.ally.controller.accountSettingsPageViewModel.pageHide);
+
+// listen for when the Account Settings page is destroyed
+$(document).on("destroy", "#account-settings-page", utopiasoftware.ally.controller.accountSettingsPageViewModel.pageDestroy);

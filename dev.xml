@@ -44,7 +44,7 @@
                                                                                                     -->
     <plugin name="cordova-plugin-contact-number-picker" spec="0.1.1"/>
     <plugin name="ionic-plugin-keyboard" spec="2.2.1"/>
-    <plugin name="onesignal-cordova-plugin" spec="^2.0.10" source="npm"/>
+    <plugin name="onesignal-cordova-plugin" spec="2.3.1" source="npm"/>
     <plugin name="laundrymart-sounds-images" spec="https://github.com/writeosahon/laundrymart-sounds-images.git#1.0.1"/>
     <!-- If available via Cordova registry; consider changing to an NPM reference. -->
     <plugin name="cordova-plugin-customurlscheme" spec="4.2.0">

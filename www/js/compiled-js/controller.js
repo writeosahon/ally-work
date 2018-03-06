@@ -10708,5 +10708,150 @@ utopiasoftware.ally.controller = {
             $('#app-main-navigator').get(0).popPage();
         }
 
+    },
+
+
+    /**
+     * object is view-model for account-settings page
+     */
+    accountSettingsPageViewModel: {
+
+        /**
+         * event is triggered when page is initialised
+         */
+        pageInit: function(event){
+
+            var $thisPage = $(event.target); // get the current page shown
+
+            // call the function used to initialise the app page if the app is fully loaded
+            loadPageOnAppReady();
+
+            //function is used to initialise the page if the app is fully ready for execution
+            function loadPageOnAppReady(){
+                // check to see if onsen is ready and if all app loading has been completed
+                if(!ons.isReady() || utopiasoftware.ally.model.isAppReady === false){
+                    setTimeout(loadPageOnAppReady, 500); // call this function again after half a second
+                    return;
+                }
+
+                // listen for the back button event
+                $('#app-main-navigator').get(0).topPage.onDeviceBackButton =
+                    utopiasoftware.ally.controller.accountSettingsPageViewModel.backButtonClicked;
+
+                // add listener for when the push notification setting is changed
+                $('#account-settings-push-notification', $thisPage).on("change", function(toggleEvent){
+                    try{
+                        window.plugins.OneSignal.
+                        setSubscription(toggleEvent.originalEvent.value); // enable/disable push notification
+                        // inform the user of the update
+                        ons.notification.
+                        toast(`${toggleEvent.originalEvent.value ? 'Enabled' : 'Disabled'} push notifications`, {timeout:3000})
+                    }
+                    catch(err){ // display an error message to the user
+                        window.plugins.toast.showWithOptions({
+                            message: "your push notification setting could not be updated right now",
+                            duration: 4000,
+                            position: "top",
+                            styling: {
+                                opacity: 1,
+                                backgroundColor: '#ff0000', //red
+                                textColor: '#FFFFFF',
+                                textSize: 14
+                            }
+                        }, function(toastEvent){
+                            if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                                window.plugins.toast.hide();
+                            }
+                        });
+                    }
+                });
+
+
+                // retrieve the app's currently version number and update the page footer display
+                Promise.resolve(cordova.getAppVersion.getVersionNumber()).
+                then(function (versionNumber) { // get the app version number
+                    $('#account-settings-ally-version', $thisPage).html(versionNumber); // update the version number display
+                }).
+                then(function(){ // get the present push notification status of the device
+                    return new Promise(function(resolve, reject){
+                        window.plugins.OneSignal.getPermissionSubscriptionState(resolve); // get device push notification status
+                    });
+                }).
+                then(function(pushStatus){ // update the displayed push notification settings status based on its current setting
+                    // check if push notification is enabled and allowed
+                    if(pushStatus.subscriptionStatus.subscribed === true &&
+                        pushStatus.subscriptionStatus.userSubscriptionSetting === true){ // push notification is enabled
+                        // enable the push notification setting
+                        $('#account-settings-push-notification', $thisPage).get(0).checked = true;
+                    }
+                    else{ // push notification is disabled
+                        // disable the push notification setting
+                        $('#account-settings-push-notification', $thisPage).get(0).checked = false;
+                    }
+
+                    $('.page-preloader', $thisPage).css("display", "none");
+                }).
+                then(function(){ // get the current user ussd setting from the app
+                    return Promise.resolve($.ajax(
+                        {
+                            url: utopiasoftware.ally.model.ally_base_url + "/mobile/ussd-get-status.php",
+                            type: "post",
+                            contentType: "application/x-www-form-urlencoded",
+                            beforeSend: function(jqxhr) {
+                                jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                            },
+                            dataType: "text",
+                            timeout: 240000, // wait for 4 minutes before timeout of request
+                            processData: true,
+                            data: {phone: utopiasoftware.ally.model.appUserDetails.phone}
+                        }
+                    ));
+                });
+
+            }
+
+        },
+
+
+        /**
+         * method is triggered when page is shown
+         *
+         * @param event
+         */
+        pageShow: (event) => {
+        },
+
+        /**
+         * method is triggered when the page is hidden
+         * @param event
+         */
+        pageHide: (event) => {
+
+        },
+
+        /**
+         * method is triggered when the page is destroyed
+         * @param event
+         */
+        pageDestroy: (event) => {
+
+        },
+
+
+        /**
+         * method is triggered when back button or device back button is clicked
+         */
+        backButtonClicked: function(){
+
+            // check if the side menu is open
+            if($('ons-splitter').get(0).right.isOpen){ // side menu open, so close it
+                $('ons-splitter').get(0).right.close();
+                return; // exit the method
+            }
+
+            // move to the previous page on the app main navigator stack
+            $('#app-main-navigator').get(0).popPage();
+        }
+
     }
 };

@@ -189,6 +189,23 @@ var utopiasoftware = {
                         phone_number: phoneNumber} // data to submit to server
                 }
             ));
+
+            // inform the user that a verification call will be received shortly
+            window.plugins.toast.showWithOptions({
+                message: "You will receive an ALLY call with your verification code, shortly",
+                duration: 4000,
+                position: "top",
+                styling: {
+                    opacity: 1,
+                    backgroundColor: '#008000',
+                    textColor: '#FFFFFF',
+                    textSize: 14
+                }
+            }, function(toastEvent){
+                if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                    window.plugins.toast.hide();
+                }
+            });
         },
 
         /**

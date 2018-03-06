@@ -2,7 +2,7 @@
 <ons-page id="account-settings-page">
     <ons-toolbar>
         <div class="left">
-            <ons-toolbar-button onclick="utopiasoftware.ally.controller.transactionHistoryPageViewModel.backButtonClicked()">
+            <ons-toolbar-button onclick="utopiasoftware.ally.controller.accountSettingsPageViewModel.backButtonClicked()">
                 <ons-icon icon="md-long-arrow-left"></ons-icon>
             </ons-toolbar-button>
         </div>
@@ -13,6 +13,9 @@
             </ons-toolbar-button>
         </div>
     </ons-toolbar>
+
+    <!-- page preloader -->
+    <ons-progress-bar class="page-preloader" indeterminate style="display: block; margin-top: 3px;"></ons-progress-bar>
 
     <ons-list>
         <ons-list-title>ALLY Account Settings</ons-list-title>
@@ -47,6 +50,10 @@
             </div>
         </ons-list-item>
     </ons-list>
+
+    <ons-bottom-toolbar style="text-align: center; padding-top: 6px; font-size: 0.85em;">
+        ALLY Version<span id="account-settings-ally-version" style="display: inline-block; margin-left: 1.1em"></span>
+    </ons-bottom-toolbar>
 
 
 </ons-page>
