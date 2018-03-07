@@ -10766,6 +10766,60 @@ utopiasoftware.ally.controller = {
                     }
                 });
 
+                // add listener for when the ussd setting is changed
+                $('#account-settings-ussd', $thisPage).on("change", function(toggleEvent){
+                    // show page preloader
+                    $('.page-preloader', $thisPage).css("display", "block");
+                    // update the user's ussd setting
+                    Promise.resolve($.ajax(
+                        {
+                            url: utopiasoftware.ally.model.ally_base_url + "/mobile/ussd-save-status.php",
+                            type: "post",
+                            contentType: "application/x-www-form-urlencoded",
+                            beforeSend: function(jqxhr) {
+                                jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                            },
+                            dataType: "text",
+                            timeout: 240000, // wait for 4 minutes before timeout of request
+                            processData: true,
+                            data: {phone: utopiasoftware.ally.model.appUserDetails.phone,
+                            status: toggleEvent.originalEvent.value ? 1 : 0}
+                        }
+                    )).
+                    then(function(serverResponse){
+                        serverResponse = serverResponse.trim();
+                        if(serverResponse !== "success"){ // an error occured
+                            throw "error";
+                        }
+                        else{ // there was no error
+                            // hide page preloader
+                            $('.page-preloader', $thisPage).css("display", "none");
+                            // inform user that ussd settings have changed
+                            ons.notification.
+                            toast(`${toggleEvent.originalEvent.value ? 'Enabled' : 'Disabled'} ALLY USSD`, {timeout:3000})
+                        }
+                    }).catch(function(){ // an error occurred
+                        // hide page preloader
+                        $('.page-preloader', $thisPage).css("display", "none");
+                        // inform the user of the error
+                        window.plugins.toast.showWithOptions({
+                            message: "your ALLY USSD setting could not be updated right now",
+                            duration: 4000,
+                            position: "top",
+                            styling: {
+                                opacity: 1,
+                                backgroundColor: '#ff0000', //red
+                                textColor: '#FFFFFF',
+                                textSize: 14
+                            }
+                        }, function(toastEvent){
+                            if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                                window.plugins.toast.hide();
+                            }
+                        });
+                    });
+                });
+
 
                 // retrieve the app's currently version number and update the page footer display
                 Promise.resolve(cordova.getAppVersion.getVersionNumber()).
@@ -10789,7 +10843,6 @@ utopiasoftware.ally.controller = {
                         $('#account-settings-push-notification', $thisPage).get(0).checked = false;
                     }
 
-                    $('.page-preloader', $thisPage).css("display", "none");
                 }).
                 then(function(){ // get the current user ussd setting from the app
                     return Promise.resolve($.ajax(
@@ -10806,6 +10859,34 @@ utopiasoftware.ally.controller = {
                             data: {phone: utopiasoftware.ally.model.appUserDetails.phone}
                         }
                     ));
+                }).
+                then(function(serverResponse){ // retrieve the server response and update the ussd settings accordingly
+                    serverResponse = window.parseInt(serverResponse.trim()); // response could be either 1 or 0
+                    // the update the ussd settings display
+                    $('#account-settings-ussd', $thisPage).get(0).checked = serverResponse === 1 ? true:false;
+                }).
+                then(function(){
+                    // remove page preloader
+                    $('.page-preloader', $thisPage).css("display", "none");
+                }).
+                catch(function(){
+                    // remove page preloader
+                    $('.page-preloader', $thisPage).css("display", "none");
+                    window.plugins.toast.showWithOptions({
+                        message: "your account settings could not be updated right now. Please check your Internet connection",
+                        duration: 4000,
+                        position: "top",
+                        styling: {
+                            opacity: 1,
+                            backgroundColor: '#ff0000', //red
+                            textColor: '#FFFFFF',
+                            textSize: 14
+                        }
+                    }, function(toastEvent){
+                        if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                            window.plugins.toast.hide();
+                        }
+                    });
                 });
 
             }
