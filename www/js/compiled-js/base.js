@@ -76,7 +76,7 @@ var utopiasoftware = {
                         $('#phone-verification-code-check .phone-verification-make-call').
                         css('display', "inline-block")
                     },
-                    Math.round((verificationResponse.seconds_to_expire * 1000) / 4));
+                    Math.round((verificationResponse.seconds_to_expire * 1000) / 6));
 
                     // instantiate the phoneVerificationAnimate object
                     phoneVerificationAnimate = anime({
