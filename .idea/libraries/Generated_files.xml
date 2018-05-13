@@ -2,9 +2,9 @@
   <library name="Generated files" type="javaScript">
     <properties>
       <sourceFilesUrls>
-        <item url="file://$PROJECT_DIR$/www/js/compiled-js/model-compiled.js" />
-        <item url="file://$PROJECT_DIR$/www/js/compiled-js/controller-compiled.js" />
         <item url="file://$PROJECT_DIR$/www/js/compiled-js/base-compiled.js" />
+        <item url="file://$PROJECT_DIR$/www/js/compiled-js/controller-compiled.js" />
+        <item url="file://$PROJECT_DIR$/www/js/compiled-js/model-compiled.js" />
       </sourceFilesUrls>
     </properties>
     <CLASSES>

@@ -476,6 +476,34 @@
 #payments-ally-direct-page #payments-ally-direct-merchant-name:focus {
     border-bottom: 2px green solid;
 }
+#payments-ally-direct-page .payments-ally-direct-discount-banner { /** style for payments discount banner rectangle **/
+    display: block;
+    position: fixed;
+    top: 0px;
+    width: 30vw;
+    margin-left: calc(100vw - 30vw);
+    color: yellow;
+}
+#payments-ally-direct-page .payments-ally-direct-discount-banner::before,
+#payments-ally-direct-page .payments-ally-direct-discount-banner::after { /** style for payments discount banner **/
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-color: transparent;
+    border-style: solid;
+}
+#payments-ally-direct-page .payments-ally-direct-discount-banner::before { /** style for payments discount banner **/
+    border-width: 3.6em;
+    border-right-color: red;
+    border-top-color: red;
+}
+#payments-ally-direct-page .payments-ally-direct-discount-banner::after { /** style for payments discount banner **/
+    border-radius: 0.4em;
+    border-width: 3.6em;
+    border-right-color: red;
+    border-top-color: red;
+}
 .payment-receipt-item-desc {
     font-size: 1em;
     font-weight: bold;

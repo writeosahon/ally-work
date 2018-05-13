@@ -29,8 +29,13 @@
                             <div style="width: 90%; display: inline-block">
                                 <ons-input id="payments-ally-scan-merchant-code" required float placeholder="Merchant Code"
                                            style="text-transform: uppercase; font-size: 0.85em; width: 100%;"
-                                           type="text"
+                                           type="number"
+                                           data-parsley-type="digits"
+                                           data-parsley-minlength="5"
+                                           data-parsley-maxlength="5"
                                            data-parsley-required-message="provide merchant code"
+                                           data-parsley-minlength-message="merchant code must be at least 5 digits"
+                                           data-parsley-maxlength-message="merchant code cannot be more than 5 digits"
                                            class="hint--top"></ons-input>
                                 <!-- this input is hidden from user. It is used to store merchant phone number for onward submission -->
                                 <input id="payments-ally-scan-merchant-phone" type="hidden">

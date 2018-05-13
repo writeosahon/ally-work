@@ -93,8 +93,8 @@ utopiasoftware.ally.controller = {
         document.addEventListener("online", function(){
 
             // setup code=push plugin to download remote update
-            codePush.sync(null, { updateDialog: null, installMode: InstallMode.ON_NEXT_RESTART,
-                mandatoryInstallMode: InstallMode.ON_NEXT_RESTART});
+            // codePush.sync(null, { updateDialog: null, installMode: InstallMode.ON_NEXT_RESTART,
+            //     mandatoryInstallMode: InstallMode.ON_NEXT_RESTART});
 
         }, false);
 
@@ -141,8 +141,8 @@ utopiasoftware.ally.controller = {
         }).
         then(function(){ // setup code=push plugin to download remote update
 
-            codePush.sync(null, { updateDialog: null, installMode: InstallMode.ON_NEXT_RESTART,
-                mandatoryInstallMode: InstallMode.ON_NEXT_RESTART});
+            // codePush.sync(null, { updateDialog: null, installMode: InstallMode.ON_NEXT_RESTART,
+            //     mandatoryInstallMode: InstallMode.ON_NEXT_RESTART});
             return null;
         }).
         then(function(){ // load the securely stored / encrypted data into the app

@@ -34,7 +34,9 @@ document.addEventListener("offline",function(){// display a toast message to let
 window.plugins.toast.showWithOptions({message:"No Internet Connection. App functionality may be limited",duration:4000,// 4000 ms
 position:"bottom",styling:{opacity:1,backgroundColor:'#000000',textColor:'#FFFFFF',textSize:14}});},false);// add listener for when the Internet network connection is online
 document.addEventListener("online",function(){// setup code=push plugin to download remote update
-codePush.sync(null,{updateDialog:null,installMode:InstallMode.ON_NEXT_RESTART,mandatoryInstallMode:InstallMode.ON_NEXT_RESTART});},false);// add listener for when the device is going into the background i.e. paused
+// codePush.sync(null, { updateDialog: null, installMode: InstallMode.ON_NEXT_RESTART,
+//     mandatoryInstallMode: InstallMode.ON_NEXT_RESTART});
+},false);// add listener for when the device is going into the background i.e. paused
 document.addEventListener("pause",function(){// get the current page view
 var currentPageView=$('ons-splitter').get(0).content.page;// if user is on the onboarding or login screens, do nothing
 if(currentPageView.toString()=='onboarding-template'||currentPageView.toString()=='login-template'){return;// exit
@@ -49,7 +51,9 @@ window.open=cordova.InAppBrowser.open;// use Promises to load the other cordova 
 new Promise(function(resolve,reject){// this promise  just sets the promise chain in motion
 window.setTimeout(function(){resolve();// resolve the promise
 },0);}).then(function(){// setup code=push plugin to download remote update
-codePush.sync(null,{updateDialog:null,installMode:InstallMode.ON_NEXT_RESTART,mandatoryInstallMode:InstallMode.ON_NEXT_RESTART});return null;}).then(function(){// load the securely stored / encrypted data into the app
+// codePush.sync(null, { updateDialog: null, installMode: InstallMode.ON_NEXT_RESTART,
+//     mandatoryInstallMode: InstallMode.ON_NEXT_RESTART});
+return null;}).then(function(){// load the securely stored / encrypted data into the app
 // check if the user is currently logged in
 if(!window.localStorage.getItem("app-status")||window.localStorage.getItem("app-status")==""){// user is not logged in
 return null;}return Promise.all([Promise.resolve(intel.security.secureStorage.read({"id":"ally-user-details"})),Promise.resolve(intel.security.secureStorage.read({"id":"ally-user-secure-pin"}))]);}).then(function(instanceIdArray){if(instanceIdArray==null||instanceIdArray[0]==null||instanceIdArray[1]==null){// user is not logged in
@@ -548,8 +552,8 @@ navigator.app.exitApp();// Close the app
 var tempObj={balance:0};// show appropriate loader
 $('#dashboard-ally-wallet-loader').css("display","inline-block");$('#dashboard-ally-wallet').css("display","none");$('#dashboard-ally-wallet').html("&#8358;"+"0");$('#dashboard-ally-wallet-last-updated').html("");// try to retrieve user updated wallet details
 Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/get-profile.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
-processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone}// data to submit to server
-})).then(function(serverResponseText){serverResponseText+="";var userDetailsData=JSON.parse(serverResponseText.trim());// get the new user object
+processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone// data to submit to server
+}})).then(function(serverResponseText){serverResponseText+="";var userDetailsData=JSON.parse(serverResponseText.trim());// get the new user object
 // add a timestamp for the last time user details was updated
 userDetailsData._lastUpdatedDate=Date.now();// check if any error occurred
 if(userDetailsData.status=="error"){// an error occurred
@@ -583,8 +587,8 @@ utopiasoftware.ally.controller.dashboardPageViewModel.walletIncomingChart.append
 // request for the user wallet transfer-in data for the provided time period
 Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/chart-transfer-in.php",//url: "in-wallet-chart-dummy.json",
 type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
-processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,duration:periodType}// data to submit to server
-})).then(function(serverResponse){// retrieve the server response
+processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,duration:periodType// data to submit to server
+}})).then(function(serverResponse){// retrieve the server response
 serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// return the server response as an object
 return Promise.all([serverResponse,utopiasoftware.ally.dashboardCharts.loadWalletTransferInData()]);}).then(function(chartDataArray){// save the chart array data to cache
 chartDataArray[1]=chartDataArray[1];chartDataArray[1][periodType]=chartDataArray[0];return utopiasoftware.ally.dashboardCharts.saveWalletTransferInData(chartDataArray[1]);}).then(function(chartDataArray){// get the chart data array to be used by chart
@@ -628,8 +632,8 @@ utopiasoftware.ally.controller.dashboardPageViewModel.walletOutgoingChart.append
 // request for the user wallet transfer-in data for the provided time period
 Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/chart-transfer-out.php",//url: "in-wallet-chart-dummy.json",
 type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
-processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,duration:periodType}// data to submit to server
-})).then(function(serverResponse){// retrieve the server response
+processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,duration:periodType// data to submit to server
+}})).then(function(serverResponse){// retrieve the server response
 serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// return the server response as an object
 return Promise.all([serverResponse,utopiasoftware.ally.dashboardCharts.loadWalletTransferOutData()]);}).then(function(chartDataArray){// save the chart array data to cache
 chartDataArray[1]=chartDataArray[1];chartDataArray[1][periodType]=chartDataArray[0];return utopiasoftware.ally.dashboardCharts.saveWalletTransferOutData(chartDataArray[1]);}).then(function(chartDataArray){// get the chart data array to be used by chart
@@ -692,7 +696,7 @@ utopiasoftware.ally.controller.dashboardPageViewModel.expenseTrackerChart.append
              * @param chartDataArray {Array} array containing chart data objects to be mapped
              *
              * @return {Array} an array containing properly formatted objects that can be used by the chart
-             */function chartDataMapping(){var chartDataArray=arguments.length<=0||arguments[0]===undefined?[]:arguments[0];var totalSum=0;// the variable holds the grand total of all category summation
+             */function chartDataMapping(){var chartDataArray=arguments.length>0&&arguments[0]!==undefined?arguments[0]:[];var totalSum=0;// the variable holds the grand total of all category summation
 // get the grand total
 totalSum=chartDataArray.reduce(function(accumulator,currentValue){accumulator+=kendo.parseFloat(currentValue.SUM);return accumulator;},totalSum);return chartDataArray.map(function(dataObject){dataObject.SUM=kendo.parseFloat(dataObject.SUM);dataObject.LABELTEXT=kendo.toString(dataObject.SUM/totalSum,"p");return dataObject;// return the modified object
 });}},/**
@@ -722,8 +726,8 @@ utopiasoftware.ally.controller.dashboardPageViewModel.paymentsOutChart.appendTo(
 // request for the user wallet payments-out data for the provided time period
 Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/chart-payment-out.php",//url: "in-wallet-chart-dummy.json",
 type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
-processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,duration:periodType}// data to submit to server
-})).then(function(serverResponse){// retrieve the server response
+processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,duration:periodType// data to submit to server
+}})).then(function(serverResponse){// retrieve the server response
 serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// return the server response as an object
 return Promise.all([serverResponse,utopiasoftware.ally.dashboardCharts.loadPaymentOutData()]);}).then(function(chartDataArray){// save the chart array data to cache
 chartDataArray[1]=chartDataArray[1];chartDataArray[1][periodType]=chartDataArray[0];return utopiasoftware.ally.dashboardCharts.savePaymentOutData(chartDataArray[1]);}).then(function(chartDataArray){// get the chart data array to be used by chart
@@ -767,8 +771,8 @@ utopiasoftware.ally.controller.dashboardPageViewModel.paymentsInChart.appendTo('
 // request for the user wallet payments-in data for the provided time period
 Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/chart-payment-in.php",//url: "in-wallet-chart-dummy.json",
 type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
-processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,duration:periodType}// data to submit to server
-})).then(function(serverResponse){// retrieve the server response
+processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,duration:periodType// data to submit to server
+}})).then(function(serverResponse){// retrieve the server response
 serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// return the server response as an object
 return Promise.all([serverResponse,utopiasoftware.ally.dashboardCharts.loadPaymentInData()]);}).then(function(chartDataArray){// save the chart array data to cache
 chartDataArray[1]=chartDataArray[1];chartDataArray[1][periodType]=chartDataArray[0];return utopiasoftware.ally.dashboardCharts.savePaymentInData(chartDataArray[1]);}).then(function(chartDataArray){// get the chart data array to be used by chart
@@ -924,8 +928,8 @@ window.plugins.toast.showWithOptions({message:"No Internet Connection. Previousl
 window.plugins.toast.hide();}});// no internet connection, so use local cache of data
 resolve(utopiasoftware.ally.loadUserCachedAppDetails());}else{// there's internet, so make request for new data
 Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/get-profile.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
-processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone}// data to submit to server
-})).then(function(serverResponseText){serverResponseText+="";var userDetailsData=JSON.parse(serverResponseText.trim());// get the new user object
+processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone// data to submit to server
+}})).then(function(serverResponseText){serverResponseText+="";var userDetailsData=JSON.parse(serverResponseText.trim());// get the new user object
 // add a timestamp for the last time user details was updated
 userDetailsData._lastUpdatedDate=Date.now();// check if any error occurred
 if(userDetailsData.status=="error"){// an error occurred
@@ -1012,8 +1016,8 @@ window.plugins.toast.showWithOptions({message:"No Internet Connection. Previousl
 window.plugins.toast.hide();}});// no internet connection, so use local cache of data
 resolve(utopiasoftware.ally.loadUserCachedAppDetails());}else{// there's internet, so make request for new data
 Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/get-profile.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
-processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone}// data to submit to server
-})).then(function(serverResponseText){serverResponseText+="";var userDetailsData=JSON.parse(serverResponseText.trim());// get the new user object
+processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone// data to submit to server
+}})).then(function(serverResponseText){serverResponseText+="";var userDetailsData=JSON.parse(serverResponseText.trim());// get the new user object
 // add a timestamp for the last time user details was updated
 userDetailsData._lastUpdatedDate=Date.now();// check if any error occurred
 if(userDetailsData.status=="error"){// an error occurred
@@ -1341,8 +1345,8 @@ utopiasoftware.ally.controller.walletTransferPageViewModel.transfersOutChart.app
 // request for the user wallet transfer-in data for the provided time period
 Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/chart-transfer-out.php",//url: "in-wallet-chart-dummy.json",
 type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
-processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,duration:periodType}// data to submit to server
-})).then(function(serverResponse){// retrieve the server response
+processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,duration:periodType// data to submit to server
+}})).then(function(serverResponse){// retrieve the server response
 serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// return the server response as an object
 return Promise.all([serverResponse,utopiasoftware.ally.dashboardCharts.loadWalletTransferOutData()]);}).then(function(chartDataArray){// save the chart array data to cache
 chartDataArray[1]=chartDataArray[1];chartDataArray[1][periodType]=chartDataArray[0];return utopiasoftware.ally.dashboardCharts.saveWalletTransferOutData(chartDataArray[1]);}).then(function(chartDataArray){// get the chart data array to be used by chart
@@ -1736,8 +1740,8 @@ utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.paymentsOutChart.ap
 // request for the user wallet payments-out data for the provided time period
 Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/chart-payment-out.php",//url: "in-wallet-chart-dummy.json",
 type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
-processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,duration:periodType}// data to submit to server
-})).then(function(serverResponse){// retrieve the server response
+processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone,duration:periodType// data to submit to server
+}})).then(function(serverResponse){// retrieve the server response
 serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// return the server response as an object
 return Promise.all([serverResponse,utopiasoftware.ally.dashboardCharts.loadPaymentOutData()]);}).then(function(chartDataArray){// save the chart array data to cache
 chartDataArray[1]=chartDataArray[1];chartDataArray[1][periodType]=chartDataArray[0];return utopiasoftware.ally.dashboardCharts.savePaymentOutData(chartDataArray[1]);}).then(function(chartDataArray){// get the chart data array to be used by chart
@@ -2125,8 +2129,8 @@ console.log("DATASOURCE ",utopiasoftware.ally.controller.transactionHistoryPageV
 }//THERE IS AN INTERNET CONNECTION
 // request for the user wallet transfer-in data for the provided time period
 Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/transaction-report.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
-processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone}// data to submit to server
-})).then(function(serverResponse){// retrieve the server response
+processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone// data to submit to server
+}})).then(function(serverResponse){// retrieve the server response
 serverResponse+="";serverResponse=JSON.parse(serverResponse.trim());// return the server response as an object
 return Promise.all([serverResponse,utopiasoftware.ally.transactionHistoryCharts.loadTransactionHistoryData()]);}).then(function(dataArray){// save the grid array data to cache
 dataArray[1]=dataArray[1];dataArray[1]=dataArray[0];return utopiasoftware.ally.transactionHistoryCharts.saveTransactionHistoryData(dataArray[1]);}).then(function(dataArray){// get the data array to be used by grid
@@ -2487,7 +2491,7 @@ $('#menu-tabbar').get(0).setActiveTab(3);}},/**
          * @param periodType {String} the time period for which the chars should be refreshed
          * @param customStartDate {Date}
          * @param customEndDate {Date}
-         */refreshExpenseTrackerDisplays:function refreshExpenseTrackerDisplays(){var periodType=arguments.length<=0||arguments[0]===undefined?'today':arguments[0];var customStartDate=arguments[1];var customEndDate=arguments[2];// update the expense tracker grid
+         */refreshExpenseTrackerDisplays:function refreshExpenseTrackerDisplays(){var periodType=arguments.length>0&&arguments[0]!==undefined?arguments[0]:'today';var customStartDate=arguments[1];var customEndDate=arguments[2];// update the expense tracker grid
 utopiasoftware.ally.controller.expenseTrackerPageViewModel.updateExpenseTrackerGrid(periodType,customStartDate,customEndDate);// update the expense tracker barchart
 utopiasoftware.ally.controller.expenseTrackerPageViewModel.updateExpenseTrackerBarChart(periodType,customStartDate,customEndDate);// update the expense tracker doughnut chart
 utopiasoftware.ally.controller.expenseTrackerPageViewModel.updateExpenseTrackerDoughnutChart(periodType,customStartDate,customEndDate);},/**
@@ -2504,7 +2508,7 @@ utopiasoftware.ally.controller.expenseTrackerPageViewModel.refreshExpenseTracker
          * @param periodType
          * @param customStartDate
          * @param customEndDate
-         */updateExpenseTrackerGrid:function updateExpenseTrackerGrid(){var periodType=arguments.length<=0||arguments[0]===undefined?'today':arguments[0];var customStartDate=arguments[1];var customEndDate=arguments[2];var pdfExportBlob=null;// holds the blob for the pdf content being exported
+         */updateExpenseTrackerGrid:function updateExpenseTrackerGrid(){var periodType=arguments.length>0&&arguments[0]!==undefined?arguments[0]:'today';var customStartDate=arguments[1];var customEndDate=arguments[2];var pdfExportBlob=null;// holds the blob for the pdf content being exported
 // check if the Expense Tracker Grid has been created before, if so, show spinner
 if(utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid){// grid has previously been created
 // show spinner for the grid object
@@ -2574,7 +2578,7 @@ utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerGrid.sh
              * @param gridDataArray {Array} array containing grid data objects to be mapped
              *
              * @return {Array} an array containing properly formatted objects that can be used by the grid
-             */function gridDataMapping(){var gridDataArray=arguments.length<=0||arguments[0]===undefined?[]:arguments[0];return gridDataArray.map(function(dataObject){dataObject.DDATE=kendo.toString(kendo.parseDate(dataObject.DDATE,"yyyy-MM-dd"),"yyyy-MM-dd");// convert to date object
+             */function gridDataMapping(){var gridDataArray=arguments.length>0&&arguments[0]!==undefined?arguments[0]:[];return gridDataArray.map(function(dataObject){dataObject.DDATE=kendo.toString(kendo.parseDate(dataObject.DDATE,"yyyy-MM-dd"),"yyyy-MM-dd");// convert to date object
 dataObject.AMOUNT=kendo.parseFloat(dataObject.AMOUNT);// convert the amount from string to number
 return dataObject;// return the modified object
 });}},/**
@@ -2583,7 +2587,7 @@ return dataObject;// return the modified object
          * @param periodType
          * @param customStartDate
          * @param customEndDate
-         */updateExpenseTrackerBarChart:function updateExpenseTrackerBarChart(){var periodType=arguments.length<=0||arguments[0]===undefined?'today':arguments[0];var customStartDate=arguments[1];var customEndDate=arguments[2];// variable holds the object that contains the customisable settings for the chart created based on the 'periodType' parameter
+         */updateExpenseTrackerBarChart:function updateExpenseTrackerBarChart(){var periodType=arguments.length>0&&arguments[0]!==undefined?arguments[0]:'today';var customStartDate=arguments[1];var customEndDate=arguments[2];// variable holds the object that contains the customisable settings for the chart created based on the 'periodType' parameter
 var chartCustomisableSettings=null;switch(periodType){// check the periodType parameter and format chartCutomisableSetting accordingly
 case"today":chartCustomisableSettings={chartTitle:"ALLY Expense Tracker -Bar Chart (Today)",labelFormat:'ha',intervalType:'Hours'};break;case"weekly":chartCustomisableSettings={chartTitle:"ALLY Expense Tracker -Bar Chart (Last 7 Days)",labelFormat:'dMMM',intervalType:'Days'};break;case"monthly":chartCustomisableSettings={chartTitle:"ALLY Expense Tracker -Bar Chart (Last 30 Days)",labelFormat:'dMMM',intervalType:'Days'};break;case"custom":chartCustomisableSettings={chartTitle:"ALLY Expense Tracker -Bar Chart (Custom)",labelFormat:'dMMM',intervalType:'Days'};break;}// check if the walletIncoming Chart has been created before, of so destroy it
 if(utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerBarChart){// chart has previously been created
@@ -2624,14 +2628,14 @@ utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerBarChar
              * @param chartDataArray {Array} array containing chart data objects to be mapped
              *
              * @return {Array} an array containing properly formatted objects that can be used by the chart
-             */function chartDataMapping(){var chartDataArray=arguments.length<=0||arguments[0]===undefined?[]:arguments[0];return chartDataArray.map(function(dataObject){dataObject.SUM=kendo.parseFloat(dataObject.SUM)/1000;return dataObject;// return the modified object
+             */function chartDataMapping(){var chartDataArray=arguments.length>0&&arguments[0]!==undefined?arguments[0]:[];return chartDataArray.map(function(dataObject){dataObject.SUM=kendo.parseFloat(dataObject.SUM)/1000;return dataObject;// return the modified object
 });}},/**
          * update the expense track doughnut chart. Either using cached data or remote data
          *
          * @param periodType
          * @param customStartDate
          * @param customEndDate
-         */updateExpenseTrackerDoughnutChart:function updateExpenseTrackerDoughnutChart(){var periodType=arguments.length<=0||arguments[0]===undefined?'today':arguments[0];var customStartDate=arguments[1];var customEndDate=arguments[2];// variable holds the object that contains the customisable settings for the chart created based on the 'periodType' parameter
+         */updateExpenseTrackerDoughnutChart:function updateExpenseTrackerDoughnutChart(){var periodType=arguments.length>0&&arguments[0]!==undefined?arguments[0]:'today';var customStartDate=arguments[1];var customEndDate=arguments[2];// variable holds the object that contains the customisable settings for the chart created based on the 'periodType' parameter
 var chartCustomisableSettings=null;switch(periodType){// check the periodType parameter and format chartCutomisableSetting accordingly
 case"today":chartCustomisableSettings={chartTitle:"ALLY Expense Tracker -Doughnut Chart (Today)",labelFormat:'ha',intervalType:'Hours'};break;case"weekly":chartCustomisableSettings={chartTitle:"ALLY Expense Tracker -Doughnut Chart (Last 7 Days)",labelFormat:'dMMM',intervalType:'Days'};break;case"monthly":chartCustomisableSettings={chartTitle:"ALLY Expense Tracker -Doughnut Chart (Last 30 Days)",labelFormat:'dMMM',intervalType:'Days'};break;case"custom":chartCustomisableSettings={chartTitle:"ALLY Expense Tracker -Doughnut Chart (Custom)",labelFormat:'dMMM',intervalType:'Days'};break;}// check if the Doughnut Chart has been created before, of so destroy it
 if(utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerDoughnutChart){// chart has previously been created
@@ -2677,7 +2681,7 @@ utopiasoftware.ally.controller.expenseTrackerPageViewModel.expenseTrackerDoughnu
              * @param chartDataArray {Array} array containing chart data objects to be mapped
              *
              * @return {Array} an array containing properly formatted objects that can be used by the chart
-             */function chartDataMapping(){var chartDataArray=arguments.length<=0||arguments[0]===undefined?[]:arguments[0];var totalSum=0;// the variable holds the grand total of all category summation
+             */function chartDataMapping(){var chartDataArray=arguments.length>0&&arguments[0]!==undefined?arguments[0]:[];var totalSum=0;// the variable holds the grand total of all category summation
 // get the grand total
 totalSum=chartDataArray.reduce(function(accumulator,currentValue){accumulator+=kendo.parseFloat(currentValue.SUM);return accumulator;},totalSum);return chartDataArray.map(function(dataObject){dataObject.SUM=kendo.parseFloat(dataObject.SUM);dataObject.LABELTEXT=kendo.toString(dataObject.SUM/totalSum,"p");return dataObject;// return the modified object
 });}},/**
