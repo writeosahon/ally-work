@@ -45,7 +45,7 @@ if(currentPageView.toString()=='onboarding-template'||currentPageView.toString()
 $('#lock-screen-modal #lock-screen-lock-pin').val("");// hide the screen pin display message
 $('#lock-screen-modal #lock-screen-message').css("visibility","hidden");// show the lock screen modal
 $('#lock-screen-modal').get(0).show();},false);try{// lock the orientation of the device to 'PORTRAIT'
-screen.lockOrientation('portrait');}catch(err){}// set status bar color
+screen.orientation.lock('portrait');}catch(err){}// set status bar color
 StatusBar.backgroundColorByHexString("#2C8E01");// prepare the inapp browser plugin
 window.open=cordova.InAppBrowser.open;// use Promises to load the other cordova plugins
 new Promise(function(resolve,reject){// this promise  just sets the promise chain in motion

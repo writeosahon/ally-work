@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<widget xmlns = "http://www.w3.org/ns/widgets"  xmlns:gap="http://phonegap.com/ns/1.0" xmlns:cdv="http://cordova.apache.org/ns/1.0"  xmlns:android="http://schemas.android.com/apk/res/android" android-versionCode="32" version="1.1.2" id = "utopiasoftware.finguard.ally"  >
+<widget xmlns = "http://www.w3.org/ns/widgets"  xmlns:gap="http://phonegap.com/ns/1.0" xmlns:cdv="http://cordova.apache.org/ns/1.0"  xmlns:android="http://schemas.android.com/apk/res/android" android-versionCode="330" version="2.0.0" id = "utopiasoftware.finguard.ally"  >
 
     <name>ALLY</name>
     <description>Sample description</description>
@@ -7,7 +7,7 @@
     <content src="index.html"/>
 
     <preference name="android-build-tool" value="gradle" />
-    <preference name="SplashScreen" value="splash" />
+    <!--<preference name="SplashScreen" value="splash" />-->
 
     <allow-intent href="http://*/*"/>
     <allow-intent href="https://*/*"/>
@@ -21,11 +21,11 @@
     <allow-intent href="allyapp:*"/>
 
     <access origin="*"/>
-    <preference name="phonegap-version" value="cli-6.5.0" />
-    <preference name="xwalkMultipleApk" value="true" />
+    <preference name="phonegap-version" value="cli-8.0.0" />
+    <!--<preference name="xwalkMultipleApk" value="true" />
     <plugin name="cordova-plugin-crosswalk-webview" spec="https://github.com/writeosahon/cordova-plugin-crosswalk-webview.git" />
     <preference name="xwalkVersion" value="xwalk_core_library:23.53.589.4" />
-    <plugin name="cordova-build-architecture" spec="https://github.com/MBuchalik/cordova-build-architecture.git#v1.0.3" source="git" />
+    <plugin name="cordova-build-architecture" spec="https://github.com/MBuchalik/cordova-build-architecture.git#v1.0.3" source="git" />-->
     <!--<preference name="xwalk64bit" value="true" />
     <preference name="buildArchitecture" value="x86_64" />-->
 
@@ -36,20 +36,20 @@
                   android:maxSdkVersion="20" />
     </config-file>-->
 
-    <plugin name="cordova-plugin-statusbar" spec="2.1.3"/>
-    <plugin name="cordova-plugin-splashscreen" spec="3.2.2"/>
-    <plugin name="cordova-plugin-screen-orientation" spec="1.4.2"/>
-    <plugin name="cordova-plugin-network-information" spec="1.2.1"/>
+    <plugin name="cordova-plugin-statusbar" spec="2.4.2"/>
+    <plugin name="cordova-plugin-splashscreen" spec="5.0.2"/>
+    <plugin name="cordova-plugin-screen-orientation" spec="3.0.1"/>
+    <plugin name="cordova-plugin-network-information" spec="2.0.1"/>
     <plugin name="com-intel-security-cordova-plugin" spec="https://github.com/AppSecurityApi/com-intel-security-cordova-plugin.git"/>
-    <plugin name="cordova-plugin-x-toast" spec="2.6.0"/>
-    <plugin name="cordova-plugin-http" spec="https://github.com/writeosahon/cordova-HTTP.git"/>
+    <plugin name="cordova-plugin-x-toast" spec="2.6.2"/>
+    <plugin name="cordova-plugin-http" spec="https://github.com/writeosahon/cordova-HTTP.git#ally-2.0.0"/>
     <plugin name="cordova-plugin-sms" spec="1.0.5"/>
-    <plugin name="cordova-plugin-privacyscreen" spec="0.3.1"/>
-    <plugin name="cordova-plugin-inappbrowser" spec="1.4.0"/>
+    <plugin name="cordova-plugin-privacyscreen" spec="0.4.0"/>
+    <plugin name="cordova-plugin-inappbrowser" spec="3.0.0"/>
     <plugin name="cordova-plugin-contact-number-picker" spec="0.1.1"/>
     <plugin name="cordova-plugin-qrscanner" spec="2.5.0"/>
     <plugin name="ionic-plugin-keyboard" spec="2.2.1"/>
-    <plugin name="cordova-plugin-file" spec="4.3.0"/>
+    <plugin name="cordova-plugin-file" spec="6.0.1"/>
     <plugin name="cordova-plugin-customurlscheme" spec="4.3.0">
         <variable name="URL_SCHEME" value="allyapp"/>
         <variable name="ANDROID_SCHEME" value=" "/>
@@ -58,23 +58,29 @@
     </plugin>
     <plugin name="onesignal-cordova-plugin" spec="2.3.1"/>
     <plugin name="ally-images-sounds" spec="https://github.com/writeosahon/ally-work-images.git#1.0.0"/>
-    <plugin name="cordova-plugin-hockeyapp" spec="5.1.1"/>
-    <plugin name="cordova-plugin-code-push" spec="1.11.0"/>
+    <plugin name="cordova-plugin-hockeyapp" spec="5.1.2"/>
+    <plugin name="cordova-plugin-code-push" spec="1.11.10"/>
     <plugin name="cordova-plugin-app-version" spec="0.1.9"/>
+    <plugin name="cordova.plugins.diagnostic" source="4.0.6" />
     <plugin name="com.lampa.startapp" spec="0.1.4"/>
 
-    <plugin name="cordova-plugin-whitelist" spec="1.2.2"/>
+    <plugin name="cordova-plugin-whitelist" spec="1.3.3"/>
 
-    <config-file platform="android" parent="/*" mode="merge">
+    <config-file platform="android" target="AndroidManifest.xml" parent="/manifest">
         <uses-permission android:name="android.permission.INTERNET" />
     </config-file>
 
     <preference name="AndroidPersistentFileLocation" value="Internal" />
 
-    <config-file platform="android" target="AndroidManifest.xml" parent="/*" mode="merge">
+    <!--<config-file platform="android" target="AndroidManifest.xml" parent="/*" mode="merge">
         <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
         <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    </config-file>
+    </config-file>-->
+
+    <edit-config file="AndroidManifest.xml" target="/manifest/uses-permission" mode="merge">
+        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    </edit-config>
 
     <preference  name="AutoHideSplashScreen" value="true"/>
     <preference  name="SplashShowOnlyFirstTime" value="false"/>
@@ -91,8 +97,8 @@
     <preference name="CrosswalkAnimatable" value="true" /> <!-- this preference is required for QRScanner to work with CrossWalk -->
 
     <platform name="android" >
-        <preference name="android-minSdkVersion" value="16"/>
-        <preference name="android-targetSdkVersion" value="21"/>
+        <preference name="android-minSdkVersion" value="21"/>
+        <preference name="android-targetSdkVersion" value="27"/>
         <preference name="android-installLocation" value="auto"/>
         <preference name="android-signed" value="true"/>
         <preference name="Orientation" value="portrait"/>
@@ -104,26 +110,27 @@
     </platform>
 
 
-    <icon platform="android" src="package-assets/ldpi_icon.png" width="36" height="36" qualifier="ldpi"/>
-    <icon platform="android" src="package-assets/mdpi_icon.png" width="48" height="48" qualifier="mdpi"/>
-    <icon platform="android" src="package-assets/hdpi_icon.png" width="72" height="72" qualifier="hdpi"/>
-    <icon platform="android" src="package-assets/xhdpi_icon.png" width="96" height="96" qualifier="xhdpi" />
+    <icon platform="android" src="package-assets/ldpi_icon.png" width="36" height="36" density="ldpi"/>
+    <icon platform="android" src="package-assets/mdpi_icon.png" width="48" height="48" density="mdpi"/>
+    <icon platform="android" src="package-assets/hdpi_icon.png" width="72" height="72" density="hdpi"/>
+    <icon platform="android" src="package-assets/xhdpi_icon.png" width="96" height="96" density="xhdpi" />
 
-    <splash platform="android" src="package-assets/ldpi_portrait.png" width="320" height="426" orientation="portrait" qualifier="port-ldpi" />
-    <splash platform="android" src="package-assets/mdpi_portrait.png" width="320" height="470" orientation="portrait" qualifier="port-mdpi" />
-    <splash platform="android" src="package-assets/hdpi_portrait.png" width="480" height="640" orientation="portrait" qualifier="port-hdpi" />
-    <splash platform="android" src="package-assets/xhdpi_portrait.png" width="720" height="960" orientation="portrait" qualifier="port-xhdpi"/>
-    <splash platform="android" src="package-assets/ldpi_landscape.png" width="426" height="320" orientation="landscape" qualifier="land-ldpi"/>
-    <splash platform="android" src="package-assets/mdpi_landscape.png" width="470" height="320" orientation="landscape" qualifier="land-mdpi"/>
-    <splash platform="android" src="package-assets/hdpi_landscape.png" width="640" height="480" orientation="landscape" qualifier="land-hdpi"/>
-    <splash platform="android" src="package-assets/xhdpi_landscape.png" width="960" height="720" orientation="landscape" qualifier="land-xhdpi"/>
+    <platform name="android">
+        <splash src="package-assets/ldpi_portrait.png" width="320" height="426" orientation="portrait" density="port-ldpi" />
+        <splash src="package-assets/mdpi_portrait.png" width="320" height="470" orientation="portrait" density="port-mdpi" />
+        <splash src="package-assets/hdpi_portrait.png" width="480" height="640" orientation="portrait" density="port-hdpi" />
+        <splash src="package-assets/xhdpi_portrait.png" width="720" height="960" orientation="portrait" density="port-xhdpi"/>
+        <splash src="package-assets/ldpi_landscape.png" width="426" height="320" orientation="landscape" density="land-ldpi"/>
+        <splash src="package-assets/mdpi_landscape.png" width="470" height="320" orientation="landscape" density="land-mdpi"/>
+        <splash src="package-assets/hdpi_landscape.png" width="640" height="480" orientation="landscape" density="land-hdpi"/>
+        <splash src="package-assets/xhdpi_landscape.png" width="960" height="720" orientation="landscape" density="land-xhdpi"/>
+    </platform>
 
-
-    <config-file platform="android" parent="/manifest/application" mode="merge">
+    <edit-config file="AndroidManifest.xml" target="/manifest/application/activity[@android:launchMode='singleTop']" mode="merge">
         <activity android:launchMode="singleTop" />
-    </config-file>
+    </edit-config>
     <!-- used to change the background color of the small icon in ONE-SIGNAL push notification -->
-    <config-file platform="android" parent="/manifest/application" mode="add">
+    <config-file platform="android" target="AndroidManifest.xml" parent="/manifest/application">
         <meta-data android:name="com.onesignal.NotificationAccentColor.DEFAULT" android:value="FF30A401" />
     </config-file>
 

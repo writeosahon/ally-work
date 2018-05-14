@@ -122,7 +122,7 @@ utopiasoftware.ally.controller = {
 
         try {
             // lock the orientation of the device to 'PORTRAIT'
-            screen.lockOrientation('portrait');
+        screen.orientation.lock('portrait');
         }
         catch(err){}
 
