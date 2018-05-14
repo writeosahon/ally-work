@@ -21,7 +21,7 @@
     <allow-intent href="allyapp:*"/>
 
     <access origin="*"/>
-    <preference name="phonegap-version" value="cli-8.0.0" />
+    <preference name="phonegap-version" value="cli-7.1.0" />
     <!--<preference name="xwalkMultipleApk" value="true" />
     <plugin name="cordova-plugin-crosswalk-webview" spec="https://github.com/writeosahon/cordova-plugin-crosswalk-webview.git" />
     <preference name="xwalkVersion" value="xwalk_core_library:23.53.589.4" />
@@ -77,7 +77,7 @@
         <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     </config-file>-->
 
-    <edit-config file="app/src/main/AndroidManifest.xml" target="/manifest/uses-permission" mode="merge">
+    <edit-config file="AndroidManifest.xml" target="/manifest/uses-permission" mode="merge">
         <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
         <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     </edit-config>
@@ -126,7 +126,7 @@
         <splash src="package-assets/xhdpi_landscape.png" width="960" height="720" orientation="landscape" density="land-xhdpi"/>
     </platform>
 
-    <edit-config file="app/src/main/AndroidManifest.xml" target="/manifest/application/activity[@android:launchMode='singleTop']" mode="merge">
+    <edit-config file="AndroidManifest.xml" target="/manifest/application/activity[@android:launchMode='singleTop']" mode="merge">
         <activity android:launchMode="singleTop" />
     </edit-config>
     <!-- used to change the background color of the small icon in ONE-SIGNAL push notification -->
