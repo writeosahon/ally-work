@@ -36,8 +36,6 @@
                   android:maxSdkVersion="20" />
     </config-file>-->
 
-    <edit-config file="app/src/main/AndroidManifest.xml" target="/manifest/application" mode="merge"></edit-config>
-
     <plugin name="cordova-plugin-statusbar" spec="2.4.2"/>
     <plugin name="cordova-plugin-splashscreen" spec="5.0.2"/>
     <plugin name="cordova-plugin-screen-orientation" spec="3.0.1"/>
@@ -79,7 +77,7 @@
         <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     </config-file>-->
 
-    <edit-config file="AndroidManifest.xml" target="/manifest/uses-permission" mode="merge">
+    <edit-config file="app/src/main/AndroidManifest.xml" target="/manifest/uses-permission" mode="merge">
         <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
         <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     </edit-config>
@@ -128,7 +126,7 @@
         <splash src="package-assets/xhdpi_landscape.png" width="960" height="720" orientation="landscape" density="land-xhdpi"/>
     </platform>
 
-    <edit-config file="AndroidManifest.xml" target="/manifest/application/activity[@android:launchMode='singleTop']" mode="merge">
+    <edit-config file="app/src/main/AndroidManifest.xml" target="/manifest/application/activity[@android:launchMode='singleTop']" mode="merge">
         <activity android:launchMode="singleTop" />
     </edit-config>
     <!-- used to change the background color of the small icon in ONE-SIGNAL push notification -->
