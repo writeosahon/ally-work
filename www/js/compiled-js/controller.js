@@ -6552,7 +6552,15 @@ utopiasoftware.ally.controller = {
         /**
          * method is triggered when the SCAN button is clicked
          */
-        scanButtonClicked: function(){
+        scanButtonClicked: async function(){
+
+            var permissionStatuses = null; // holds the permission statuses for the permissions requested
+
+            permissionStatuses =  await new Promise(function(resolve, reject){
+                cordova.plugins.diagnostic.requestRuntimePermissions(resolve, reject,[
+                    cordova.plugins.diagnostic.permission.CAMERA
+                ]);
+            });
 
             // remove any tooltip being displayed on all forms on the page
             $('#payments-ally-scan-page [data-hint]').removeClass("hint--always hint--success hint--medium hint--rounded hint--no-animate");
@@ -6577,7 +6585,10 @@ utopiasoftware.ally.controller = {
                 QRScanner.show(function(status){ // make webview transparent
                     QRScanner.scan(function(err,qrCode){ // begin scanning QR code
 
-                        if(err){ // an error occurred, so inform the user
+                        if(err || !permissionStatuses ||
+                            permissionStatuses[cordova.plugins.diagnostic.permission.CAMERA] !==
+                            cordova.plugins.diagnostic.permissionStatus.GRANTED){ // an error occurred, so inform the user
+                            // ALSO check if the the requested runtime permissions were granted without errors
 
                             // remove page transparency
                             $('html, body').removeClass('ally-transparent');
