@@ -2118,7 +2118,7 @@ _context2.next=5;return new Promise(function(resolve,reject){cordova.plugins.dia
 pdfExportCompleteArgs.promise.then(function(pdfData){// get the pdf structure if the content being exported
 pdfExportBlob=pdfData.blobData;// get the blob for the exported pdf
 // check if the user has given permission to write pdf file to device
-if(!permissionStatuses||permissionStatuses[cordova.plugins.diagnostic.permission.WRITE_EXTERNAL_STORAGE]!==cordova.plugins.diagnostic.permissionStatus.GRANTED||permissionStatuses[cordova.plugins.diagnostic.permission.READ_EXTERNAL_STORAGE]!==cordova.plugins.diagnostic.permissionStatus.GRANTED){throw"error";}return new Promise(function(resolve,reject){// return the directory where to store the document/image
+if(!permissionStatuses||permissionStatuses[cordova.plugins.diagnostic.permission.WRITE_EXTERNAL_STORAGE]!==cordova.plugins.diagnostic.permissionStatus.GRANTED||permissionStatuses[cordova.plugins.diagnostic.permission.READ_EXTERNAL_STORAGE]!==cordova.plugins.diagnostic.permissionStatus.GRANTED){throw"error - no permissions";}return new Promise(function(resolve,reject){// return the directory where to store the document/image
 window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory,resolve,reject);});}).then(function(directory){return new Promise(function(resolve,reject){// return the created file which holds the pdf document
 directory.getFile('ALLY-Transactions-'+Date.now()+'.pdf',{create:true,exclusive:false},resolve,reject);});}).then(function(file){// get the file object
 fileObj=file;// assign the file object to the function variable
@@ -2148,7 +2148,7 @@ _context3.next=5;return new Promise(function(resolve,reject){cordova.plugins.dia
 pdfExportCompleteArgs.promise.then(function(pdfData){// get the pdf structure if the content being exported
 pdfExportBlob=pdfData.blobData;// get the blob for the exported pdf
 console.log("EXPORTED",pdfData);// check if the user has given permission to write pdf file to device
-if(!permissionStatuses||permissionStatuses[cordova.plugins.diagnostic.permission.WRITE_EXTERNAL_STORAGE]!==cordova.plugins.diagnostic.permissionStatus.GRANTED||permissionStatuses[cordova.plugins.diagnostic.permission.READ_EXTERNAL_STORAGE]!==cordova.plugins.diagnostic.permissionStatus.GRANTED){throw"error";}return new Promise(function(resolve,reject){// return the directory where to store the document/image
+if(!permissionStatuses||permissionStatuses[cordova.plugins.diagnostic.permission.WRITE_EXTERNAL_STORAGE]!==cordova.plugins.diagnostic.permissionStatus.GRANTED||permissionStatuses[cordova.plugins.diagnostic.permission.READ_EXTERNAL_STORAGE]!==cordova.plugins.diagnostic.permissionStatus.GRANTED){throw"error - no permissions";}return new Promise(function(resolve,reject){// return the directory where to store the document/image
 window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory,resolve,reject);});}).then(function(directory){return new Promise(function(resolve,reject){// return the created file which holds the pdf document
 directory.getFile('ALLY-Transactions-'+Date.now()+'.pdf',{create:true,exclusive:false},resolve,reject);});}).then(function(file){// get the file object
 fileObj=file;// assign the file object to the function variable

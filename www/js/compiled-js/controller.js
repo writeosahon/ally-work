@@ -7873,12 +7873,12 @@ utopiasoftware.ally.controller = {
                                     pdfExportBlob = pdfData.blobData; // get the blob for the exported pdf
 
                                     // check if the user has given permission to write pdf file to device
-                                    if(!permissionStatuses ||
+                                    if((!permissionStatuses) ||
                                         permissionStatuses[cordova.plugins.diagnostic.permission.WRITE_EXTERNAL_STORAGE] !==
                                         cordova.plugins.diagnostic.permissionStatus.GRANTED ||
                                         permissionStatuses[cordova.plugins.diagnostic.permission.READ_EXTERNAL_STORAGE] !==
                                         cordova.plugins.diagnostic.permissionStatus.GRANTED){
-                                        throw "error";
+                                        throw "error - no permissions";
                                     }
 
                                     return new Promise(function(resolve, reject){ // return the directory where to store the document/image
@@ -8026,12 +8026,12 @@ utopiasoftware.ally.controller = {
                                 console.log("EXPORTED", pdfData);
 
                                 // check if the user has given permission to write pdf file to device
-                                if(!permissionStatuses ||
+                                if((!permissionStatuses) ||
                                     permissionStatuses[cordova.plugins.diagnostic.permission.WRITE_EXTERNAL_STORAGE] !==
                                     cordova.plugins.diagnostic.permissionStatus.GRANTED ||
                                     permissionStatuses[cordova.plugins.diagnostic.permission.READ_EXTERNAL_STORAGE] !==
                                     cordova.plugins.diagnostic.permissionStatus.GRANTED){
-                                    throw "error";
+                                    throw "error - no permissions";
                                 }
 
                                 return new Promise(function(resolve, reject){ // return the directory where to store the document/image
