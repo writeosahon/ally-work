@@ -7873,7 +7873,7 @@ utopiasoftware.ally.controller = {
                                     pdfExportBlob = pdfData.blobData; // get the blob for the exported pdf
 
                                     // check if the user has given permission to write pdf file to device
-                                    if((!permissionStatuses) ||
+                                    if(
                                         permissionStatuses[cordova.plugins.diagnostic.permission.WRITE_EXTERNAL_STORAGE] !==
                                         cordova.plugins.diagnostic.permissionStatus.GRANTED ||
                                         permissionStatuses[cordova.plugins.diagnostic.permission.READ_EXTERNAL_STORAGE] !==
@@ -8026,7 +8026,7 @@ utopiasoftware.ally.controller = {
                                 console.log("EXPORTED", pdfData);
 
                                 // check if the user has given permission to write pdf file to device
-                                if((!permissionStatuses) ||
+                                if(
                                     permissionStatuses[cordova.plugins.diagnostic.permission.WRITE_EXTERNAL_STORAGE] !==
                                     cordova.plugins.diagnostic.permissionStatus.GRANTED ||
                                     permissionStatuses[cordova.plugins.diagnostic.permission.READ_EXTERNAL_STORAGE] !==
