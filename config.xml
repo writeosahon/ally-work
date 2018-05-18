@@ -82,7 +82,7 @@
     </edit-config>
 
     <edit-config file="AndroidManifest.xml" target="/manifest/uses-permission/[@android:name='android.permission.WRITE_EXTERNAL_STORAGE']" mode="overwrite">
-        <uses-permission xmlns:tools="http://schemas.android.com/tools" android:name="android.permission.WRITE_EXTERNAL_STORAGE"  android:maxSdkVersion="27" tools:node="replace" />
+        <uses-permission xmlns:tools="http://schemas.android.com/tools" android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="replace" />
     </edit-config>
 
     <preference  name="AutoHideSplashScreen" value="true"/>
