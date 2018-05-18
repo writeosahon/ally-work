@@ -6876,15 +6876,34 @@ utopiasoftware.ally.controller = {
                             { field: 'paymentReceiptValue', headerText: ' ', width: "50%", clipMode: 'ellipsiswithtooltip' }
                         ],
                         dataSource: [],
-                        pdfExportComplete: function(pdfExportCompleteArgs){
+                        pdfExportComplete: async function(pdfExportCompleteArgs){
                             console.log("ARGUMENTS", pdfExportCompleteArgs);
                             var fileObj = null; // variable holds the file object to be created
                             var pdfExportBlob = null; // holds the blob for the pdf content being exported
+
+                            var permissionStatuses = null; // holds the statuses of the runtime permissions requested
+
+                            // request runtime permissions to write pdf file to device
+                            permissionStatuses =  await new Promise(function(resolve, reject){
+                                cordova.plugins.diagnostic.requestRuntimePermissions(resolve, reject,[
+                                    cordova.plugins.diagnostic.permission.WRITE_EXTERNAL_STORAGE,
+                                    cordova.plugins.diagnostic.permission.READ_EXTERNAL_STORAGE
+                                ]);
+                            });
 
                             // get the blob data when the export process is completed
                             pdfExportCompleteArgs.promise.then(function(pdfData){ // get the pdf structure if the content being exported
                                 pdfExportBlob = pdfData.blobData; // get the blob for the exported pdf
                                 console.log("EXPORTED", pdfData);
+
+                                // check if the user has given permission to write pdf file to device
+                                if((!permissionStatuses) ||
+                                    permissionStatuses[cordova.plugins.diagnostic.permission.WRITE_EXTERNAL_STORAGE] !==
+                                    cordova.plugins.diagnostic.permissionStatus.GRANTED ||
+                                    permissionStatuses[cordova.plugins.diagnostic.permission.READ_EXTERNAL_STORAGE] !==
+                                    cordova.plugins.diagnostic.permissionStatus.GRANTED){
+                                    throw "error - no runtime permissions";
+                                }
 
                                 return new Promise(function(resolve, reject){ // return the directory where to store the document/image
                                     window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory, resolve, reject);
@@ -9473,14 +9492,33 @@ utopiasoftware.ally.controller = {
                                 }]
                             }],
                             dataSource: dataArray,
-                            pdfExportComplete: function(pdfExportCompleteArgs){
+                            pdfExportComplete: async function(pdfExportCompleteArgs){
                                 console.log("ARGUMENTS", pdfExportCompleteArgs);
                                 var fileObj = null; // variable holds the file object to be created
+
+                                var permissionStatuses = null; // holds the statuses of the runtime permissions requested
+
+                                // request runtime permissions to write pdf file to device
+                                permissionStatuses =  await new Promise(function(resolve, reject){
+                                    cordova.plugins.diagnostic.requestRuntimePermissions(resolve, reject,[
+                                        cordova.plugins.diagnostic.permission.WRITE_EXTERNAL_STORAGE,
+                                        cordova.plugins.diagnostic.permission.READ_EXTERNAL_STORAGE
+                                    ]);
+                                });
 
                                 // get the blob data when the export process is completed
                                 pdfExportCompleteArgs.promise.then(function(pdfData){ // get the pdf structure if the content being exported
                                     pdfExportBlob = pdfData.blobData; // get the blob for the exported pdf
                                     console.log("EXPORTED", pdfData);
+
+                                    // check if the user has given permission to write pdf file to device
+                                    if((!permissionStatuses) ||
+                                        permissionStatuses[cordova.plugins.diagnostic.permission.WRITE_EXTERNAL_STORAGE] !==
+                                        cordova.plugins.diagnostic.permissionStatus.GRANTED ||
+                                        permissionStatuses[cordova.plugins.diagnostic.permission.READ_EXTERNAL_STORAGE] !==
+                                        cordova.plugins.diagnostic.permissionStatus.GRANTED){
+                                        throw "error - no permissions";
+                                    }
 
                                     return new Promise(function(resolve, reject){ // return the directory where to store the document/image
                                         window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory, resolve, reject);
@@ -9642,14 +9680,33 @@ utopiasoftware.ally.controller = {
                             }]
                         }],
                         dataSource: dataArray,
-                        pdfExportComplete: function(pdfExportCompleteArgs){
+                        pdfExportComplete: async function(pdfExportCompleteArgs){
                             console.log("ARGUMENTS", pdfExportCompleteArgs);
                             var fileObj = null; // variable holds the file object to be created
+
+                            var permissionStatuses = null; // holds the statuses of the runtime permissions requested
+
+                            // request runtime permissions to write pdf file to device
+                            permissionStatuses =  await new Promise(function(resolve, reject){
+                                cordova.plugins.diagnostic.requestRuntimePermissions(resolve, reject,[
+                                    cordova.plugins.diagnostic.permission.WRITE_EXTERNAL_STORAGE,
+                                    cordova.plugins.diagnostic.permission.READ_EXTERNAL_STORAGE
+                                ]);
+                            });
 
                             // get the blob data when the export process is completed
                             pdfExportCompleteArgs.promise.then(function(pdfData){ // get the pdf structure if the content being exported
                                 pdfExportBlob = pdfData.blobData; // get the blob for the exported pdf
                                 console.log("EXPORTED", pdfData);
+
+                                // check if the user has given permission to write pdf file to device
+                                if((!permissionStatuses) ||
+                                    permissionStatuses[cordova.plugins.diagnostic.permission.WRITE_EXTERNAL_STORAGE] !==
+                                    cordova.plugins.diagnostic.permissionStatus.GRANTED ||
+                                    permissionStatuses[cordova.plugins.diagnostic.permission.READ_EXTERNAL_STORAGE] !==
+                                    cordova.plugins.diagnostic.permissionStatus.GRANTED){
+                                    throw "error - no runtime permissions";
+                                }
 
                                 return new Promise(function(resolve, reject){ // return the directory where to store the document/image
                                     window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory, resolve, reject);
