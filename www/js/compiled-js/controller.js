@@ -5457,15 +5457,33 @@ utopiasoftware.ally.controller = {
          * @param buttonElem
          * @returns {Promise}
          */
-        walletTransferSmsConfirmButtonClicked: function(buttonElem){
+        walletTransferSmsConfirmButtonClicked: async function(buttonElem){
 
             hockeyapp.trackEvent(function(){}, function(){}, "FUND TRANSFERRED"); // track fund transfer
 
             // get the details of the wall transfer for which an sms confirmation is being sent
             var walletTransferDetails = JSON.parse($(buttonElem).attr('data-wallet-transfer'));
 
+            var permissionStatuses = null; // holds the statuses of the runtime permissions requested
+
+            // request runtime permissions to send SMS on the device
+            permissionStatuses =  await new Promise(function(resolve, reject){
+                cordova.plugins.diagnostic.requestRuntimePermissions(resolve, reject,[
+                    cordova.plugins.diagnostic.permission.SEND_SMS
+                ]);
+            });
+
+
             // use a promise to send the sms confirmation message to the recipient
             new Promise(function(resolve, reject){
+
+                // check if the user has given permission to send sms on device
+                if((!permissionStatuses) ||
+                    permissionStatuses[cordova.plugins.diagnostic.permission.SEND_SMS] !==
+                    cordova.plugins.diagnostic.permissionStatus.GRANTED){
+                    throw "error - no runtime permissions";
+                }
+
                 // send sms
                 SMS.sendSMS(walletTransferDetails.receiver, "Hello, I just sent N" +
                     walletTransferDetails.amount + " to your ALLY wallet. Download ALLY using this link " +
