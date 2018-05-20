@@ -5369,10 +5369,30 @@ utopiasoftware.ally.controller = {
         /**
          * method is triggered when the 'Pick Contact" button is clicked
          */
-        pickContactButtonClicked: function(){
+        pickContactButtonClicked: async function(){
+
+            var permissionStatuses = null; // holds the statuses of the runtime permissions requested
+
+            // request runtime permissions to enable access to phone contacts
+            permissionStatuses =  await new Promise(function(resolve, reject){
+                cordova.plugins.diagnostic.requestRuntimePermissions(resolve, reject,[
+                    cordova.plugins.diagnostic.permission.READ_CONTACTS,
+                    cordova.plugins.diagnostic.permission.GET_ACCOUNTS
+                ]);
+            });
 
             // display the list of contacts from the user's phone address book
             new Promise(function(resolve, reject){
+
+                // check if the user has given permission to write pdf file to device
+                if((!permissionStatuses) ||
+                    permissionStatuses[cordova.plugins.diagnostic.permission.READ_CONTACTS] !==
+                    cordova.plugins.diagnostic.permissionStatus.GRANTED ||
+                    permissionStatuses[cordova.plugins.diagnostic.permission.GET_ACCOUNTS] !==
+                    cordova.plugins.diagnostic.permissionStatus.GRANTED){
+                    throw "error - no runtime permissions";
+                }
+
                 window.plugins.contactNumberPicker.pick(resolve, reject);
             }).
             then(function(contact){ // retrieve picked contact
@@ -8638,10 +8658,29 @@ utopiasoftware.ally.controller = {
         /**
          * method is triggered when the 'Pick Contact" button is clicked
          */
-        pickContactButtonClicked: function(){
+        pickContactButtonClicked: async function(){
+
+            var permissionStatuses = null; // holds the statuses of the runtime permissions requested
+
+            // request runtime permissions to enable access to phone contacts
+            permissionStatuses =  await new Promise(function(resolve, reject){
+                cordova.plugins.diagnostic.requestRuntimePermissions(resolve, reject,[
+                    cordova.plugins.diagnostic.permission.READ_CONTACTS,
+                    cordova.plugins.diagnostic.permission.GET_ACCOUNTS
+                ]);
+            });
 
             // display the list of contacts from the user's phone address book
             new Promise(function(resolve, reject){
+                // check if the user has given permission to write pdf file to device
+                if((!permissionStatuses) ||
+                    permissionStatuses[cordova.plugins.diagnostic.permission.READ_CONTACTS] !==
+                    cordova.plugins.diagnostic.permissionStatus.GRANTED ||
+                    permissionStatuses[cordova.plugins.diagnostic.permission.GET_ACCOUNTS] !==
+                    cordova.plugins.diagnostic.permissionStatus.GRANTED){
+                    throw "error - no runtime permissions";
+                }
+
                 window.plugins.contactNumberPicker.pick(resolve, reject);
             }).
             then(function(contact){ // retrieve picked contact
@@ -10943,6 +10982,60 @@ utopiasoftware.ally.controller = {
                     });
                 });
 
+                // add listener for when the sms notification setting is changed
+                $('#account-settings-sms-notification', $thisPage).on("change", function(toggleEvent){
+                    // show page preloader
+                    $('.page-preloader', $thisPage).css("display", "block");
+                    // update the user's sms notification setting
+                    Promise.resolve($.ajax(
+                        {
+                            url: utopiasoftware.ally.model.ally_base_url + "/mobile/sms-notification-save-status.php",
+                            type: "post",
+                            contentType: "application/x-www-form-urlencoded",
+                            beforeSend: function(jqxhr) {
+                                jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                            },
+                            dataType: "text",
+                            timeout: 240000, // wait for 4 minutes before timeout of request
+                            processData: true,
+                            data: {phone: utopiasoftware.ally.model.appUserDetails.phone,
+                                status: toggleEvent.originalEvent.value ? 1 : 0}
+                        }
+                    )).
+                    then(function(serverResponse){
+                        serverResponse = serverResponse.trim();
+                        if(serverResponse !== "success"){ // an error occured
+                            throw "error";
+                        }
+                        else{ // there was no error
+                            // hide page preloader
+                            $('.page-preloader', $thisPage).css("display", "none");
+                            // inform user that ussd settings have changed
+                            ons.notification.
+                            toast(`${toggleEvent.originalEvent.value ? 'Enabled' : 'Disabled'} SMS notifications`, {timeout:3000})
+                        }
+                    }).catch(function(){ // an error occurred
+                        // hide page preloader
+                        $('.page-preloader', $thisPage).css("display", "none");
+                        // inform the user of the error
+                        window.plugins.toast.showWithOptions({
+                            message: "your ALLY SMS notification setting could not be updated right now",
+                            duration: 4000,
+                            position: "top",
+                            styling: {
+                                opacity: 1,
+                                backgroundColor: '#ff0000', //red
+                                textColor: '#FFFFFF',
+                                textSize: 14
+                            }
+                        }, function(toastEvent){
+                            if(toastEvent && toastEvent.event == "touch"){ // user tapped the toast, so hide toast immediately
+                                window.plugins.toast.hide();
+                            }
+                        });
+                    });
+                });
+
 
                 // retrieve the app's currently version number and update the page footer display
                 Promise.resolve(cordova.getAppVersion.getVersionNumber()).
@@ -10967,7 +11060,7 @@ utopiasoftware.ally.controller = {
                     }
 
                 }).
-                then(function(){ // get the current user ussd setting from the app
+                then(function(){ // get the current user ussd setting from the app server
                     return Promise.resolve($.ajax(
                         {
                             url: utopiasoftware.ally.model.ally_base_url + "/mobile/ussd-get-status.php",
