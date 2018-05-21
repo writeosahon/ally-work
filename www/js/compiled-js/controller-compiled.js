@@ -2917,7 +2917,12 @@ return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mob
 processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone}}));}).then(function(serverResponse){// retrieve the server response and update the ussd settings accordingly
 serverResponse=window.parseInt(serverResponse.trim());// response could be either 1 or 0
 // the update the ussd settings display
-$('#account-settings-ussd',$thisPage).get(0).checked=serverResponse===1?true:false;}).then(function(){// remove page preloader
+$('#account-settings-ussd',$thisPage).get(0).checked=serverResponse===1?true:false;}).then(function(){// get the current user sms notification setting from the app server
+return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/sms-notification-get-status.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
+processData:true,data:{phone:utopiasoftware.ally.model.appUserDetails.phone}}));}).then(function(serverResponse){// retrieve the server response and update the sms notification settings accordingly
+serverResponse=window.parseInt(serverResponse.trim());// response could be either 1 or 0
+// the update the sms notification settings display
+$('#account-settings-sms-notification',$thisPage).get(0).checked=serverResponse===1?true:false;}).then(function(){// remove page preloader
 $('.page-preloader',$thisPage).css("display","none");}).catch(function(){// remove page preloader
 $('.page-preloader',$thisPage).css("display","none");window.plugins.toast.showWithOptions({message:"your account settings could not be updated right now. Please check your Internet connection",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#ff0000',//red
 textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately

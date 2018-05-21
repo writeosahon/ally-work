@@ -11081,6 +11081,27 @@ utopiasoftware.ally.controller = {
                     // the update the ussd settings display
                     $('#account-settings-ussd', $thisPage).get(0).checked = serverResponse === 1 ? true:false;
                 }).
+                then(function(){ // get the current user sms notification setting from the app server
+                    return Promise.resolve($.ajax(
+                        {
+                            url: utopiasoftware.ally.model.ally_base_url + "/mobile/sms-notification-get-status.php",
+                            type: "post",
+                            contentType: "application/x-www-form-urlencoded",
+                            beforeSend: function(jqxhr) {
+                                jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                            },
+                            dataType: "text",
+                            timeout: 240000, // wait for 4 minutes before timeout of request
+                            processData: true,
+                            data: {phone: utopiasoftware.ally.model.appUserDetails.phone}
+                        }
+                    ));
+                }).
+                then(function(serverResponse){ // retrieve the server response and update the sms notification settings accordingly
+                    serverResponse = window.parseInt(serverResponse.trim()); // response could be either 1 or 0
+                    // the update the sms notification settings display
+                    $('#account-settings-sms-notification', $thisPage).get(0).checked = serverResponse === 1 ? true:false;
+                }).
                 then(function(){
                     // remove page preloader
                     $('.page-preloader', $thisPage).css("display", "none");
