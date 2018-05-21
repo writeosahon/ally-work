@@ -1802,17 +1802,26 @@ if(navigator.connection.type===Connection.NONE){// no Internet Connection
 window.plugins.toast.showWithOptions({message:"merchant details cannot be found without an Internet Connection",duration:4000,position:"top",styling:{opacity:1,backgroundColor:'#ff0000',//red
 textColor:'#FFFFFF',textSize:14}},function(toastEvent){if(toastEvent&&toastEvent.event=="touch"){// user tapped the toast, so hide toast immediately
 window.plugins.toast.hide();}});return;// exit method immediately
-}// display the loader message to indicate that account is being created;
+}// display the loader message
 $('#hour-glass-loader-modal .modal-message').html("Finding Merchant Details...");// create the form data to be submitted
-var formData={merchantcode:$('#payments-ally-scan-page #payments-ally-scan-merchant-code').val().trim()};Promise.all([formData,$('#hour-glass-loader-modal').get(0).show()]).then(function(promiseDataArray){return Promise.resolve($.ajax({url:utopiasoftware.ally.model.ally_base_url+"/mobile/pay-merchant-normal.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
+var formData={merchantcode:$('#payments-ally-scan-page #payments-ally-scan-merchant-code').val().trim()};Promise.all([formData,$('#hour-glass-loader-modal').get(0).show()]).then(function(promiseDataArray){return Promise.all([Promise.resolve($.ajax(// find the merchant details
+{url:utopiasoftware.ally.model.ally_base_url+"/mobile/pay-merchant-normal.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
 processData:true,data:promiseDataArray[0]// data to submit to server
-}));}).then(function(serverResponse){serverResponse=JSON.parse((serverResponse+"").trim());// get the new user object
-// check if any error occurred
-if(serverResponse.status=="error"){// an error occured
-throw serverResponse.message;// throw the error message attached to this error
-}return serverResponse;// forward the serverResponse i.e the user details object
-}).then(function(serverResponse){// update the payment form with the data retrieved
-$('#payments-ally-direct-page #payments-ally-direct-merchant-code').val(serverResponse.usercode);$('#payments-ally-direct-page #payments-ally-direct-merchant-phone').val(serverResponse.phone);$('#payments-ally-direct-page #payments-ally-direct-merchant-name').val(serverResponse.merchantname);// flag that merchant payment is active
+})),Promise.resolve($.ajax(// check if the specified merchant has a discount attached
+{url:utopiasoftware.ally.model.ally_base_url+"/mobile/get-discount-status.php",type:"post",contentType:"application/x-www-form-urlencoded",beforeSend:function beforeSend(jqxhr){jqxhr.setRequestHeader("X-ALLY-APP","mobile");},dataType:"text",timeout:240000,// wait for 4 minutes before timeout of request
+processData:true,data:promiseDataArray[0]// data to submit to server
+}))]);}).then(function(serverResponseArray){// get the appropriate response objects contained in the serverResponseArray
+serverResponseArray[0]=JSON.parse((serverResponseArray[0]+"").trim());serverResponseArray[1]=JSON.parse((serverResponseArray[1]+"").trim());// check if any error occurred when finding the merchant details
+if(serverResponseArray[0].status=="error"){// an error occured
+throw serverResponseArray[0].message;// throw the error message attached to this error
+}return serverResponseArray;// forward the serverResponseArray
+}).then(function(serverResponseArray){// update the payment form with the merchant data retrieved
+$('#payments-ally-direct-page #payments-ally-direct-merchant-code').val(serverResponseArray[0].usercode);$('#payments-ally-direct-page #payments-ally-direct-merchant-phone').val(serverResponseArray[0].phone);$('#payments-ally-direct-page #payments-ally-direct-merchant-name').val(serverResponseArray[0].merchantname);// check if the merchant to be paid has an active discount
+if(serverResponseArray[1].status=="success"&&serverResponseArray[1].discount>0){// the merchant has an active discount
+// display the discount banner for merchant on the payments-ally-direct-page
+$('#payments-ally-direct-page .payments-ally-direct-discount-banner').css("display","block");$('#payments-ally-direct-page .payments-ally-direct-discount-banner .payments-ally-direct-discount-value').html(serverResponseArray[1].discount);}else{// the merchant does not have any active discount
+// hide the discount banner for merchant on the payments-ally-direct-page
+$('#payments-ally-direct-page .payments-ally-direct-discount-banner').css("display","none");}// flag that merchant payment is active
 utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment=true;// call the page pageHide method for this currently active page
 utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.pageHide();// proceed to payment section
 return $('#payments-page #payments-tabbar').get(0).setActiveTab(1);}).then(function(){$('#hour-glass-loader-modal').get(0).hide();// hide loader
