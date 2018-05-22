@@ -494,13 +494,13 @@
     border-style: solid;
 }
 #payments-ally-direct-page .payments-ally-direct-discount-banner::before { /** style for payments discount banner **/
-    border-width: 3.6em;
+    border-width: 3.3em;
     border-right-color: red;
     border-top-color: red;
 }
 #payments-ally-direct-page .payments-ally-direct-discount-banner::after { /** style for payments discount banner **/
     border-radius: 0.4em;
-    border-width: 3.6em;
+    border-width: 3.3em;
     border-right-color: red;
     border-top-color: red;
 }

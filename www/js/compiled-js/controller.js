@@ -6658,7 +6658,7 @@ utopiasoftware.ally.controller = {
                         utopiasoftware.ally.controller.paymentsAllyDirectPageViewModel.activePayment = true;
 
                         // pause the video preview
-                        QRScanner.pausePreview(function(status){
+                        QRScanner.pausePreview(async function(status){
                             // get each content of the QR Code
                             var qrCodeSegmentsArray = (qrCode + "").trim().split("|");
                             // update the contents of the payment form with the qrCodeSegmentsArray
@@ -6666,25 +6666,60 @@ utopiasoftware.ally.controller = {
                             $('#payments-ally-direct-page #payments-ally-direct-merchant-code').val(qrCodeSegmentsArray[1]);
                             $('#payments-ally-direct-page #payments-ally-direct-merchant-phone').val(qrCodeSegmentsArray[2]);
 
-                            // wait for some time before proceeding to payment
-                            window.setTimeout(function(){
+                            // remove page transparency
+                            $('html, body').removeClass('ally-transparent');
+                            $('#payments-page').removeClass('transparent');
+                            $('#payments-ally-scan-page').removeClass('transparent');
 
-                                // remove page transparency
-                                $('html, body').removeClass('ally-transparent');
-                                $('#payments-page').removeClass('transparent');
-                                $('#payments-ally-scan-page').removeClass('transparent');
+                            // hide the payment-ally-scan-modal & display the hour loader modal to let user know app is busy
+                            await Promise.all([$('#payments-ally-scan-modal').get(0).hide(),
+                                $('#hour-glass-loader-modal').get(0).show()]);
 
-                                // reset the form validator object on the page
-                                utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();
-                                // reset the form
-                                $('#payments-ally-scan-page #payments-ally-scan-form').get(0).reset();
+                            // reset the form validator object on the page
+                            utopiasoftware.ally.controller.paymentsAllyScanPageViewModel.formValidator.reset();
+                            // reset the form
+                            $('#payments-ally-scan-page #payments-ally-scan-form').get(0).reset();
 
-                                // hide the payment-ally-scan-modal
-                                $('#payments-ally-scan-modal').get(0).hide();
-                                // proceed to payment
-                                $('#payments-page #payments-tabbar').get(0).setActiveTab(1);
-                            }, 1000);
+                            try{ // check if the specified merchant has a discount attached
+                                var serverResponse = await Promise.resolve($.ajax(
+                                    {
+                                        url: utopiasoftware.ally.model.ally_base_url + "/mobile/get-discount-status.php",
+                                        type: "post",
+                                        contentType: "application/x-www-form-urlencoded",
+                                        beforeSend: function(jqxhr) {
+                                            jqxhr.setRequestHeader("X-ALLY-APP", "mobile");
+                                        },
+                                        dataType: "text",
+                                        timeout: 240000, // wait for 4 minutes before timeout of request
+                                        processData: true,
+                                        data: {merchantcode: qrCodeSegmentsArray[1]}}
+                                ));
 
+                                // convert the server response to valid json
+                                serverResponse = JSON.parse((serverResponse + "").trim());
+
+                                // check if the merchant to be paid has an active discount
+                                if(serverResponse.status == "success" &&
+                                    serverResponse.discount > 0){ // the merchant has an active discount
+                                    // display the discount banner for merchant on the payments-ally-direct-page
+                                    $('#payments-ally-direct-page .payments-ally-direct-discount-banner').css("display", "block");
+                                    $('#payments-ally-direct-page .payments-ally-direct-discount-banner .payments-ally-direct-discount-value').
+                                    html(serverResponse.discount);
+                                }
+                                else{ // the merchant does not have any active discount
+                                    // hide the discount banner for merchant on the payments-ally-direct-page
+                                    $('#payments-ally-direct-page .payments-ally-direct-discount-banner').css("display", "none");
+                                }
+
+                            }
+                            catch(err){ // catch any error,
+                                // but do nothing
+                            }
+                            finally{
+                                // hide the hour loader & proceed to payment
+                                Promise.all([$('#hour-glass-loader-modal').get(0).hide(),
+                                    $('#payments-page #payments-tabbar').get(0).setActiveTab(1)]);
+                            }
 
                         });
                     });
